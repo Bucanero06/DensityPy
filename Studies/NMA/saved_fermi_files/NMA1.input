@@ -1,0 +1,29 @@
+ ////////////////////////////////////////////////////////////////////////////////////
+&GATEWAY
+ Title = NMA
+ coord = NMA_molcas_optimised.xyz
+ basis = 6-31+g_st__st_.1.molcas
+ group = c1 //!this prevents use of symmetry
+ ////////////////////////////////////////////////////////////////////////////////////
+&SEWARD
+&SCF
+&RASSCF
+ LumOrb
+ nactel=6 0 0
+ Ras2= 4
+ inactive=17
+ TDM
+ CIRoot
+ 5 5 1
+&RASSI
+Nr of JobIph
+1 ALL
+MEES //!prints one-electron properties
+EJOB
+
+
+
+
+
+
+

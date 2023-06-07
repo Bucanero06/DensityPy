@@ -1,0 +1,176 @@
+ ////////////////////////////////////////////////////////////////////////////////////
+&GATEWAY
+ Title = NMA
+ coord = NMA_molcas_optimised.xyz
+ basis = 6-31+g_st__st_.1.molcas
+ group = c1 //!this prevents use of symmetry
+ ////////////////////////////////////////////////////////////////////////////////////
+// >> Do While
+// &SEWARD
+// &SCF
+// &SLAPAF
+//>>> EndDo
+////////////////////////////////////////////////////////////////////////////////////
+&SEWARD
+&SCF
+&RASSCF
+ LumOrb
+ nactel=6 0 0
+ Ras2= 4
+ inactive=17
+ TDM
+ CIRoot
+ 5 5 1
+&RASSI
+Nr of JobIph
+1 ALL
+MEES //!prints one-electron properties
+EJOB
+////////////////////////////////////////////////////////////////////////////////////
+//>>> Do while
+// &SEWARD
+// &RASSCF; nActEl=8 0 0; Inactive=16; Ras2=5//; CIRoot = 5 5 1;
+// &SLAPAF
+//>>> EndDo
+//
+////////////////////////////////////////////////////////////////////////////////////
+//>>> Do while
+// &SEWARD
+// &RASSCF; Title="NMA minimum"; nActEl=6 0 0; Inactive=17; Ras2=4//; CiRoot= 1- 10 1
+// &CASPT2 ;
+// &SLAPAF
+//>>> EndDo
+////////////////////////////////////////////////////////////////////////////////////
+//*CASPT2 energy for CH4 in acetone at a fixed nuclear geometry
+//*File: CASPT2.energy_solvent.CH4
+//*
+// RF−input
+//    PCM−model; solvent= water
+// End of RF−input
+//&SEWARD
+//&RASSCF
+// Spin= 1; Nactel= 6 0 0; Inactive= 2; Ras2= 6
+//&CASPT2
+// Frozen= 1
+// Multistate= 1 1
+// RFPert
+////////////////////////////////////////////////////////////////////////////////////
+
+//>>> EXPORT MOLCAS_MAXITER=300
+//>>> Do while
+// &SEWARD
+// >>> If ( Iter = 1 ) <<<
+//    &SCF
+// >>> EndIf <<<
+//
+// &RASSCF; nActEl=6 0 0; Inactive=17; Ras2=4 ;CIRoot = 5 5 1 ; Rlxroot=1
+// LumOrb
+// &CASPT2; Frozen=5; RFPert ; MultiState= 5 1 2 3 4 5
+// &SLAPAF
+////    MEP−search
+////    MEPStep=0.1
+//>>> EndDo
+////////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//a more detailed analysis of the nature of the obtained states it is also possible to obtain
+//in a graphical way the charge density differences between to states, typically the difference
+//between the ground and an excited state.
+//
+//OutOrbital
+// Natural= 5
+//&GRID_IT
+// FILEORB = $Project.RasOrb.1
+// NAME = 1; 17-21//All
+//&GRID_IT
+// FILEORB = $Project.RasOrb.2
+// NAME = 2; 17-21//All
+//&GRID_IT
+// FILEORB = $Project.RasOrb.3
+// NAME = 3; 17-21//All
+//&GRID_IT
+// FILEORB = $Project.RasOrb.4
+// NAME = 4; 17-21//All
+//&GRID_IT
+// FILEORB = $Project.RasOrb.5
+// NAME = 5; 17-21//All
+////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//&SEWARD
+//&SCF
+//&RASSCF
+// nactel= 0 0 0
+// Ras2= 0
+// inactive=20
+// TDM
+// CIRoot
+// 1 1 1
+//&RASSI
+//Nr of JobIph
+//1 ALL
+//MEES //!prints one-electron properties
+////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////
+//*RASSI calculation on five singlet excited states in NMA
+//*File: RASSI.excited.acrolein
+//*
+//&SEWARD; &SCF
+//&RASSCF
+//     Spin= 1; Nactel= 6 0 0; Inactive= 17; Ras2= 4
+// CiRoot= 10 10 1
+//// OutOrbital
+//// Natural= 5
+//&CASPT2
+// Frozen = 5
+// MultiState= 10 1 2 3 4 5 6 7 8 9 10
+//>>COPY $Project.JobMix JOB001
+//&RASSI
+// Nr of JobIph
+// 1 10
+// 1 2 3 4 5 6 7 8 9 10
+//EJob
+////////////////////////////////////////////////////////////////////////////////////
+//&GRID_IT
+// FILEORB = $Project.RasOrb.1
+// NAME = 1; 18-21//All
+//&GRID_IT
+// FILEORB = $Project.RasOrb.2
+// NAME = 2; 18-21//All
+//&GRID_IT
+// FILEORB = $Project.RasOrb.3
+// NAME = 3; 18-21//All
+//&GRID_IT
+// FILEORB = $Project.RasOrb.4
+// NAME = 4; 18-21//All
+//&GRID_IT
+// FILEORB = $Project.RasOrb.5
+// NAME = 5; z//All
+////////////////////////////////////////////////////////////////////////////////////
+//We want to compute vertical singlet-triplet gaps from the singlet ground state of acrolein to different, up to five, triplet excited states
+//*CASPT2/RASSI calculation on singlet−triplet gaps in acrolein
+//*File: CASPT2.S−T_gap.acrolein
+//*
+// AMFI
+//&SEWARD
+//&SCF
+//&RASSCF
+// Spin= 1; Nactel= 6 0 0; Inactive= 12; Ras2= 5
+// CiRoot= 1 1 1
+//&CASPT2
+// Frozen= 4
+// MultiState= 1 1
+//>>COPY $Project.JobMix JOB001
+//&RASSCF
+// LumOrb
+// Spin= 3; Nactel= 6 0 0; Inactive= 12; Ras2= 5
+// CiRoot= 5 5 1
+//&CASPT2
+// Frozen= 4
+// MultiState= 5 1 2 3 4 5
+//>>COPY $Project.JobMix JOB002
+//&RASSI
