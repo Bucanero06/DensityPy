@@ -1,0 +1,6 @@
+#CONFIDENTIAL
+Group   = D2h
+DataDir = ParentIons
+Charge  = 1
+LMaxMultipole = 3
+ParentIons = 1Ag.1 1B1g.1 1Au.1 3B2u.1 

@@ -1,0 +1,6 @@
+#Confidential
+StoreDirectory = store_Box500_Lmax10_ARES_Vel
+BasisFile = Basis
+AbsorptionFile = AbsorptionPotential
+PropagationFile = Propagation
+AnalysisFile = Analysis

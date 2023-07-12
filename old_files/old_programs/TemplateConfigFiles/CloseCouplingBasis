@@ -1,0 +1,63 @@
+# CONFIDENTIAL
+Group = D2h
+
+# It is possible, but not compulsory, to specify a maximum orbital
+# angular momentum for the external channels.
+LMAX = 4
+PARENT_ION_LIST= 1Ag.1; 1Ag.2; 1B3g.1; 3B1u.1; 3B2u.1; 3B2u.2 
+
+#Total symmetry: [<2S+1><Irrep>]
+[2Ag]{
+      
+     # One can specify the maximum l for the whole symmetry
+     LMAX=4
+     
+     # and the name of the parent ions that must be considered.
+     1Ag.1 
+     1Ag.2 
+     3B2u.1 
+
+     # One can also provide explicitly the list of all
+     # the l.m pairs to be coupled to the parent ions. In this
+     # case, the list of Xlm overwrites the implicit list determined
+     # by symmetry and LMAX (if defined). If an element of the Xlm
+     # list does not match the required symmetry, the program stops 
+     # issuing a syntax error.
+     1B3g.1 ( 2 -1, 4 -1, 4 -3 )
+     3B1u.1 ( 1  0, 3  0, 3  2 )
+}
+
+[2B1g]{ # If LMAX is not specified, all Xlm must be given
+     1Ag.1  ( 2 -2, 4 -2, 4 -4 )
+     1Ag.2  ( 2 -2, 4 -2, 4 -4 )
+     1B3g.1 ( 2 1, 4 1, 4 3 )
+     3B1u.1 ( 3 -2 )
+     3B2u.1 ( 1 1, 3 1, 3 3 )
+     3B2u.2 ( 1 1, 3 1, 3 3 )
+}
+
+# A semicolon can be used to put on the same line separate statements
+[2B2g]{ LMAX=6; 1Ag.1; 1Ag.2; 1B3g.1; 3B1u.1; 3B2u.1; 3B2u.2 }
+
+# One can incorporate in the definition of the parent ions a previously given
+# parent-ion list
+[2B3g]{ LMAX=6; PARENT_ION_LIST; 3B3u.1; 3B3u.2 }
+
+# If LMAX is defined outside, it is not necessary to specify it in the definition
+# of the close-coupling space for a given symmetry
+[2Au ]{ PARENT_ION_LIST }
+[2B1u]{ PARENT_ION_LIST }
+[2B2u]{ PARENT_ION_LIST }
+[2B3u]{ PARENT_ION_LIST }
+
+
+[4Ag ]{ PARENT_ION_LIST }
+[4B1g]{ PARENT_ION_LIST }
+[4B2g]{ PARENT_ION_LIST }
+[4B3g]{ PARENT_ION_LIST }
+[4Au ]{ PARENT_ION_LIST }
+[4B1u]{ PARENT_ION_LIST }
+[4B2u]{ PARENT_ION_LIST }
+[4B3u]{ PARENT_ION_LIST }
+
+
