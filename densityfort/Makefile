@@ -3,27 +3,23 @@ ALL_PRGS = astraBuildOperator          \
            astraConvertIntegralsUKRmol \
            astraConvertDensityMatrices \
            astraSetup                  \
+           astraCondition              \
            astraTest                   \
+           ChargeMigration             \
+           testBS_FEDVR                \
+	   Split3DGrid                 \
            TestIntegralsFullFullMatrix \
-           astraBuildSTEX_TDMs         \
-           TestBlocks
-           #astraCondition              \
-           #ChargeMigration             \
-           #testBS_FEDVR                \
-	   #Split3DGrid                 \
-           #TestIntegralsFullFullMatrix \
-           #testModuleMatrix
-           #ChargeMigrationFT           \
+           ChargeMigrationFT		\
+           SpectrumReconstruction           
+           #TestIntegralsFullFullMatrix
            #TemplateProgram             \
-           #ChargeMigration             \
-           #ChargeMigrationFT           \
            #testBS_FEDVR                \
-	   #Split3DGrid
+           #astraBuildSTEX_TDMs
            #TestAngularMomentum         \
            #tmp_LocLocMatrix            \
            #tmp_FullFullMatrix          \
            #TestBsplines_Juan           \
            #ComputeSpectrum_H0_CCO      \
-           #ComputeScatteringStates
+           #ComputeScatteringStates 
 
 include etc/CompilerOptions.mk

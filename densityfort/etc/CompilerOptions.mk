@@ -32,9 +32,15 @@ export HOST MAKE HOMEDIR LIBDIR INCLUDE COM COM_SHARE COM_ASTRA SHARE SHARE_ASTR
 
 ifeq ($(FC),ifort)
 
-  MKL_PATH=/opt/intel/mkl/lib/intel64
-  MKL_INCLUDE=/opt/intel/mkl/include
-  LINK_OPTS=-I$(MKL_PATH) -mkl -lmkl_lapack95_lp64 -lmkl_blas95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -I$(MKL_INCLUDE) 
+	#  MKL_PATH=/opt/intel/mkl/lib/intel64
+	#  MKL_INCLUDE=/opt/intel/mkl/include
+
+	# Via Intel's oneAPI Math Kernel Library (oneMKL)
+	MKL_PATH=/opt/intel/oneapi/mkl/latest/lib/intel64
+	MKL_INCLUDE=/opt/intel/oneapi/mkl/latest/include
+
+
+  LINK_OPTS=-I$(MKL_PATH) -qmkl -lmkl_lapack95_lp64 -lmkl_blas95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -I$(MKL_INCLUDE)
   MOD_OPTION=-I$(MKL_INCLUDE) -module
   ifeq ($(DEB_FLAG),d)
     F77_OPTS=-c -g -traceback -safe-cray-ptr ${DEFAULT_INT} 
@@ -89,6 +95,8 @@ export FC_OPTS F77_OPTS CC_OPTS LINK_OPTS MOD_OPTION MKL_PATH FC_OPTS_ATSP FC_MA
 
 LIBSRCDIR=${HOMEDIR}/libsrc
 libinstall:
+	mkdir -p $(BIN)
+
 	for i in $(LIBSRCDIR) ; \
 	do \
 		cd $$i ; \
@@ -115,8 +123,10 @@ $(ALL_PRGS) :
 	rm -f ../bin
 	ln -s $(BIN) ../bin
 
+
+
 #all : $(ALL_PRGS) TDSE_PETSc
-all : libinstall $(ALL_PRGS) 
+all : libinstall $(ALL_PRGS)
 
 TDSE_PETSc : export PRG_NAME=$(@F)
 TDSE_PETSc :

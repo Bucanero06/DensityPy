@@ -1,3 +1,5 @@
+# TODO: Update this file, make sure to also update auto example/template in main.py
+
 This document describes the steps to prepare the input files for a complete calculation of the charge migration in the CO2 molecule, subject to external pulses. This case study can be used as a reference for other systems as well, since each Project follows the same steps. 
 The process is highly automatized, with python scripts generating most of the necessary input files for the molcas and chargemigration programs. However, some of the parameters must be modified by the user both at the beginning and during the process.
 
@@ -23,14 +25,15 @@ Every project begins with a file containing the cartesian coordinates for the mo
 
 The xyz file specifies the number of atoms in the molecules, the molecule name, and the list of atoms with their symbol and cartesian coordinates in atomic units. The example below for the CO2 molecule, is taken from https://pubchem.ncbi.nlm.nih.gov/compound/Carbon-dioxide, where more examples of molecules at their equilibrium position can be found.
 
-
-    -------------------- CO2.xyz --------------------
-    3									     #Number of Atoms
-    Carbon Dioxide							     #Name of Molecule
-    O         -1.19700        0.00000        0.00000	     #Atoms
+```
+ -------------------- CO2.xyz --------------------
+    3					              # Number of Atoms
+    Carbon Dioxide		                      # Name of Molecule
+    O         -1.19700        0.00000        0.00000  # Atoms (coordinates)
     O          1.19700        0.00000        0.00000
     C          0.00000        0.00000        0.00000
     -------------------------------------------------
+```
 
 
 1b) To compute the energies and properties of the electronic states of the molecule, we need to specify the type of ab initio calculation Molcas should perform (e.g., HF, CASSCF, etc.), the orbital basis, etc. Finally, we need to run Molcas. The calculations are launched with a python script, which is based on the configuration file "chargemigration.ini".

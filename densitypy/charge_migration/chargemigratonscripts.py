@@ -39,6 +39,9 @@ def Write_Pulses(Field_File, Type_of_Pulse_Pump, Start_Time, Pump_Central_Freque
                  Type_of_Pulse_Probe, Time_Delay_Range, Probe_Central_Frequency,
                  Probe_Periods, Probe_Phase, Probe_Intensity, Probe_Polarization, writeCM):
     with open(Field_File, 'w') as fout:
+        Pump_Polarization = " ".join(map(str, Pump_Polarization))
+        Probe_Polarization = " ".join(map(str, Probe_Polarization))
+
         # >Writes Pump Pulse
         fout.write("[XUV]{( " + str(Type_of_Pulse_Pump) + " " +
                    str(Start_Time) + " " +
@@ -48,10 +51,16 @@ def Write_Pulses(Field_File, Type_of_Pulse_Pump, Start_Time, Pump_Central_Freque
                    str(Pump_Intensity) + " " +
                    str(Pump_Polarization) + " );}")
         for Time_Delay in Time_Delay_Range:
+            # split Probe_Polarization from list to string of the form "theta phi"
+
             # >Writes Probe Pulse
-            fout.write(
-                f"\n[PP{Time_Delay}]{{ XUV; ( {Type_of_Pulse_Probe} {Time_Delay} {Probe_Central_Frequency} "
-                f"{Probe_Periods} {Probe_Phase} {Probe_Intensity} {Probe_Polarization} );}}")
+            # fout.write("\n[PP" + str(Time_Delay) + "]{ XUV; ( " + str(Type_of_Pulse_Probe) + " " +
+            #            str(Time_Delay) + " " +
+            #            str(Probe_Central_Frequency) + " " +
+            #            str(Probe_Periods) + " " + str(Probe_Phase) + " " +
+            #            str(Probe_Intensity) + " " + " " + Probe_Polarization + " );}")
+            fout.write(f"\n[PP{Time_Delay}]{{ XUV; ( {Type_of_Pulse_Probe} {Time_Delay} {Probe_Central_Frequency} "
+                          f"{Probe_Periods} {Probe_Phase} {Probe_Intensity} {Probe_Polarization} );}}")
 
         fout.write("\nEXECUTE{")
         for Time_Delay in Time_Delay_Range:
@@ -60,7 +69,6 @@ def Write_Pulses(Field_File, Type_of_Pulse_Pump, Start_Time, Pump_Central_Freque
             fout.write("}")
         else:
             fout.write("XUV;}")
-
 
 # # >THIS IS AN EDIT IN PROGRESS DO NOT USE< USE THE ABOVE
 # def Write_Pulses(Field_File, Type_of_Pulse_Pump, Start_Time, Pump_Central_Frequency,
@@ -83,7 +91,7 @@ def Write_Pulses(Field_File, Type_of_Pulse_Pump, Start_Time, Pump_Central_Freque
 
 
 # >Calls Charge Migration Code and gives command line arguements (1)
-def Call_Charge_Migration(Input_Directory, Output_Directory, Number_Of_Times,
+def Call_Charge_Migration(Bin_Directory, Input_Directory, Output_Directory, Number_Of_Times,
                           Min_Time, Max_Time, Field_File, stept, stepw,
                           geometry, orbital_list, writeCMflag, Volume, debug_mode, weights_file, dephasing_factor,
                           relaxing_factor, bath_temp, iExcitation, iEPSILON):
@@ -104,6 +112,8 @@ def Call_Charge_Migration(Input_Directory, Output_Directory, Number_Of_Times,
     logger.info(screen_print)
     # >Runs Charge Migration (Fortran Code)
     execute_command(
+        f"export LD_LIBRARY_PATH='/opt/intel/oneapi/mkl/2023.2.0/lib/intel64:/opt/intel/oneapi/compiler/2023.2.0/linux/compiler/lib/intel64_lin:$LD_LIBRARY_PATH' &&"
+        f"{Bin_Directory}/"
         f"{debug_mode_decoy}ChargeMigration -i {Input_Directory} -o {Output_Directory} -nt {str(Number_Of_Times)} "
         f"-tmin {str(Min_Time)} -tmax {str(Max_Time)} -field {Field_File} -vol {str(Volume)} -stept {str(stept)} "
         f"-stepw {str(stepw)} -xyz {str(geometry)} {weights_file_decoy} {writeCMflag_decoy} -iorb "
@@ -111,7 +121,7 @@ def Call_Charge_Migration(Input_Directory, Output_Directory, Number_Of_Times,
         f"{str(dephasing_factor)} -s {iExcitation} -e {iEPSILON}")
 
 
-def Call_Charge_MigrationFT(Input_Directory, Output_Directory, geometry, Number_of_Omegas,
+def Call_Charge_MigrationFT(Bin_Directory, Input_Directory, Output_Directory, geometry, Number_of_Omegas,
                             Min_Omegas, Max_Omegas, Number_of_TauOmega, Min_TauOmega, Max_TauOmega,
                             TimeStep_FT, WidthStep_FT, Field_File, debug_mode, iExcitation, iEPSILON):
     screen_print = "Running ChargeMigrationFT"
@@ -129,7 +139,8 @@ def Call_Charge_MigrationFT(Input_Directory, Output_Directory, geometry, Number_
         f'-twmax {str(Min_TauOmega)} -twmin {str(Max_TauOmega)} -s {iExcitation} -e {iEPSILON}')
 
 
-def Save_Spectrum_Difference(Output_Directory, difference_file, Dephasing_Factor, Relaxing_Factor, Time_Delay_Start,
+def Save_Spectrum_Difference(Bin_Directory, Output_Directory, difference_file, Dephasing_Factor, Relaxing_Factor,
+                             Time_Delay_Start,
                              Time_Delay_Stop, Min_Omegas,
                              Max_Omegas, Pump_Periods, Probe_Periods, Pump_Intensity,
                              Probe_Intensity, Number_Of_PP, Pump_Phase, Probe_Phase, TimeStep_FT, WidthStep_FT,
@@ -168,7 +179,7 @@ def Dipole_Charge_Comparison(dipole_file, charge_file, output_file):
     system('rm temp_charge temp_dipole temp_difference')
 
 
-def Call_Spectrum_Reconstruction_n_Difference(MolcasOut, SimOut, Geometry, Number_of_Omegas,
+def Call_Spectrum_Reconstruction_n_Difference(Bin_Directory, MolcasOut, SimOut, Geometry, Number_of_Omegas,
                                               Min_Omegas, Max_Omegas, Number_of_TauOmega, Min_TauOmega, Max_TauOmega,
                                               debug_mode):
     screen_print = "Running Spectrum Reconstruction"

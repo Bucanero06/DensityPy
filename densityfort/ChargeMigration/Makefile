@@ -3,8 +3,8 @@
 EXTLIBS=
 
 #.. General files
-#..
-gen_ff77 = ipsort dpsort dquadpack xermsg
+#.. 
+gen_ff77 = ipsort dpsort dquadpack xermsg 
 
 gen_ff90 = \
 ModuleErrorHandling \
@@ -17,7 +17,7 @@ ModuleBSpline \
 ModuleParameterList \
 ModulePulses_3D \
 ncdphi \
-ModuleDiagonalize
+ModuleDiagonalize 
 
 #.. Local files
 #..
@@ -47,7 +47,7 @@ $(OBJ)/ModuleRTP.o: \
 $(OBJ)/Module_CD_IO.o: \
                     $(SHARE)/$(OBJ)/ModuleErrorHandling.o \
                     $(SHARE)/$(OBJ)/ModuleString.o
-
+ 
 
 #.. Commands with common syntax
 #..

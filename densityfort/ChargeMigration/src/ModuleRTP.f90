@@ -74,7 +74,7 @@ contains
     call List%Get( "-i",  strnBuf  )
     allocate(InpDir,source=trim(adjustl(strnBuf)))
     call List%Get( "-xyz",  strnBuf  )
-    allocate(FileGeometry,source=InpDir//"/"//trim(adjustl(strnBuf)))
+    allocate(FileGeometry,source=trim(adjustl(strnBuf)))
     call List%Get( "-nt",  nTimes  )
     call List%Get( "-tmin", Tmin  )
     call List%Get( "-tmax", Tmax  )

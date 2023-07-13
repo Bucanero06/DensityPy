@@ -69,6 +69,7 @@ def run(json_config, pymolcas_input, study_directory,
     Number_of_States = project_settings['number_of_states']
     List_of_Orbitals = project_settings['list_of_active_orbitals']
     Molcas_Directory = project_settings['molcas_output_directory']
+    Bin_Directory = project_settings['bin_directory']
 
     # Grid Settings
     grid_settings = config['grid_settings']
@@ -240,10 +241,10 @@ def run(json_config, pymolcas_input, study_directory,
         #
         iExcitation = -1  # Just Ground and Prepare
         iEPSILON = -1  # Just Ground and Prepare
-        Call_Charge_Migration(Molcas_Directory, Output_Directory, Number_of_Times,
-                              Min_Time, Max_Time, Field_File, TimeStep_FT, WidthStep_FT, XYZ_Geometry,
-                              List_of_Orbitals, writeCM, Volume, debug_mode, weights_file, Dephasing_Factor,
-                              Relaxing_Factor, Bath_Temp, iExcitation, iEPSILON)
+        Call_Charge_Migration(Bin_Directory, Molcas_Directory, Output_Directory, Number_of_Times, Min_Time, Max_Time,
+                              Field_File, TimeStep_FT, WidthStep_FT, XYZ_Geometry, List_of_Orbitals, writeCM, Volume,
+                              debug_mode, weights_file, Dephasing_Factor, Relaxing_Factor, Bath_Temp, iExcitation,
+                              iEPSILON)
 
         if old_main:
             pass
@@ -272,10 +273,10 @@ def run(json_config, pymolcas_input, study_directory,
         else:
             iExcitation = 0
             iEPSILON = 0
-            Call_Charge_Migration(Molcas_Directory, Output_Directory, Number_of_Times,
-                                  Min_Time, Max_Time, Field_File, TimeStep_FT, WidthStep_FT, XYZ_Geometry,
-                                  List_of_Orbitals, writeCM, Volume, debug_mode, weights_file, Dephasing_Factor,
-                                  Relaxing_Factor, Bath_Temp, iExcitation, iEPSILON)
+            Call_Charge_Migration(Bin_Directory, Molcas_Directory, Output_Directory, Number_of_Times, Min_Time,
+                                  Max_Time, Field_File, TimeStep_FT, WidthStep_FT, XYZ_Geometry, List_of_Orbitals,
+                                  writeCM, Volume, debug_mode, weights_file, Dephasing_Factor, Relaxing_Factor,
+                                  Bath_Temp, iExcitation, iEPSILON)
         SaveFile(json_config, f"{Output_Directory}/")
     # >ChargeMigrationFT
     if run_ChargeMigrationFT:
@@ -323,19 +324,20 @@ def run(json_config, pymolcas_input, study_directory,
         else:
             iExcitation = 0
             iEPSILON = 0
-            Call_Charge_MigrationFT(Molcas_Directory, Output_Directory, XYZ_Geometry, Number_of_Omegas,
+            Call_Charge_MigrationFT(Bin_Directory, Molcas_Directory, Output_Directory, XYZ_Geometry, Number_of_Omegas,
                                     Min_Omegas, Max_Omegas, Number_of_TauOmegas, Min_TauOmega, Max_TauOmega,
                                     TimeStep_FT, WidthStep_FT, Field_File, debug_mode, iExcitation, iEPSILON)
     # >SpectrumReconstruction
     if run_SpectrumReconstruction:
         if save_previous:
-            Save_Spectrum_Difference(Output_Directory, 'difference_' + Output_Directory, Dephasing_Factor,
-                                     Relaxing_Factor, Time_Delay_Start, Time_Delay_Stop, Min_Omegas, Max_Omegas,
-                                     Pump_Periods, Probe_Periods, Pump_Intensity, Probe_Intensity, Number_Of_PP,
-                                     Pump_Phase, Probe_Phase, TimeStep_FT, WidthStep_FT, Pump_Polarization,
-                                     Probe_Polarization, Number_of_Omegas, Min_TauOmega, Max_TauOmega)
+            Save_Spectrum_Difference(Bin_Directory, Output_Directory, 'difference_' + Output_Directory,
+                                     Dephasing_Factor, Relaxing_Factor, Time_Delay_Start, Time_Delay_Stop, Min_Omegas,
+                                     Max_Omegas, Pump_Periods, Probe_Periods, Pump_Intensity, Probe_Intensity,
+                                     Number_Of_PP, Pump_Phase, Probe_Phase, TimeStep_FT, WidthStep_FT,
+                                     Pump_Polarization, Probe_Polarization, Number_of_Omegas, Min_TauOmega,
+                                     Max_TauOmega)
         #
-        Call_Spectrum_Reconstruction_n_Difference(Molcas_Directory, Output_Directory, XYZ_Geometry,
+        Call_Spectrum_Reconstruction_n_Difference(Bin_Directory, Molcas_Directory, Output_Directory, XYZ_Geometry,
                                                   Number_of_Omegas, Min_Omegas, Max_Omegas, Number_of_TauOmegas,
                                                   Min_TauOmega, Max_TauOmega, debug_mode)
 
@@ -361,7 +363,7 @@ if __name__ == "__main__":
         weights_file=None,
         parallel=False,
         old_main=True,
-        givenfieldfile=None,
+        # givenfieldfile="Field_pulses",
         fieldfilehelp=False,
         save_previous=False,
 
@@ -372,6 +374,6 @@ if __name__ == "__main__":
         run_Kinetics=False,
 
         # Development Group
-        debug_mode=False,
+        debug_mode=True,
 
         )

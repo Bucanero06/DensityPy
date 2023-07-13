@@ -2,7 +2,7 @@
 ifeq ($(FC),ifort)
    FC_OPTS_GBTO=-O2 -c -i8
    #LINK_OPTS_GBTO=-mkl -i8 -Dusempi -Dsplitreduce -Dmpi64bitinteger
-   LINK_OPTS_GBTO=-mkl 
+   LINK_OPTS_GBTO=-qmkl
    MOD_OPTS_GBTO=-module 
 else ifeq($(FC),gfortran) 
    FC_OPTS_GBTO=-O2 -c -fdefault-integer-8 -ffree-line-length-132 
