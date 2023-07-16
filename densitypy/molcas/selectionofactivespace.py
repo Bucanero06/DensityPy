@@ -4,7 +4,7 @@ from configparser import ConfigParser
 from os import path
 import sys
 
-from densitypy.project_utils.def_functions import ExecutePymolcasWithErrorPrint, ExecuteNoWrite, Find
+from densitypy.project_utils.def_functions import execute_pymolcas_with_error_print, find
 
 
 def SelectionOfActiveSpace(ini_file):
@@ -33,13 +33,13 @@ def SelectionOfActiveSpace(ini_file):
 
     # Run Pymolcas using the input file previously created
     print("Wait while Molcas runs a SCF calculations and creates a Luscus file you can use to analyze the Orbitals")
-    ExecutePymolcasWithErrorPrint("pymolcas " + Project_Name + ".input -f", Project_Name)
+    execute_pymolcas_with_error_print("pymolcas " + Project_Name + ".input -f", Project_Name)
 
     # Look for <ProjectName>.lus file to be used by LUSCUS GUI
     pathtomolcasrc = path.expanduser("~/.Molcas/molcasrc")
     # molcas_workdir = GetValueOfAsString(pathtomolcasrc, "MOLCAS_WORKDIR", "=")
     molcas_workdir = "MOLCAS_WORKDIR"
-    luscusfiledirectory = Find(Project_Name + ".lus", ".", molcas_workdir)
+    luscusfiledirectory = find(Project_Name + ".lus", ".", molcas_workdir)
 
     # Call luscus to allow selection of Active Space
     print("Opening Molcas GUI Luscus")

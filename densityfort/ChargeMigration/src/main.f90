@@ -92,7 +92,6 @@ program ChargeMigration
     character(len = 64), pointer :: Simulation_Tagv(:)
     character(len = 1000) :: strn
     type(pulse_train), pointer :: train(:)
-
     !..
     !    B_{ij}^{\alpha} = \int d^3r \phi_i(\vec{r})\phi_j(\vec{r}) w_\alpha(\vec{r})
     !                    = BeckeMatrix(i,j,alpha)
@@ -177,7 +176,6 @@ program ChargeMigration
     !.. Load Orbitals
     call LoadOrbitals(InpDir, nOrb, ivOrb, npts, OrbTab)! $\varphi_n(\vec{r}_i)$
 
-
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !.. Compute and Write or Read Becke's Weights
     if(.not. SaveDensity)then
@@ -187,10 +185,24 @@ program ChargeMigration
             call Read_Weights(Weight_File, WEIGHTV, nAtoms, nPts)
         else
             call ComputeAtomicWeights(nPts, gridv, nAtoms, AtCoord, WeightV, Radius_BS)
-            call Write_Weights(Weight_File // "_" // OUTDir, WEIGHTV, gridv, nAtoms, nPts)
+            call Write_Weights(OUTDir // "/" // Weight_File // "_" // OUTDir, WEIGHTV, gridv, nAtoms, nPts)
         endif
         !.. Compute Berycenter of Atmoic Charges
         call Compute_R_el(gridv, WeightV, OrbTab, R_el)
+        !
+        !!#########>>>>>>
+        !*** move to its own subroutine
+        open(newunit = uid, &
+                file = OutDir // "/" // "R_el_bc", &
+                form = "formatted", &
+                status = "unknown")
+        do iAtom = 1, nAtoms
+            write(uid, "(*(x,e24.14e3))") (R_el(iPol, iAtom), iPol = 1, 3)
+        end do
+        close(uid)
+
+        !!#########>>>>>>
+        !
         !.. Compute Becke's Matrix
         !    call ComputeBeckeMatrix(WeightV, OrbTab, BeckeMatrix)
         !    BeckeMatrix = BeckeMatrix * Computed_Volume
@@ -206,8 +218,8 @@ program ChargeMigration
 
 
     !.. Compute Liouvillian and Diagonalizes it
-    call ComputeLiouvillian01(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, DEPHASING_FACTOR, RELAXATION_FACTOR)
-    call DiagonalizeLindblad0(Liouvillian0, L0_Eval, L0_LEvec, L0_REvec)
+    call ComputeLiouvillian_0(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, DEPHASING_FACTOR, RELAXATION_FACTOR)
+    call DiagonalizeLindblad_0(Liouvillian0, L0_Eval, L0_LEvec, L0_REvec)
 
     allocate(zStatRho (nStates, nStates))
     allocate(zStatRho0(nStates, nStates))
@@ -252,7 +264,6 @@ program ChargeMigration
             !
             if(SaveDensity)then
                 call TabulateChargeDensity(OrbitalDensity, OrbTab, ChDen)
-                !                call TabulateChargeDensity1(OrbitalDensity, OrbTab, ChDen)
                 write(istrn, "(f12.4)")t
                 !..Makes new directory inside of ChargeDensity directory for each simulation
                 call system("mkdir -p " // OutDir // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)))
@@ -285,268 +296,104 @@ program ChargeMigration
 
 contains
 
-    !###############################>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-    subroutine Compute_R_el(gridv, WeightV, OrbTab, R_el)
-        real(kind(1d0)), allocatable, intent(in) :: OrbTab (:, :), gridv(:, :), WeightV(:, :)
-        real(kind(1d0)), allocatable, intent(out) :: R_el(:, :)
-
-        real(kind(1d0)) :: sum, m, r, sum1
-        integer :: nAtoms, nPts, nOrbs, iOrb, jOrb, uid
-        nAtoms = size(WeightV, 2)
-        nPts = size(WeightV, 1)
-        nOrbs = size(OrbTab, 2)
-
-        !
-        write(*, "(a)") "Computing Barycenters of the Atomic Charges"
-        !
-        allocate(R_el(3, nAtoms))
-
-        do iPol = 1, 3
-            do iAtom = 1, nAtoms
-                sum = 0.d0
-                sum1 = 0.d0
-                do iOrb = 1, nOrb
-                    do jOrb = 1, nOrb
-                        do iPts = 1, nPts
-                            m = WeightV(iPts, iAtom) * OrbTab(iPts, iOrb) * OrbTab(iPts, iOrb)
-                            r = gridv(iPol, iPts)
-                            sum = sum + ((m * r))
-                            sum1 = sum1 + m
-                        end do
-                    end do
-                end do
-                !
-                !
-                R_el(iPol, iAtom) = sum / sum1
-            end do
-        end do
-
-        open(newunit = uid, &
-                file = "R_el_bc", &
-                form = "formatted", &
-                status = "unknown")
-        do iAtom = 1, nAtoms
-            write(uid, "(*(x,e24.14e3))") (R_el(iPol, iAtom), iPol = 1, 3)
-        end do
-        close(uid)
-    end subroutine Compute_R_el
+    ! ################################################
+    !... Lindblad
+    ! ----------------------------------------------------
+    !.. Build the time-independent Lindblad superoperator
+    !..
+    !.. Linblad equation (Schroedinger representation)
+    !.. d/dt \rho(t) = -i [H,\rho(t)]+
+    !                     \sum_{mn} [ L_{mn} \rho(t) L_{mn}^\dagger -
+    !                    -\frac{1}{2} L_{mn}^\dagger L_{mn} \rho(t)
+    !                    -\frac{1}{2} \rho(t) L_{mn}^\dagger L_{mn}
+    !   H = H_0 + (\hat{\epsilon}\cdot\vec{\mu}) E(t)
     !
-    subroutine ComputeNewBeckeMatrix1(WeightV, OrbTab, Becke_new, Bary_center)
-        real(kind(1d0)), intent(in) :: WeightV(:, :)
-        real(kind(1d0)), intent(in) :: OrbTab (:, :)
-        real(kind(1d0)), allocatable, intent(out) :: Becke_new(:, :, :, :)
-        real(kind(1d0)), intent(in) :: Bary_center(:, :)
-
-        integer :: nPts, nOrbs, nAtoms
-        integer :: iPts, iOrb1, iOrb2, iAtom, iPol
-        real(kind(1d0)) :: dsum
-
-        !
-        write(*, "(a)") "Computing Becke's Matrix"
-        !
-        nAtoms = size(WeightV, 2)
-        nPts = size(WeightV, 1)
-        nOrbs = size(OrbTab, 2)
-
-        !        if(allocated(Becke_new))deallocate(Becke_new)
-        allocate(Becke_new(3, nOrbs, nOrbs, nAtoms))
-
-        Becke_new = 0.d0
-        do iPol = 1, 3
-            do iAtom = 1, nAtoms
-                do iOrb2 = 1, nOrbs
-                    do iOrb1 = 1, nOrbs
-                        do iPts = 1, nPts
-                            Becke_new(iPol, iOrb1, iOrb2, iAtom) = Becke_new(iPol, iOrb1, iOrb2, iAtom) + &
-                                    WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2) * &
-                                            Bary_center(iPol, iAtom)
-
-                        enddo
-                    enddo
-                enddo
-            enddo
-        end do
-    end subroutine ComputeNewBeckeMatrix1
+    !.. For pure dephasing without relaxation:
+    !   L_{nm} = \delta_{mn} \sqrt{\gamma_m/2} | m \rangle \langle m |
     !
-    subroutine ComputeNewBeckeMatrix2(WeightV, OrbTab, Becke_new, gridv)
-        real(kind(1d0)), intent(in) :: WeightV(:, :)
-        real(kind(1d0)), intent(in) :: OrbTab (:, :)
-        real(kind(1d0)), allocatable, intent(out) :: Becke_new(:, :, :, :)
-        real(kind(1d0)), intent(in) :: gridv(:, :)
-
-        integer :: nPts, nOrbs, nAtoms
-        integer :: iPts, iOrb1, iOrb2, iAtom, iPol
-        real(kind(1d0)) :: dsum
-
-        !
-        write(*, "(a)") "Computing Becke's Matrix"
-        !
-        nAtoms = size(WeightV, 2)
-        nPts = size(WeightV, 1)
-        nOrbs = size(OrbTab, 2)
-
-        if(allocated(Becke_new))deallocate(Becke_new)
-        allocate(Becke_new(3, nOrbs, nOrbs, nAtoms))
-
-        Becke_new = 0.d0
-        do iPol = 1, 3
-            do iAtom = 1, nAtoms
-                do iOrb2 = 1, nOrbs
-                    do iOrb1 = 1, nOrbs
-                        do iPts = 1, nPts
-                            Becke_new(iPol, iOrb1, iOrb2, iAtom) = Becke_new(iPol, iOrb1, iOrb2, iAtom) + &
-                                    WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2) * &
-                                            gridv(iPol, iPts)
-                        enddo
-                    enddo
-                enddo
-            enddo
-        end do
-    end subroutine ComputeNewBeckeMatrix2
+    !.. For relaxation without pure dephasing:
+    !   L_{mn} = (1-\delta_{nm}) \sqrt{\gamma_{mn}} |m\rangle \langle n|
+    !   subject to the constraint \gamma_{mn} = e^{-\beta \omega_{mn}} \gamma_{nm}
+    !   where \beta = 1/(k_B T)
     !
-    subroutine ComputeNewAtomicCharges(OrbitalDensity, Becke_new, QchargeVec_new)
-        real(kind(1d0)), intent(in) :: OrbitalDensity(:, :)
-        real(kind(1d0)), intent(in) :: Becke_new(:, :, :, :)
-        real(kind(1d0)), allocatable, intent(out) :: QchargeVec_new    (:, :)
+    subroutine ComputeLiouvillian_0(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, DEPHASING_FACTOR, RELAXATION_FACTOR)
+        real   (kind(1d0)), intent(in) :: Evec(:)
+        real   (kind(1d0)), intent(in) :: Dmat(:, :, :)
+        complex(kind(1d0)), allocatable, intent(out) :: Liouvillian0(:, :)
 
-        integer :: iAtom, nAtoms, nOrbs, jOrb, iOrb, nPts, iPol
-        real(kind(1d0)), external :: DDOT
-        real(kind(1d0)) :: dsum
-        nPts = size(Becke_new, 1)
-        nOrbs = size(Becke_new, 2)
-        nAtoms = size(Becke_new, 4)
-        allocate(QchargeVec_new(3, nAtoms))
+        real(kind(1d0)), intent(in) :: DEPHASING_FACTOR
+        real(kind(1d0)), intent(in) :: RELAXATION_FACTOR
+        real(kind(1d0)), intent(in) :: BATH_TEMPERATURE
 
-        QchargeVec_new = 0.d0
-        do iPol = 1, 3
-            do iAtom = 1, nAtoms
-                do jOrb = 1, nOrbs
-                    do iOrb = 1, nOrbs
-                        QchargeVec_new(iPol, iAtom) = QchargeVec_new(iPol, iAtom) + OrbitalDensity(iOrb, jOrb) &
-                                * Becke_new(iPol, iOrb, jOrb, iAtom)
-                        !                QchargeVec_new(iPol, iAtom) = ddot(nOrbs * nOrbs, OrbitalDensity, 1, Becke_new(iPol, 1, 1, iAtom), 1)
-                    end do
-                end do
-            enddo
-        end do
-    end subroutine ComputeNewAtomicCharges
+        integer :: nLiou, nStates, i, j, iLiou, i1, i2, iLiou1, iLiou2
+        !.. Dephasing and Relaxation Constants
+        real   (kind(1d0)), allocatable :: PairGamma(:, :), TotalGamma(:)
+        real   (kind(1d0)) :: AverageDipole, dBuf
+        real(kind(1d0)) :: BETA
 
-    subroutine ComputeDipole_new(Amat, OrbTab, Dipole_new_, gridv)
-        real(kind(1d0)), intent(in) :: Amat(:, :)
-        real(kind(1d0)), intent(in) :: OrbTab (:, :)
-        real(kind(1d0)), intent(in) :: gridv(:, :)
-        real(kind(1d0)), allocatable, intent(out) :: Dipole_new_(:)
-        integer :: nPts, nOrbs
-        integer :: iPts, iOrb, jOr
+        BETA = 1.d0 / (BOLTZMANN_CONSTANT_auK * BATH_TEMPERATURE)
 
-        nPts = size(OrbTab, 1)
-        nOrbs = size(OrbTab, 2)
+        nStates = size(Evec, 1)
 
-        if (.not.allocated(Dipole_new_))allocate(Dipole_new_(3))
-        Dipole_new_ = 1
-        do iPol = 1, 3
-            do iOrb = 1, nOrb
-                do jOrb = 1, nOrb
-                    do iPts = 1, nPts
-                        Dipole_new_(iPol) = Dipole_new_(iPol) + OrbTab(iPts, iOrb) * OrbTab(iPts, jOrb) * Amat(iOrb, jOrb) * gridv(iPol, iPts)
-                    enddo
-                enddo
-            enddo
-        end do
-
-    end subroutine ComputeDipole_new
-    !###############################>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
-    subroutine ComputeOrbitalDensity(zStatRho, TDM, Amat)
-        complex(kind(1d0)), intent(in) :: zStatRho(:, :)
-        real   (kind(1d0)), intent(in) :: TDM(:, :, :, :)
-        real   (kind(1d0)), allocatable, intent(out) :: Amat  (:, :)
-        integer :: nOrb, iOrbi, iOrbj, iStatei, iStatej
-
-        nOrb = size(TDM, 1)
-
-        if(allocated(Amat))then
-            if(abs(size(Amat, 1) - nOrb) + abs(size(Amat, 2) - nOrb)>0)then
-                deallocate(Amat)
-                allocate(Amat(nOrb, nOrb))
-            endif
-        else
-            allocate(Amat(nOrb, nOrb))
-        endif
+        nLiou = nStates ** 2
+        allocate(Liouvillian0(nLiou, nLiou))
+        Liouvillian0 = Z0
         !
-        !.. Build the expansion Matrix
-        !   $A_{nm}(t) = \sum_{IJ} P_{IJ}(t) \rho^{JI}_{nm}$
-        !   where $P_{IJ}(t)$ is the solution of a suitable Master equation, starting from $P_{IJ}(0)$
-        !   Here, we will neglect relaxation and decoherence and hence $P_{IJ}(t) = P_{IJ}(0) e^{-i\omega_{IJ}t}$
-        !   where $\omega_{IJ}=E_I-E_J$
-        Amat = 0.d0
-        do iOrbi = 1, nOrb
-            do iOrbj = 1, nOrb
+        !.. Unitary component
+        do iLiou = 1, nLiou
+            call LiouvilleToHilbertIndexes(iLiou, i, j)
+            Liouvillian0(iLiou, iLiou) = Evec(i) - Evec(j)
+        end do
+        !
+        !.. Determine the factors \gamma_{mn}
+        allocate(PairGamma(nStates, nStates))
+        PairGamma = 0.d0
+        do i = 1, nStates
+            !
+            dBuf = 0.d0
+            do j = 1, nStates
+                if(j==i)cycle
                 !
-                do iStatei = 1, nStates
-                    do iStatej = 1, nStates
-                        Amat(iOrbi, iOrbj) = Amat(iOrbi, iOrbj) + &
-                                dble(zStatRho(iStatei, iStatej) * TDM(iOrbi, iOrbj, iStatej, iStatei))
-                    enddo
-                enddo
+                AverageDipole = sqrt(sum(Dmat(i, j, :)**2) / 3.d0)
+                dBuf = dBuf + AverageDipole
+                !
+                !.. Relaxation Factor
+                PairGamma(i, j) = RELAXATION_FACTOR * AverageDipole
+                if(Evec(i)>Evec(j)) PairGamma(i, j) = PairGamma(i, j) * exp(-BETA * (Evec(i) - Evec(j)))
                 !
             enddo
+            !
+            !.. Dephasing Factor
+            PairGamma(i, i) = DEPHASING_FACTOR * sqrt(dBuf)
+            !
         enddo
-
-    end subroutine ComputeOrbitalDensity
-
-
-    subroutine TabulateChargeDensity(Amat, OrbTab, ChDen)
-        real(kind(1d0)), intent(in) :: Amat(:, :)
-        real(kind(1d0)), intent(in) :: OrbTab(:, :)
-        real(kind(1d0)), intent(out) :: ChDen(:)
-
-        integer :: nOrb, iOrbi, iOrbj
-
-        nOrb = size(OrbTab, 2)
-        !.. Tabulate Charge Density
-        ChDen = 0.d0
-        do iPts = 1, nPts
-            do iOrbi = 1, nOrb
-                do iOrbj = 1, nOrb
-                    ChDen(iPts) = ChDen(iPts) + OrbTab(iPts, iOrbi) * Amat(iOrbi, iOrbj) * OrbTab(iPts, iOrbj)
-                enddo
+        !
+        !.. Determines \Gamma_i = \sum_m \gamma_{mi}
+        allocate(TotalGamma(nStates))
+        do i = 1, nStates
+            TotalGamma(i) = sum(PairGamma(:, i))
+        enddo
+        !
+        !.. Dissipative component
+        do iLiou = 1, nLiou
+            call LiouvilleToHilbertIndexes(iLiou, i, j)
+            Liouvillian0(iLiou, iLiou) = Liouvillian0(iLiou, iLiou) - Zi * (TotalGamma(i) + TotalGamma(j)) / 2.d0
+        enddo
+        do i1 = 1, nStates
+            call HilbertToLiouvilleIndexes(i1, i1, iLiou1)
+            do i2 = 1, nStates
+                call HilbertToLiouvilleIndexes(i2, i2, iLiou2)
+                Liouvillian0(iLiou1, iLiou2) = Liouvillian0(iLiou1, iLiou2) + Zi * PairGamma(i1, i2)
             enddo
         enddo
-    end subroutine TabulateChargeDensity
-    !!!t
-    subroutine TabulateChargeDensity1(Amat, OrbTab, ChDen)
-        real(kind(1d0)), intent(in) :: Amat(:, :)
-        real(kind(1d0)), intent(in) :: OrbTab(:, :)
-        real(kind(1d0)), intent(out) :: ChDen(:)
 
-        integer :: nOrb, iOrbi, iOrbj
+    end subroutine ComputeLiouvillian_0
+    !.. Diagonalize the time-independent Lindblad superoperator
+    !<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-        nOrb = size(OrbTab, 2)
-        !.. Tabulate Charge Density
-        ChDen = 0.d0
-        do iPts = 1, nPts
-            do iOrbi = 1, nOrb
-                do iOrbj = 1, nOrb
-                    ChDen(iPts) = ChDen(iPts) + OrbTab(iPts, iOrbi) * OrbTab(iPts, iOrbj)
-                enddo
-            enddo
-        enddo
-    end subroutine TabulateChargeDensity1
-
-
-    complex(kind(1d0)) function zTraceFunction(zA) result(zTrace)
-        integer :: i
-        complex(kind(1d0)), intent(in) :: zA(:, :)
-        zTrace = 0.d0
-        do i = 1, size(zA, 1)
-            zTrace = zTrace + zA(i, i)
-        enddo
-    end function zTraceFunction
-
-
+    ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    ! Hilbert and Liouville space transformations subroutines
+    ! ----------------------------------------------------
     subroutine LiouvillianPropagator(L0_Eval, L0_LEvec, L0_REvec, zStatRho)
 
         complex(kind(1d0)), intent(in) :: L0_LEvec(:, :), L0_REvec(:, :), L0_Eval(:)
@@ -655,8 +502,35 @@ contains
         call ZGEMV("N", nLiou, nLiou, Z1, L0_REvec, nLiou, RhoVec2, 1, Z0, RhoVec, 1)
         call LiouvilleToHilbertMatrix(RhoVec, zStatRho)
     end subroutine LiouvillianPropagator
+    subroutine DiagonalizeLindblad_0(Liouvillian0, L0_Eval, L0_LEvec, L0_REvec)
+        complex(kind(1d0)), intent(inout) :: Liouvillian0(:, :)
+        complex(kind(1d0)), allocatable, intent(out) :: L0_LEvec(:, :), L0_REvec(:, :), L0_Eval(:)
+        complex(kind(1d0)), allocatable :: zmat(:, :)
+        integer :: nLiou, iLiou, n, i, j
 
+        nLiou = size(Liouvillian0, 1)
 
+        allocate(L0_LEvec(nLiou, nLiou))
+        allocate(L0_REvec(nLiou, nLiou))
+        allocate(L0_Eval (nLiou))
+        L0_LEvec = Z0
+        L0_REvec = Z0
+        L0_Eval = Z0
+        call Short_Diag(nLiou, Liouvillian0, L0_Eval, L0_LEvec, L0_REvec)
+        do iLiou = 1, nLiou
+            write(*, *) iLiou, L0_Eval(iLiou)
+        enddo
+        !.. Test that U_R U_L^\dagger is indeed the identity
+        n = nLiou
+        allocate(zmat(n, n))
+        zmat = Z0
+        call ZGEMM("N", "T", n, n, n, Z1, L0_REvec, n, L0_LEvec, n, Z0, zmat, n)
+        do i = 1, n
+            zmat(i, i) = zmat(i, i) - Z1
+        enddo
+        write(*, *)"|U_R U_L^+ -1|_1 = ", sum(abs(zmat))
+
+    end subroutine DiagonalizeLindblad_0
     subroutine HilbertToLiouvilleMatrix(RhoMat, RhoVec)
         complex(kind(1d0)), intent(in) :: RhoMat(:, :)
         complex(kind(1d0)), intent(out) :: RhoVec(:)
@@ -669,7 +543,6 @@ contains
             enddo
         enddo
     end subroutine HilbertToLiouvilleMatrix
-
     subroutine LiouvilleToHilbertMatrix(RhoVec, RhoMat)
         complex(kind(1d0)), intent(in) :: RhoVec(:)
         complex(kind(1d0)), intent(out) :: RhoMat(:, :)
@@ -683,7 +556,6 @@ contains
             enddo
         enddo
     end subroutine LiouvilleToHilbertMatrix
-
     subroutine HilbertToLiouvilleIndexes(i, j, iPair)
         integer, intent(in) :: i, j
         integer, intent(out) :: iPair
@@ -695,7 +567,6 @@ contains
             iPair = (i - 1) * i + j
         endif
     end subroutine HilbertToLiouvilleIndexes
-
     subroutine LiouvilleToHilbertIndexes(iPair, i, j)
         integer, intent(in) :: iPair
         integer, intent(out) :: i, j
@@ -713,357 +584,12 @@ contains
             j = iPair - n2 - n
         endif
     end subroutine LiouvilleToHilbertIndexes
+    !<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-    !    !####################
-    !!
-    !    !..FUNCTIONS
-    !    !
-    !    !.. Eq. 3 $w_a \vec(r)$  (WEIGHTS)
-    !    !Result =P_a(\vec{r})/\sum_bP_b(\vec{r}) $
-    real(kind(1d0)) function wkfun1(rvec, iAtom, AtCoord, &
-            nAtoms, k) result(res)
-        !
-        integer, intent(in) :: iAtom, k, nAtoms
-        real(kind(1d0)), intent(in) :: rvec(3), AtCoord(3, nAtoms)
-        !
-        res = Pkfuna1(rvec, iAtom, AtCoord, nAtoms, k) / PkfunTot1(rvec, AtCoord, nAtoms, k)
-    end function wkfun1
-    !
-    !    !..Eq. 3 \sum_bP_b(\vec{r}) in the denominator
-    !    !
-    real(kind(1d0)) function PkFunTot1(rvec, AtCoord, nAtoms, k) result(res)
-        integer, intent(in) :: nAtoms
-        real(kind(1d0)), intent(in) :: rvec(3), AtCoord(3, nAtoms)
-        integer, intent(in) :: k
-        integer :: iAtom
-        res = 0.d0
-        do iAtom = 1, nAtoms
-            res = res + Pkfuna1(rvec, iAtom, AtCoord, nAtoms, k)
-        enddo
-    end function PkFunTot1
-    !
-    !    !.. Eq. 2 P_a(\vec{r}) in and nominator of Eq. 3
-    !    !
-    real(kind(1d0)) function Pkfuna1(rvec, iAtom, AtCoord, nAtoms, k) result(res)
-        integer, intent(in) :: nAtoms, iAtom
-        real(kind(1d0)), intent(in) :: rvec(3), AtCoord(3, nAtoms)
-        integer, intent(in) :: k
-        integer :: jAtom
-        res = 1.d0
-        do jAtom = 1, nAtoms
-            if(jAtom == iAtom) cycle
-            res = res * skfunab1(rvec, AtCoord(:, iAtom), AtCoord(:, jAtom), k)
-        enddo
-    end function Pkfuna1
-    !
-    !    !..
-    !    !
-    real(kind(1d0)) function skfunab1(rvec, avec, bvec, k) result(res)
-        real(kind(1d0)), intent(in) :: rvec(3), avec(3), bvec(3)
-        integer, intent(in) :: k
-        real(kind(1d0)) :: mu
-        mu = EllipticalCoord1(rvec, avec, bvec)
-        res = skfun1(mu, k)
-    end function skfunab1
-    !
-    !    !.. $s(\mu): [-1,1]  \rightarrow [0,1]$  (Step Function)
-    !    !
-    real(kind(1d0)) function skfun1(mu, k) result(res)
-        implicit none
-        real(kind(1d0)), intent(in) :: mu
-        integer, intent(in) :: k
-        res = 0.5d0 * (1.d0 - fkfun1(mu, k))
-    end function skfun1
-    !
-    !    !.. Eq. 4 Recursive $f_k(\mu)$
-    !    !
-    real(kind(1d0)) recursive function fkfun1(mu, k) result(res)
-        implicit none
-        real(kind(1d0)), intent(in) :: mu
-        integer, intent(in) :: k
-        res = 0.5d0 * mu * (3.d0 - mu**2)
-        if(k==1)return
-        res = fkfun1(res, k - 1)
-    end function fkfun1
-    !
-    !    !.. Eq. 1 $\mu_{ab}(\vec{r})$
-    !    !
-    real(kind(1d0)) function EllipticalCoord1(rvec, avec, bvec) result(res)
-        real(kind(1d0)), intent(in) :: rvec(3), avec(3), bvec(3)
-        real(kind(1d0)) :: r_a, r_b, R_ab ! $r_a$, $r_b$, $R_ab$
-        r_a = EuclDist1(rvec, avec)
-        r_b = EuclDist1(rvec, bvec)
-        R_ab = EuclDist1(avec, bvec)
-        res = (r_a - r_b) / R_ab
-    end function EllipticalCoord1
-    !
-    !    !.. Distance
-    !    !
-    real(kind(1d0)) function EuclDist1(avec, bvec) result(res)
-        real(kind(1d0)), intent(in) :: avec(3), bvec(3)
-        real(kind(1d0)) :: cvec(3)
-        cvec = (avec - bvec)
-        res = sqrt(sum(cvec * cvec))
-    end function EuclDist1
-    !    !
-    !    !END OF FUNCTIONS
-    !
-
-
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!>>>>>>>>>>>>>>
-    subroutine ComputeVolume(nPts, Volume, gridv)
-        integer, intent(in) :: nPts
-        real(kind(1d0)), intent(out) :: Volume
-        real(kind(1d0)), allocatable, intent(in) :: gridv(:, :)
-        real(kind(1d0)) :: coord1, coord2, delta
-        real(kind(1d0)), parameter :: threshold = 1d-10
-
-        integer :: iPts, iCoord
-        Volume = 1.d0
-
-        do iCoord = 1, 3
-            coord1 = gridv(iCoord, 1)
-            delta = 1d10
-            do iPts = 2, nPts
-                coord2 = gridv(iCoord, iPts)
-                if (abs(coord1 - coord2)>threshold) then
-                    delta = min(delta, abs(coord1 - coord2))
-                endif
-            enddo
-            Volume = Volume * delta
-        enddo
-
-    end subroutine ComputeVolume
-
-    subroutine AtomicRadius_Bragg_Slater_Becke(AtomName, nAtom, Radius_BS)
-        real(kind(1d0)), allocatable, intent(out) :: Radius_BS(:)
-        integer, intent(in) :: nAtom
-        character(len = 16), intent(in) :: AtomName(:)
-        integer :: iAtom
-        allocate(Radius_BS(nAtom))
-
-        do iAtom = 1, nAtom
-            Radius_BS(iAtom) = Radius_Table(AtomName(iAtom))
-        end do
-    end subroutine AtomicRadius_Bragg_Slater_Becke
-
-
-    real(kind(1d0)) function Radius_Table(Atomic_Name) result(Atomic_Radius)
-        character(len = 16), intent(in) :: Atomic_Name
-
-        if (Atomic_Name == "H") then
-            Atomic_Radius = 0.35
-
-        elseif (Atomic_Name == "C") then
-            Atomic_Radius = 0.70
-
-        elseif (Atomic_Name == "N") then
-            Atomic_Radius = 0.65
-
-        elseif (Atomic_Name == "O") then
-            Atomic_Radius = 0.60
-
-        elseif (Atomic_Name == "Mg") then
-            Atomic_Radius = 1.50
-        end if
-
-    end function Radius_Table
-
-    subroutine ComputeAtomicCharges(OrbitalDensity, BeckeMatrix, QchargeVec)
-        real(kind(1d0)), intent(in) :: OrbitalDensity(:, :)
-        real(kind(1d0)), intent(in) :: BeckeMatrix   (:, :, :)
-        real(kind(1d0)), allocatable, intent(out) :: QchargeVec    (:)
-        integer :: iAtom, nAtoms, nOrbs, jOrb, iOrb
-        real(kind(1d0)), external :: DDOT
-        nOrbs = size(BeckeMatrix, 1)
-        nAtoms = size(BeckeMatrix, 3)
-        if(.not.allocated(QchargeVec))allocate(QchargeVec(nAtoms))
-        QchargeVec = 0.d0
-        do iAtom = 1, nAtoms
-            !            do jOrb = 1, nOrbs
-            !                do iOrb = 1, nOrbs
-            !                    QchargeVec(iAtom) = QchargeVec(iAtom) + OrbitalDensity(iOrb, jOrb) * BeckeMatrix(iOrb, jOrb, iAtom)
-            !                end do
-            !            end do
-            QchargeVec(iAtom) = ddot(nOrbs * nOrbs, OrbitalDensity, 1, BeckeMatrix(1, 1, iAtom), 1)
-        enddo
-    end subroutine ComputeAtomicCharges
-
-    subroutine ComputeBeckeMatrix(WeightV, OrbTab, Becke)
-        real(kind(1d0)), allocatable, intent(in) :: WeightV(:, :)
-        real(kind(1d0)), allocatable, intent(in) :: OrbTab (:, :)
-        real(kind(1d0)), allocatable, intent(out) :: Becke(:, :, :)
-
-        integer :: nPts, nOrbs, nAtoms
-        integer :: iPts, iOrb1, iOrb2, iAtom
-        real(kind(1d0)) :: dsum
-
-        nAtoms = size(WeightV, 2)
-        nPts = size(WeightV, 1)
-        nOrbs = size(OrbTab, 2)
-
-        if(allocated(Becke))deallocate(Becke)
-        allocate(Becke(nOrbs, nOrbs, nAtoms))
-
-        Becke = 0.d0
-        do iAtom = 1, nAtoms
-            do iOrb2 = 1, nOrbs
-                do iOrb1 = 1, nOrbs
-                    dsum = 0.d0
-                    do iPts = 1, nPts
-                        dsum = dsum + WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2)
-                    enddo
-                    Becke(iOrb1, iOrb2, iAtom) = dsum
-                enddo
-            enddo
-        enddo
-    end subroutine ComputeBeckeMatrix
-
-
-    subroutine ComputeAtomicWeights(nPts, gridv, nAtoms, AtCoord, WeightV, Radius_BS)
-        integer, intent(in) :: nPts, nAtoms
-        real(kind(1d0)), intent(in) :: gridv(:, :), AtCoord(:, :), Radius_BS(:)
-        real(kind(1d0)), allocatable, intent(out) :: WeightV(:, :)
-
-        integer, parameter :: k = 4
-        integer :: iPts, iAtom
-        real(kind(1d0)) :: rvec(3)
-
-        write(*, "(a)") "Computing Weights"
-
-        allocate(WEIGHTV(nPts, nAtoms))
-        do iPts = 1, nPts
-            rvec = gridv(:, iPts)
-            do iAtom = 1, nAtoms
-                WeightV(iPts, iAtom) = wkfun(rvec, iAtom, AtCoord, nAtoms, k, Radius_BS)
-            enddo
-        enddo
-    end subroutine ComputeAtomicWeights
-    !..FUNCTIONS
-    !
-    !.. Eq. 3 $w_a \vec(r)$  (WEIGHTS)
-    !Result =P_a(\vec{r})/\sum_bP_b(\vec{r}) $
-    real(kind(1d0)) function wkfun(rvec, iAtom, AtCoord, &
-            nAtoms, k, Radius_BS) result(res)
-        !
-        integer, intent(in) :: iAtom, k, nAtoms
-        real(kind(1d0)), intent(in) :: rvec(3), AtCoord(3, nAtoms), Radius_BS(:)
-        !
-        res = Pkfuna(rvec, iAtom, AtCoord, nAtoms, k, Radius_BS) / PkfunTot(rvec, AtCoord, nAtoms, k, Radius_BS)
-    end function wkfun
-
-    !..Eq. 3 \sum_bP_b(\vec{r}) in the denominator
-    !
-    real(kind(1d0)) function PkFunTot(rvec, AtCoord, nAtoms, k, Radius_BS) result(res)
-        integer, intent(in) :: nAtoms
-        real(kind(1d0)), intent(in) :: rvec(3), AtCoord(3, nAtoms), Radius_BS(:)
-        integer, intent(in) :: k
-        integer :: iAtom
-        res = 0.d0
-        do iAtom = 1, nAtoms
-            res = res + Pkfuna(rvec, iAtom, AtCoord, nAtoms, k, Radius_BS)
-        enddo
-    end function PkFunTot
-
-    !.. Eq. 2 P_a(\vec{r}) in and nominator of Eq. 3
-    !
-    real(kind(1d0)) function Pkfuna(rvec, iAtom, AtCoord, nAtoms, k, Radius_BS) result(res)
-        integer, intent(in) :: nAtoms, iAtom
-        real(kind(1d0)), intent(in) :: rvec(3), AtCoord(3, nAtoms), Radius_BS(:)
-        integer, intent(in) :: k
-        integer :: jAtom
-        real(kind(1d0)) :: a_ij, R_i, R_j
-        res = 1.d0
-        do jAtom = 1, nAtoms
-            if(jAtom == iAtom) cycle
-            R_i = Radius_BS(iAtom)
-            R_j = Radius_BS(jAtom)
-            a_ij = get_param_a(R_i, R_j)
-            res = res * skfunab(rvec, AtCoord(:, iAtom), AtCoord(:, jAtom), k, a_ij)
-        enddo
-    end function Pkfuna
-
-
-    !..
-    !
-    real(kind(1d0)) function skfunab(rvec, avec, bvec, k, a_ij) result(res)
-        real(kind(1d0)), intent(in) :: rvec(3), avec(3), bvec(3)
-        integer, intent(in) :: k
-        real(kind(1d0)) :: mu_old, mu_new, a_ij
-        mu_old = EllipticalCoord(rvec, avec, bvec)
-        mu_new = new_mu_transformation(mu_old, a_ij)
-        res = skfun(mu_new, k)
-    end function skfunab
-
-    !.. $s(\mu): [-1,1]  \rightarrow [0,1]$  (Step Function)
-    !
-    real(kind(1d0)) function skfun(mu, k) result(res)
-        implicit none
-        real(kind(1d0)), intent(in) :: mu
-        integer, intent(in) :: k
-        real(kind(1d0)) :: r_m
-
-        res = 0.5d0 * (1.d0 - fkfun(mu, k))
-    end function skfun
-
-    !.. Eq. 4 Recursive $f_k(\mu)$
-    !
-    real(kind(1d0)) recursive function fkfun(mu, k) result(res)
-        implicit none
-        real(kind(1d0)), intent(in) :: mu
-        integer, intent(in) :: k
-        res = 0.5d0 * mu * (3.d0 - mu**2)
-        if(k==1)return
-        res = fkfun(res, k - 1)
-    end function fkfun
-
-    !.. Eq. 1 $\mu_{ab}(\vec{r})$
-    !
-    real(kind(1d0)) function EllipticalCoord(rvec, avec, bvec) result(res)
-        real(kind(1d0)), intent(in) :: rvec(3), avec(3), bvec(3)
-        real(kind(1d0)) :: r_a, r_b, R_ab ! $r_a$, $r_b$, $R_ab$
-        r_a = EuclDist(rvec, avec)
-        r_b = EuclDist(rvec, bvec)
-        R_ab = EuclDist(avec, bvec)
-        res = (r_a - r_b) / R_ab
-    end function EllipticalCoord
-
-    !.. Distance
-    !
-    real(kind(1d0)) function EuclDist(avec, bvec) result(res)
-        real(kind(1d0)), intent(in) :: avec(3), bvec(3)
-        real(kind(1d0)) :: cvec(3)
-        cvec = (avec - bvec)
-        res = sqrt(sum(cvec * cvec))
-    end function EuclDist
-    !
-    !END OF FUNCTIONS
-
-
-    !..get_param_aij
-    !..
-    real(kind(1d0)) function get_param_a(R_i, R_j) result(a_ij)
-        real(kind(1d0)), intent(in) :: R_i, R_j
-        real(kind(1d0)) :: Chi
-        Chi = R_i / R_j
-        a_ij = (Chi - 1) / (Chi + 1)
-        if (abs(a_ij)>(0.5d0)) then
-            a_ij = 0.5d0
-        endif
-    end function get_param_a
-
-    real(kind(1d0)) function new_mu_transformation(mu, a_ij) result(res)
-        real(kind(1d0)), intent(in) :: mu, a_ij
-        res = mu + a_ij * (1 - mu**2)
-    end function new_mu_transformation
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!>>>>>>>>>>>>>>
-
-
-
-    subroutine DiagonalizeDipole(Dmat, &
-            EVEC_DX, zUMAT_DX, &
-            EVEC_DY, zUMAT_DY, &
-            EVEC_DZ, zUMAT_DZ)
+    ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    ! Called ... rn not going to organize these yet
+    ! ----------------------------------------------------
+    subroutine DiagonalizeDipole(Dmat, EVEC_DX, zUMAT_DX, EVEC_DY, zUMAT_DY, EVEC_DZ, zUMAT_DZ)
         real   (kind(1d0)), intent(in) :: Dmat(:, :, :)
         complex(kind(1d0)), allocatable, intent(out) :: zUMAT_DX(:, :), zUMAT_DY(:, :), zUMAT_DZ(:, :)
         real   (kind(1d0)), allocatable, intent(out) :: EVEC_DX(:), EVEC_DY(:), EVEC_DZ(:)
@@ -1104,404 +630,544 @@ contains
         deallocate(rmat)
 
     end subroutine DiagonalizeDipole
+    subroutine ComputeVolume(nPts, Volume, gridv)
+        integer, intent(in) :: nPts
+        real(kind(1d0)), intent(out) :: Volume
+        real(kind(1d0)), allocatable, intent(in) :: gridv(:, :)
+        real(kind(1d0)) :: coord1, coord2, delta
+        real(kind(1d0)), parameter :: threshold = 1d-10
 
-    !.. Build the time-independent Lindblad superoperator
+        integer :: iPts, iCoord
+        Volume = 1.d0
+
+        do iCoord = 1, 3
+            coord1 = gridv(iCoord, 1)
+            delta = 1d10
+            do iPts = 2, nPts
+                coord2 = gridv(iCoord, iPts)
+                if (abs(coord1 - coord2)>threshold) then
+                    delta = min(delta, abs(coord1 - coord2))
+                endif
+            enddo
+            Volume = Volume * delta
+        enddo
+
+    end subroutine ComputeVolume
+    subroutine Compute_R_el(gridv, WeightV, OrbTab, R_el) !!!***** refactor writing to Module RTP, hard coded... *****
+        real(kind(1d0)), allocatable, intent(in) :: OrbTab (:, :), gridv(:, :), WeightV(:, :)
+        real(kind(1d0)), allocatable, intent(out) :: R_el(:, :)
+
+        real(kind(1d0)) :: sum, m, r, sum1
+        integer :: nAtoms, nPts, nOrbs, iOrb, jOrb, uid
+        nAtoms = size(WeightV, 2)
+        nPts = size(WeightV, 1)
+        nOrbs = size(OrbTab, 2)
+
+        !
+        write(*, "(a)") "Computing Barycenters of the Atomic Charges"
+        !
+        allocate(R_el(3, nAtoms))
+
+        do iPol = 1, 3
+            do iAtom = 1, nAtoms
+                sum = 0.d0
+                sum1 = 0.d0
+                do iOrb = 1, nOrb
+                    do jOrb = 1, nOrb
+                        do iPts = 1, nPts
+                            m = WeightV(iPts, iAtom) * OrbTab(iPts, iOrb) * OrbTab(iPts, iOrb)
+                            r = gridv(iPol, iPts)
+                            sum = sum + ((m * r))
+                            sum1 = sum1 + m
+                        end do
+                    end do
+                end do
+                !
+                !
+                R_el(iPol, iAtom) = sum / sum1
+            end do
+        end do
+
+        !        open(newunit = uid, &
+        !                file = "R_el_bc", & !!!!!!! hard coded
+        !                form = "formatted", &
+        !                status = "unknown")
+        !        do iAtom = 1, nAtoms
+        !            write(uid, "(*(x,e24.14e3))") (R_el(iPol, iAtom), iPol = 1, 3)
+        !        end do
+        !        close(uid)
+    end subroutine Compute_R_el
+    subroutine AtomicRadius_Bragg_Slater_Becke(AtomName, nAtom, Radius_BS)
+        real(kind(1d0)), allocatable, intent(out) :: Radius_BS(:)
+        integer, intent(in) :: nAtom
+        character(len = 16), intent(in) :: AtomName(:)
+        integer :: iAtom
+        allocate(Radius_BS(nAtom))
+
+        do iAtom = 1, nAtom
+            Radius_BS(iAtom) = Radius_Table(AtomName(iAtom))
+        end do
+    end subroutine AtomicRadius_Bragg_Slater_Becke
+    subroutine ComputeNewAtomicCharges(OrbitalDensity, Becke_new, QchargeVec_new)
+        real(kind(1d0)), intent(in) :: OrbitalDensity(:, :)
+        real(kind(1d0)), intent(in) :: Becke_new(:, :, :, :)
+        real(kind(1d0)), allocatable, intent(out) :: QchargeVec_new    (:, :)
+
+        integer :: iAtom, nAtoms, nOrbs, jOrb, iOrb, nPts, iPol
+        real(kind(1d0)), external :: DDOT
+        real(kind(1d0)) :: dsum
+        nPts = size(Becke_new, 1)
+        nOrbs = size(Becke_new, 2)
+        nAtoms = size(Becke_new, 4)
+        allocate(QchargeVec_new(3, nAtoms))
+
+        QchargeVec_new = 0.d0
+        do iPol = 1, 3
+            do iAtom = 1, nAtoms
+                do jOrb = 1, nOrbs
+                    do iOrb = 1, nOrbs
+                        QchargeVec_new(iPol, iAtom) = QchargeVec_new(iPol, iAtom) + OrbitalDensity(iOrb, jOrb) &
+                                * Becke_new(iPol, iOrb, jOrb, iAtom)
+                        !                QchargeVec_new(iPol, iAtom) = ddot(nOrbs * nOrbs, OrbitalDensity, 1, Becke_new(iPol, 1, 1, iAtom), 1)
+                    end do
+                end do
+            enddo
+        end do
+    end subroutine ComputeNewAtomicCharges
+    subroutine ComputeOrbitalDensity(zStatRho, TDM, Amat)
+        complex(kind(1d0)), intent(in) :: zStatRho(:, :)
+        real   (kind(1d0)), intent(in) :: TDM(:, :, :, :)
+        real   (kind(1d0)), allocatable, intent(out) :: Amat  (:, :)
+        integer :: nOrb, iOrbi, iOrbj, iStatei, iStatej
+
+        nOrb = size(TDM, 1)
+
+        if(allocated(Amat))then
+            if(abs(size(Amat, 1) - nOrb) + abs(size(Amat, 2) - nOrb)>0)then
+                deallocate(Amat)
+                allocate(Amat(nOrb, nOrb))
+            endif
+        else
+            allocate(Amat(nOrb, nOrb))
+        endif
+        !
+        !.. Build the expansion Matrix
+        !   $A_{nm}(t) = \sum_{IJ} P_{IJ}(t) \rho^{JI}_{nm}$
+        !   where $P_{IJ}(t)$ is the solution of a suitable Master equation, starting from $P_{IJ}(0)$
+        !   Here, we will neglect relaxation and decoherence and hence $P_{IJ}(t) = P_{IJ}(0) e^{-i\omega_{IJ}t}$
+        !   where $\omega_{IJ}=E_I-E_J$
+        Amat = 0.d0
+        do iOrbi = 1, nOrb
+            do iOrbj = 1, nOrb
+                !
+                do iStatei = 1, nStates
+                    do iStatej = 1, nStates
+                        Amat(iOrbi, iOrbj) = Amat(iOrbi, iOrbj) + &
+                                dble(zStatRho(iStatei, iStatej) * TDM(iOrbi, iOrbj, iStatej, iStatei))
+                    enddo
+                enddo
+                !
+            enddo
+        enddo
+
+    end subroutine ComputeOrbitalDensity
+    subroutine ComputeAtomicWeights(nPts, gridv, nAtoms, AtCoord, WeightV, Radius_BS)
+        integer, intent(in) :: nPts, nAtoms
+        real(kind(1d0)), intent(in) :: gridv(:, :), AtCoord(:, :), Radius_BS(:)
+        real(kind(1d0)), allocatable, intent(out) :: WeightV(:, :)
+
+        integer, parameter :: k = 4
+        integer :: iPts, iAtom
+        real(kind(1d0)) :: rvec(3)
+
+        write(*, "(a)") "Computing Weights"
+
+        allocate(WEIGHTV(nPts, nAtoms))
+        do iPts = 1, nPts
+            rvec = gridv(:, iPts)
+            do iAtom = 1, nAtoms
+                WeightV(iPts, iAtom) = wkfun(rvec, iAtom, AtCoord, nAtoms, k, Radius_BS)
+            enddo
+        enddo
+    end subroutine ComputeAtomicWeights
+    subroutine TabulateChargeDensity(Amat, OrbTab, ChDen)
+        real(kind(1d0)), intent(in) :: Amat(:, :)
+        real(kind(1d0)), intent(in) :: OrbTab(:, :)
+        real(kind(1d0)), intent(out) :: ChDen(:)
+
+        integer :: nOrb, iOrbi, iOrbj
+
+        nOrb = size(OrbTab, 2)
+        !.. Tabulate Charge Density
+        ChDen = 0.d0
+        do iPts = 1, nPts
+            do iOrbi = 1, nOrb
+                do iOrbj = 1, nOrb
+                    ChDen(iPts) = ChDen(iPts) + OrbTab(iPts, iOrbi) * Amat(iOrbi, iOrbj) * OrbTab(iPts, iOrbj)
+                enddo
+            enddo
+        enddo
+    end subroutine TabulateChargeDensity
+    ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    ! Repeated subroutines ...? with slightly different names e.g. ComputeBeckeMatrix and ComputeNewBeckeMatrix1
+    ! ----------------------------------------------------
+    subroutine ComputeBeckeMatrix(WeightV, OrbTab, Becke)
+        real(kind(1d0)), allocatable, intent(in) :: WeightV(:, :)
+        real(kind(1d0)), allocatable, intent(in) :: OrbTab (:, :)
+        real(kind(1d0)), allocatable, intent(out) :: Becke(:, :, :)
+
+        integer :: nPts, nOrbs, nAtoms
+        integer :: iPts, iOrb1, iOrb2, iAtom
+        real(kind(1d0)) :: dsum
+
+        nAtoms = size(WeightV, 2)
+        nPts = size(WeightV, 1)
+        nOrbs = size(OrbTab, 2)
+
+        if(allocated(Becke))deallocate(Becke)
+        allocate(Becke(nOrbs, nOrbs, nAtoms))
+
+        Becke = 0.d0
+        do iAtom = 1, nAtoms
+            do iOrb2 = 1, nOrbs
+                do iOrb1 = 1, nOrbs
+                    dsum = 0.d0
+                    do iPts = 1, nPts
+                        dsum = dsum + WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2)
+                    enddo
+                    Becke(iOrb1, iOrb2, iAtom) = dsum
+                enddo
+            enddo
+        enddo
+    end subroutine ComputeBeckeMatrix
+    subroutine ComputeNewBeckeMatrix1(WeightV, OrbTab, Becke_new, Bary_center)
+        real(kind(1d0)), intent(in) :: WeightV(:, :)
+        real(kind(1d0)), intent(in) :: OrbTab (:, :)
+        real(kind(1d0)), allocatable, intent(out) :: Becke_new(:, :, :, :)
+        real(kind(1d0)), intent(in) :: Bary_center(:, :)
+
+        integer :: nPts, nOrbs, nAtoms
+        integer :: iPts, iOrb1, iOrb2, iAtom, iPol
+        real(kind(1d0)) :: dsum
+
+        !
+        write(*, "(a)") "Computing Becke's Matrix"
+        !
+        nAtoms = size(WeightV, 2)
+        nPts = size(WeightV, 1)
+        nOrbs = size(OrbTab, 2)
+
+        !        if(allocated(Becke_new))deallocate(Becke_new)
+        allocate(Becke_new(3, nOrbs, nOrbs, nAtoms))
+
+        Becke_new = 0.d0
+        do iPol = 1, 3
+            do iAtom = 1, nAtoms
+                do iOrb2 = 1, nOrbs
+                    do iOrb1 = 1, nOrbs
+                        do iPts = 1, nPts
+                            Becke_new(iPol, iOrb1, iOrb2, iAtom) = Becke_new(iPol, iOrb1, iOrb2, iAtom) + &
+                                    WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2) * &
+                                            Bary_center(iPol, iAtom)
+
+                        enddo
+                    enddo
+                enddo
+            enddo
+        end do
+    end subroutine ComputeNewBeckeMatrix1
+    subroutine ComputeNewBeckeMatrix2(WeightV, OrbTab, Becke_new, gridv)
+        real(kind(1d0)), intent(in) :: WeightV(:, :)
+        real(kind(1d0)), intent(in) :: OrbTab (:, :)
+        real(kind(1d0)), allocatable, intent(out) :: Becke_new(:, :, :, :)
+        real(kind(1d0)), intent(in) :: gridv(:, :)
+
+        integer :: nPts, nOrbs, nAtoms
+        integer :: iPts, iOrb1, iOrb2, iAtom, iPol
+        real(kind(1d0)) :: dsum
+
+        !
+        write(*, "(a)") "Computing Becke's Matrix"
+        !
+        nAtoms = size(WeightV, 2)
+        nPts = size(WeightV, 1)
+        nOrbs = size(OrbTab, 2)
+
+        if(allocated(Becke_new))deallocate(Becke_new)
+        allocate(Becke_new(3, nOrbs, nOrbs, nAtoms))
+
+        Becke_new = 0.d0
+        do iPol = 1, 3
+            do iAtom = 1, nAtoms
+                do iOrb2 = 1, nOrbs
+                    do iOrb1 = 1, nOrbs
+                        do iPts = 1, nPts
+                            Becke_new(iPol, iOrb1, iOrb2, iAtom) = Becke_new(iPol, iOrb1, iOrb2, iAtom) + &
+                                    WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2) * &
+                                            gridv(iPol, iPts)
+                        enddo
+                    enddo
+                enddo
+            enddo
+        end do
+    end subroutine ComputeNewBeckeMatrix2
+    ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    ! Not used in the code ...?
+    ! ----------------------------------------------------
+    subroutine ComputeAtomicCharges(OrbitalDensity, BeckeMatrix, QchargeVec)
+        real(kind(1d0)), intent(in) :: OrbitalDensity(:, :)
+        real(kind(1d0)), intent(in) :: BeckeMatrix   (:, :, :)
+        real(kind(1d0)), allocatable, intent(out) :: QchargeVec    (:)
+        integer :: iAtom, nAtoms, nOrbs, jOrb, iOrb
+        real(kind(1d0)), external :: DDOT
+        nOrbs = size(BeckeMatrix, 1)
+        nAtoms = size(BeckeMatrix, 3)
+        if(.not.allocated(QchargeVec))allocate(QchargeVec(nAtoms))
+        QchargeVec = 0.d0
+        do iAtom = 1, nAtoms
+            !            do jOrb = 1, nOrbs
+            !                do iOrb = 1, nOrbs
+            !                    QchargeVec(iAtom) = QchargeVec(iAtom) + OrbitalDensity(iOrb, jOrb) * BeckeMatrix(iOrb, jOrb, iAtom)
+            !                end do
+            !            end do
+            QchargeVec(iAtom) = ddot(nOrbs * nOrbs, OrbitalDensity, 1, BeckeMatrix(1, 1, iAtom), 1)
+        enddo
+    end subroutine ComputeAtomicCharges
+    subroutine ComputeDipole_new(Amat, OrbTab, Dipole_new_, gridv)
+        real(kind(1d0)), intent(in) :: Amat(:, :)
+        real(kind(1d0)), intent(in) :: OrbTab (:, :)
+        real(kind(1d0)), intent(in) :: gridv(:, :)
+        real(kind(1d0)), allocatable, intent(out) :: Dipole_new_(:)
+        integer :: nPts, nOrbs
+        integer :: iPts, iOrb, jOr
+
+        nPts = size(OrbTab, 1)
+        nOrbs = size(OrbTab, 2)
+
+        if (.not.allocated(Dipole_new_))allocate(Dipole_new_(3))
+        Dipole_new_ = 1
+        do iPol = 1, 3
+            do iOrb = 1, nOrb
+                do jOrb = 1, nOrb
+                    do iPts = 1, nPts
+                        Dipole_new_(iPol) = Dipole_new_(iPol) + OrbTab(iPts, iOrb) * OrbTab(iPts, jOrb) * Amat(iOrb, jOrb) * gridv(iPol, iPts)
+                    enddo
+                enddo
+            enddo
+        end do
+
+    end subroutine ComputeDipole_new
+    complex(kind(1d0)) function zTraceFunction(zA) result(zTrace)
+        integer :: i
+        complex(kind(1d0)), intent(in) :: zA(:, :)
+        zTrace = 0.d0
+        do i = 1, size(zA, 1)
+            zTrace = zTrace + zA(i, i)
+        enddo
+    end function zTraceFunction
+    ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    ! FUNCTIONS ... rn not going to organize these yet
+    ! ----------------------------------------------------
+    !..Radius_Table for atomic radius based on atomic name
+    real(kind(1d0)) function Radius_Table(Atomic_Name) result(Atomic_Radius)
+        character(len = 16), intent(in) :: Atomic_Name
+
+        if (Atomic_Name == "H") then
+            Atomic_Radius = 0.35
+
+        elseif (Atomic_Name == "C") then
+            Atomic_Radius = 0.70
+
+        elseif (Atomic_Name == "N") then
+            Atomic_Radius = 0.65
+
+        elseif (Atomic_Name == "O") then
+            Atomic_Radius = 0.60
+
+        elseif (Atomic_Name == "Mg") then
+            Atomic_Radius = 1.50
+        end if
+
+    end function Radius_Table
+    !..get_param_aij
+    real(kind(1d0)) function get_param_a(R_i, R_j) result(a_ij)
+        real(kind(1d0)), intent(in) :: R_i, R_j
+        real(kind(1d0)) :: Chi
+        Chi = R_i / R_j
+        a_ij = (Chi - 1) / (Chi + 1)
+        if (abs(a_ij)>(0.5d0)) then
+            a_ij = 0.5d0
+        endif
+    end function get_param_a
+    !..new_mu_transformation
+    real(kind(1d0)) function new_mu_transformation(mu, a_ij) result(res)
+        real(kind(1d0)), intent(in) :: mu, a_ij
+        res = mu + a_ij * (1 - mu**2)
+    end function new_mu_transformation
+    ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    ! Repeated FUNCTIONS ...?  with slightly different names e.g. wkfun and wkfun1
+    ! ----------------------------------------------------
+    ! ----------------------------------------------------
+    !.. Eq. 3 $w_a \vec(r)$  (WEIGHTS)
+    !Result =P_a(\vec{r})/\sum_bP_b(\vec{r}) $
+    real(kind(1d0)) function wkfun(rvec, iAtom, AtCoord, nAtoms, k, Radius_BS) result(res)
+        !
+        integer, intent(in) :: iAtom, k, nAtoms
+        real(kind(1d0)), intent(in) :: rvec(3), AtCoord(3, nAtoms), Radius_BS(:)
+        !
+        res = Pkfuna(rvec, iAtom, AtCoord, nAtoms, k, Radius_BS) / PkfunTot(rvec, AtCoord, nAtoms, k, Radius_BS)
+    end function wkfun
+    real(kind(1d0)) function wkfun1(rvec, iAtom, AtCoord, nAtoms, k) result(res)
+        !
+        integer, intent(in) :: iAtom, k, nAtoms
+        real(kind(1d0)), intent(in) :: rvec(3), AtCoord(3, nAtoms)
+        !
+        res = Pkfuna1(rvec, iAtom, AtCoord, nAtoms, k) / PkfunTot1(rvec, AtCoord, nAtoms, k)
+    end function wkfun1
+    ! ----------------------------------------------------
+    !..Eq. 3 \sum_bP_b(\vec{r}) in the denominator
+    real(kind(1d0)) function PkFunTot(rvec, AtCoord, nAtoms, k, Radius_BS) result(res)
+        integer, intent(in) :: nAtoms
+        real(kind(1d0)), intent(in) :: rvec(3), AtCoord(3, nAtoms), Radius_BS(:)
+        integer, intent(in) :: k
+        integer :: iAtom
+        res = 0.d0
+        do iAtom = 1, nAtoms
+            res = res + Pkfuna(rvec, iAtom, AtCoord, nAtoms, k, Radius_BS)
+        enddo
+    end function PkFunTot
+    real(kind(1d0)) function PkFunTot1(rvec, AtCoord, nAtoms, k) result(res)
+        integer, intent(in) :: nAtoms
+        real(kind(1d0)), intent(in) :: rvec(3), AtCoord(3, nAtoms)
+        integer, intent(in) :: k
+        integer :: iAtom
+        res = 0.d0
+        do iAtom = 1, nAtoms
+            res = res + Pkfuna1(rvec, iAtom, AtCoord, nAtoms, k)
+        enddo
+    end function PkFunTot1
+    ! ----------------------------------------------------
+    !.. Eq. 2 P_a(\vec{r}) in and nominator of Eq. 3
+    real(kind(1d0)) function Pkfuna(rvec, iAtom, AtCoord, nAtoms, k, Radius_BS) result(res)
+        integer, intent(in) :: nAtoms, iAtom
+        real(kind(1d0)), intent(in) :: rvec(3), AtCoord(3, nAtoms), Radius_BS(:)
+        integer, intent(in) :: k
+        integer :: jAtom
+        real(kind(1d0)) :: a_ij, R_i, R_j
+        res = 1.d0
+        do jAtom = 1, nAtoms
+            if(jAtom == iAtom) cycle
+            R_i = Radius_BS(iAtom)
+            R_j = Radius_BS(jAtom)
+            a_ij = get_param_a(R_i, R_j)
+            res = res * skfunab(rvec, AtCoord(:, iAtom), AtCoord(:, jAtom), k, a_ij)
+        enddo
+    end function Pkfuna
+    real(kind(1d0)) function Pkfuna1(rvec, iAtom, AtCoord, nAtoms, k) result(res)
+        integer, intent(in) :: nAtoms, iAtom
+        real(kind(1d0)), intent(in) :: rvec(3), AtCoord(3, nAtoms)
+        integer, intent(in) :: k
+        integer :: jAtom
+        res = 1.d0
+        do jAtom = 1, nAtoms
+            if(jAtom == iAtom) cycle
+            res = res * skfunab1(rvec, AtCoord(:, iAtom), AtCoord(:, jAtom), k)
+        enddo
+    end function Pkfuna1
+    ! ----------------------------------------------------
     !..
-    !.. Linblad equation (Schroedinger representation)
-    !.. d/dt \rho(t) = -i [H,\rho(t)]+
-    !                     \sum_{mn} [
-    !                                 L_{mn} \rho(t) L_{mn}^\dagger -
-    !                    -\frac{1}{2} L_{mn}^\dagger L_{mn} \rho(t)
-    !                    -\frac{1}{2} \rho(t) L_{mn}^\dagger L_{mn}
-    !
-    !   H = H_0 + (\hat{\epsilon}\cdot\vec{\mu}) E(t)
-    !
-    !.. For pure dephasing without relaxation:
-    !
-    !   L_{nm} = \delta_{mn} \sqrt{\gamma_m/2} | m \rangle \langle m |
-    !
-    !.. For relaxation without pure dephasing:
-    !
-    !   L_{mn} = (1-\delta_{nm}) \sqrt{\gamma_{mn}} |m\rangle \langle n|
-    !
-    !   subject to the constraint \gamma_{mn} = e^{-\beta \omega_{mn}} \gamma_{nm}
-    !
-    !   where \beta = 1/(k_B T)
-    !
-    !################################################
-    subroutine ComputeLiouvillian0(Evec, Dmat, Liouvillian0)
-        real   (kind(1d0)), intent(in) :: Evec(:)
-        real   (kind(1d0)), intent(in) :: Dmat(:, :, :)
-        complex(kind(1d0)), allocatable, intent(out) :: Liouvillian0(:, :)
+    real(kind(1d0)) function skfunab(rvec, avec, bvec, k, a_ij) result(res)
+        real(kind(1d0)), intent(in) :: rvec(3), avec(3), bvec(3)
+        integer, intent(in) :: k
+        real(kind(1d0)) :: mu_old, mu_new, a_ij
+        mu_old = EllipticalCoord(rvec, avec, bvec)
+        mu_new = new_mu_transformation(mu_old, a_ij)
+        res = skfun(mu_new, k)
+    end function skfunab
+    real(kind(1d0)) function skfunab1(rvec, avec, bvec, k) result(res)
+        real(kind(1d0)), intent(in) :: rvec(3), avec(3), bvec(3)
+        integer, intent(in) :: k
+        real(kind(1d0)) :: mu
+        mu = EllipticalCoord1(rvec, avec, bvec)
+        res = skfun1(mu, k)
+    end function skfunab1
+    ! ----------------------------------------------------
+    !.. $s(\mu): [-1,1]  \rightarrow [0,1]$  (Step Function)
+    real(kind(1d0)) function skfun(mu, k) result(res)
+        implicit none
+        real(kind(1d0)), intent(in) :: mu
+        integer, intent(in) :: k
+        real(kind(1d0)) :: r_m
 
-        real(kind(1d0)), parameter :: WATER_MELTING_POINT = 273.15
-        real(kind(1d0)), parameter :: BATH_TEMPERATURE = WATER_MELTING_POINT + 3000
-        real(kind(1d0)), parameter :: BETA = 1.d0 / (BOLTZMANN_CONSTANT_auK * BATH_TEMPERATURE)
-        real(kind(1d0)), parameter :: DEPHASING_FACTOR = 1.d-3
-        real(kind(1d0)), parameter :: RELAXATION_FACTOR = 1.d-3
-
-        integer :: nLiou, nStates, i, j, iLiou, i1, i2, iLiou1, iLiou2
-        !.. Dephasing and Relaxation Constants
-        real   (kind(1d0)), allocatable :: PairGamma(:, :), TotalGamma(:)
-        real   (kind(1d0)) :: AverageDipole, dBuf
-
-        nStates = size(Evec, 1)
-
-        nLiou = nStates ** 2
-        allocate(Liouvillian0(nLiou, nLiou))
-        Liouvillian0 = Z0
-        !
-        !.. Unitary component
-        do iLiou = 1, nLiou
-            call LiouvilleToHilbertIndexes(iLiou, i, j)
-            Liouvillian0(iLiou, iLiou) = Evec(i) - Evec(j)
-        end do
-        !
-        !.. Determine the factors \gamma_{mn}
-        allocate(PairGamma(nStates, nStates))
-        PairGamma = 0.d0
-        do i = 1, nStates
-            !
-            dBuf = 0.d0
-            do j = 1, nStates
-                if(j==i)cycle
-                !
-                AverageDipole = sqrt(sum(Dmat(i, j, :)**2) / 3.d0)
-                dBuf = dBuf + AverageDipole
-                !
-                !.. Relaxation Factor
-                PairGamma(i, j) = RELAXATION_FACTOR * AverageDipole
-                if(Evec(i)>Evec(j)) PairGamma(i, j) = PairGamma(i, j) * exp(-BETA * (Evec(i) - Evec(j)))
-                !
-            enddo
-            !
-            !.. Dephasing Factor
-            PairGamma(i, i) = DEPHASING_FACTOR * sqrt(dBuf)
-            !
-        enddo
-        !
-        !.. Determines \Gamma_i = \sum_m \gamma_{mi}
-        allocate(TotalGamma(nStates))
-        do i = 1, nStates
-            TotalGamma(i) = sum(PairGamma(:, i))
-        enddo
-        !
-        !.. Dissipative component
-        do iLiou = 1, nLiou
-            call LiouvilleToHilbertIndexes(iLiou, i, j)
-            Liouvillian0(iLiou, iLiou) = Liouvillian0(iLiou, iLiou) - Zi * (TotalGamma(i) + TotalGamma(j)) / 2.d0
-        enddo
-        do i1 = 1, nStates
-            call HilbertToLiouvilleIndexes(i1, i1, iLiou1)
-            do i2 = 1, nStates
-                call HilbertToLiouvilleIndexes(i2, i2, iLiou2)
-                Liouvillian0(iLiou1, iLiou2) = Liouvillian0(iLiou1, iLiou2) + Zi * PairGamma(i1, i2)
-            enddo
-        enddo
-
-    end subroutine ComputeLiouvillian0
-    !###########################################
-
-    subroutine ComputeLiouvillian01(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, DEPHASING_FACTOR, RELAXATION_FACTOR)
-        real   (kind(1d0)), intent(in) :: Evec(:)
-        real   (kind(1d0)), intent(in) :: Dmat(:, :, :)
-        complex(kind(1d0)), allocatable, intent(out) :: Liouvillian0(:, :)
-
-        real(kind(1d0)), intent(in) :: DEPHASING_FACTOR
-        real(kind(1d0)), intent(in) :: RELAXATION_FACTOR
-        real(kind(1d0)), intent(in) :: BATH_TEMPERATURE
-
-        integer :: nLiou, nStates, i, j, iLiou, i1, i2, iLiou1, iLiou2
-        !.. Dephasing and Relaxation Constants
-        real   (kind(1d0)), allocatable :: PairGamma(:, :), TotalGamma(:)
-        real   (kind(1d0)) :: AverageDipole, dBuf
-        real(kind(1d0)) :: BETA
-
-        BETA = 1.d0 / (BOLTZMANN_CONSTANT_auK * BATH_TEMPERATURE)
-
-        nStates = size(Evec, 1)
-
-        nLiou = nStates ** 2
-        allocate(Liouvillian0(nLiou, nLiou))
-        Liouvillian0 = Z0
-        !
-        !.. Unitary component
-        do iLiou = 1, nLiou
-            call LiouvilleToHilbertIndexes(iLiou, i, j)
-            Liouvillian0(iLiou, iLiou) = Evec(i) - Evec(j)
-        end do
-        !
-        !.. Determine the factors \gamma_{mn}
-        allocate(PairGamma(nStates, nStates))
-        PairGamma = 0.d0
-        do i = 1, nStates
-            !
-            dBuf = 0.d0
-            do j = 1, nStates
-                if(j==i)cycle
-                !
-                AverageDipole = sqrt(sum(Dmat(i, j, :)**2) / 3.d0)
-                dBuf = dBuf + AverageDipole
-                !
-                !.. Relaxation Factor
-                PairGamma(i, j) = RELAXATION_FACTOR * AverageDipole
-                if(Evec(i)>Evec(j)) PairGamma(i, j) = PairGamma(i, j) * exp(-BETA * (Evec(i) - Evec(j)))
-                !
-            enddo
-            !
-            !.. Dephasing Factor
-            PairGamma(i, i) = DEPHASING_FACTOR * sqrt(dBuf)
-            !
-        enddo
-        !
-        !.. Determines \Gamma_i = \sum_m \gamma_{mi}
-        allocate(TotalGamma(nStates))
-        do i = 1, nStates
-            TotalGamma(i) = sum(PairGamma(:, i))
-        enddo
-        !
-        !.. Dissipative component
-        do iLiou = 1, nLiou
-            call LiouvilleToHilbertIndexes(iLiou, i, j)
-            Liouvillian0(iLiou, iLiou) = Liouvillian0(iLiou, iLiou) - Zi * (TotalGamma(i) + TotalGamma(j)) / 2.d0
-        enddo
-        do i1 = 1, nStates
-            call HilbertToLiouvilleIndexes(i1, i1, iLiou1)
-            do i2 = 1, nStates
-                call HilbertToLiouvilleIndexes(i2, i2, iLiou2)
-                Liouvillian0(iLiou1, iLiou2) = Liouvillian0(iLiou1, iLiou2) + Zi * PairGamma(i1, i2)
-            enddo
-        enddo
-
-    end subroutine ComputeLiouvillian01
-
-
-    !.. Diagonalize the time-independent Lindblad superoperator
-    subroutine DiagonalizeLindblad0(Liouvillian0, L0_Eval, L0_LEvec, L0_REvec)
-        complex(kind(1d0)), intent(inout) :: Liouvillian0(:, :)
-        complex(kind(1d0)), allocatable, intent(out) :: L0_LEvec(:, :), L0_REvec(:, :), L0_Eval(:)
-        complex(kind(1d0)), allocatable :: zmat(:, :)
-        integer :: nLiou, iLiou, n, i, j
-
-        nLiou = size(Liouvillian0, 1)
-
-        allocate(L0_LEvec(nLiou, nLiou))
-        allocate(L0_REvec(nLiou, nLiou))
-        allocate(L0_Eval (nLiou))
-        L0_LEvec = Z0
-        L0_REvec = Z0
-        L0_Eval = Z0
-        call Short_Diag(nLiou, Liouvillian0, L0_Eval, L0_LEvec, L0_REvec)
-        do iLiou = 1, nLiou
-            write(*, *) iLiou, L0_Eval(iLiou)
-        enddo
-        !.. Test that U_R U_L^\dagger is indeed the identity
-        n = nLiou
-        allocate(zmat(n, n))
-        zmat = Z0
-        call ZGEMM("N", "T", n, n, n, Z1, L0_REvec, n, L0_LEvec, n, Z0, zmat, n)
-        do i = 1, n
-            zmat(i, i) = zmat(i, i) - Z1
-        enddo
-        write(*, *)"|U_R U_L^+ -1|_1 = ", sum(abs(zmat))
-
-    end subroutine DiagonalizeLindblad0
-
-    !>>
-    subroutine Save_Dipole(FileName, Dipole, nTimes, tmin, dt)
-        character(len = *), intent(in) :: FileName
-        complex(kind(1d0)), intent(in) :: Dipole(:, :)
-        real   (kind(1d0)), intent(in) :: tmin, dt
-        integer, intent(in) :: nTimes
-
-        real   (kind(1d0)) :: t
-        integer :: uid_dipole, iPol, it
-
-        open(newunit = uid_dipole, &
-                file = FileName, &
-                form = "formatted", &
-                status = "unknown", &
-                action = "write")
-        do it = 1, nTimes
-            t = tmin + dt * dble(it - 1)
-            write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((dble(Dipole(iPol, it)), aimag(Dipole(iPol, it))), iPol = 1, 3)
-        enddo
-        close(uid_dipole)
-    end subroutine Save_Dipole
-    !
-    !
-    subroutine Save_Dipole1(FileName, Dipole, nTimes, tmin, dt)
-        character(len = *), intent(in) :: FileName
-        real(kind(1d0)), intent(in) :: Dipole(:, :)
-        !        complex(kind(1d0)), intent(in) :: Dipole(:, :)
-        real   (kind(1d0)), intent(in) :: tmin, dt
-        integer, intent(in) :: nTimes
-
-        real   (kind(1d0)) :: t
-        integer :: uid_dipole, iPol, it
-
-        open(newunit = uid_dipole, &
-                file = FileName, &
-                form = "formatted", &
-                status = "unknown", &
-                action = "write")
-        do it = 1, nTimes
-            t = tmin + dt * dble(it - 1)
-            !            write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((dble(Dipole(iPol, it)), aimag(Dipole(iPol, it))), iPol = 1, 3)
-            write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((Dipole(iPol, it), 0.d0), iPol = 1, 3)
-        enddo
-        close(uid_dipole)
-    end subroutine Save_Dipole1
-
-    subroutine Save_Q_Charge(FileName, Charge, nTimes, tmin, dt, nAtoms)
-        character(len = *), intent(in) :: FileName
-        real(kind(1d0)), intent(in) :: Charge(:, :)
-        real   (kind(1d0)), intent(in) :: tmin, dt
-        integer, intent(in) :: nTimes, nAtoms
-
-        real   (kind(1d0)) :: t
-        integer :: uid_AtomicCharge, iPol, it, iAtom
-
-        !.. Save Q_Charge
-        open(newunit = uid_AtomicCharge, &
-                file = FileName, &
-                form = "formatted", &
-                status = "unknown", &
-                action = "write")
-        !..Regular
-        do it = 1, nTimes
-            t = tmin + dt * dble(it - 1)
-            write(uid_AtomicCharge, "(*(x,e24.16))") t, sum(Charge(:, it)), (Charge(iAtom, it), iAtom = 1, nAtoms)
-        enddo
-        !
-        !
-        !..New
-        !        do it = 1, nTimes
-        !            t = tmin + dt * dble(it - 1)
-        !            write(uid_AtomicCharge, "(*(x,e24.16))") t, sum(Charge(:, :, it)), ((Charge(iPol, iAtom, it), iPol = 1, 3), iAtom = 1, nAtoms)
-        !        enddo
-        !        !
-        close(uid_AtomicCharge)
-    end subroutine Save_Q_Charge
-    !
-    !
-    subroutine Save_Q_Charge1(FileName, Charge, nTimes, tmin, dt, nAtoms)
-        character(len = *), intent(in) :: FileName
-        real(kind(1d0)), intent(in) :: Charge(:, :, :)
-        real   (kind(1d0)), intent(in) :: tmin, dt
-        integer, intent(in) :: nTimes, nAtoms
-
-        real   (kind(1d0)) :: t
-        integer :: uid_AtomicCharge, iPol, it, iAtom
-
-        !.. Save Q_Charge
-        open(newunit = uid_AtomicCharge, &
-                file = FileName, &
-                form = "formatted", &
-                status = "unknown", &
-                action = "write")
-
-        !..New
-        do it = 1, nTimes
-            t = tmin + dt * dble(it - 1)
-            write(uid_AtomicCharge, "(*(x,e24.16))") t, sum(Charge(:, :, it)), ((Charge(iPol, iAtom, it), iPol = 1, 3), iAtom = 1, nAtoms)
-        enddo
-        !
-        close(uid_AtomicCharge)
-    end subroutine Save_Q_Charge1
-
-    !    !*** APPARENTLY, IT IS NOT WORKING YET!
-    !    subroutine ComputeDipoleFTplus(&
-    !            L0_Eval, L0_LEvec, L0_REvec, &
-    !            OmegaVec, zStatRho0, DipoleFTplus, &
-    !            StepTime, StepWidth)
-    !
-    !        complex(kind(1d0)), intent(in) :: L0_LEvec(:, :), L0_REvec(:, :), L0_Eval(:), zStatRho0(:, :)
-    !        real   (kind(1d0)), intent(in) :: OmegaVec(:)
-    !        complex(kind(1d0)), intent(out) :: DipoleFTplus(:, :)
-    !        real   (kind(1d0)), intent(in) :: StepTime, StepWidth
-    !
-    !        real(kind(1d0)), parameter :: DIPOLE_THRESHOLD = 1.d-49
-    !
-    !        logical, save :: FIRST_CALL = .TRUE.
-    !        integer, save :: nliou, nStates, nOmegas
-    !        complex(kind(1d0)), allocatable, save :: zmat1(:, :), zmat2(:, :), zvec1(:), zvec2(:), zvec3(:)
-    !        integer :: iPol, iOmega, iLiou, iState
-    !        real(kind(1d0)) :: w, sigma
-    !
-    !        if(FIRST_CALL)then
-    !
-    !            nliou = size(L0_Eval, 1)
-    !            nStates = size(zStatRho0, 1)
-    !            nOmegas = size(OmegaVec)
-    !            allocate(zvec1(nLiou))
-    !            allocate(zvec2(nLiou))
-    !            allocate(zvec3(nLiou))
-    !            allocate(zmat1(nStates, nStates))
-    !            allocate(zmat2(nStates, nStates))
-    !            zmat1 = Z0
-    !            zmat2 = Z0
-    !            zvec1 = Z0
-    !            zvec2 = Z0
-    !            zvec3 = Z0
-    !
-    !            FIRST_CALL = .FALSE.
-    !
-    !        endif
-    !
-    !        sigma = StepWidth / sqrt(2.d0)
-    !
-    !        do iPol = 1, 3
-    !            call ZGEMM("N", "N", nStates, nStates, nStates, Z1, zStatRho0, nStates, &
-    !                    Dmat(1, 1, iPol), nStates, Z0, zmat1, nStates)
-    !            call HilbertToLiouvilleMatrix(zmat1, zvec1)
-    !            call ZGEMV("C", nLiou, nLiou, Z1, L0_LEvec, nLiou, zvec1, 1, Z0, zvec2, 1)
-    !            do iOmega = 1, nOmegas
-    !                w = OmegaVec(iOmega)
-    !                do iLiou = 1, nLiou
-    !                    !*** CHECK CONSISTENCY OF SIGMA AND STEPWIDTH
-    !                    zvec1(iLiou) = exp(-sigma**2 * (w - L0_Eval(iLiou))**2) / (w - L0_Eval(iLiou)) * zvec2(iLiou)
-    !                    !***
-    !                enddo
-    !                call ZGEMV("N", nLiou, nLiou, Z1, L0_REvec, nLiou, zvec1, 1, Z0, zvec3, 1)
-    !                call LiouvilleToHilbertMatrix(zvec3, zmat2)
-    !                DipoleFTplus(iPol, iOmega) = 0.d0
-    !                do iState = 1, nStates
-    !                    DipoleFTplus(iPol, iOmega) = DipoleFTplus(iPol, iOmega) + zmat2(iState, iState)
-    !                enddo
-    !                DipoleFTplus(iPol, iOmega) = DipoleFTplus(iPol, iOmega) * exp(Zi * w * StepTime) / (2.d0 * PI)
-    !
-    !                if(abs(DipoleFTplus(iPol, iOmega)) < DIPOLE_THRESHOLD) DipoleFTplus(iPol, iOmega) = 0.d0
-    !
-    !            enddo
-    !        enddo
-    !
-    !    end subroutine ComputeDipoleFTplus
+        res = 0.5d0 * (1.d0 - fkfun(mu, k))
+    end function skfun
+    real(kind(1d0)) function skfun1(mu, k) result(res)
+        implicit none
+        real(kind(1d0)), intent(in) :: mu
+        integer, intent(in) :: k
+        res = 0.5d0 * (1.d0 - fkfun1(mu, k))
+    end function skfun1
+    ! ----------------------------------------------------
+    !.. Eq. 4 Recursive $f_k(\mu)$
+    real(kind(1d0)) recursive function fkfun(mu, k) result(res)
+        implicit none
+        real(kind(1d0)), intent(in) :: mu
+        integer, intent(in) :: k
+        res = 0.5d0 * mu * (3.d0 - mu**2)
+        if(k==1)return
+        res = fkfun(res, k - 1)
+    end function fkfun
+    real(kind(1d0)) recursive function fkfun1(mu, k) result(res)
+        implicit none
+        real(kind(1d0)), intent(in) :: mu
+        integer, intent(in) :: k
+        res = 0.5d0 * mu * (3.d0 - mu**2)
+        if(k==1)return
+        res = fkfun1(res, k - 1)
+    end function fkfun1
+    ! ----------------------------------------------------
+    !.. Eq. 1 $\mu_{ab}(\vec{r})$
+    real(kind(1d0)) function EllipticalCoord(rvec, avec, bvec) result(res)
+        real(kind(1d0)), intent(in) :: rvec(3), avec(3), bvec(3)
+        real(kind(1d0)) :: r_a, r_b, R_ab ! $r_a$, $r_b$, $R_ab$
+        r_a = EuclDist(rvec, avec)
+        r_b = EuclDist(rvec, bvec)
+        R_ab = EuclDist(avec, bvec)
+        res = (r_a - r_b) / R_ab
+    end function EllipticalCoord
+    real(kind(1d0)) function EllipticalCoord1(rvec, avec, bvec) result(res)
+        real(kind(1d0)), intent(in) :: rvec(3), avec(3), bvec(3)
+        real(kind(1d0)) :: r_a, r_b, R_ab ! $r_a$, $r_b$, $R_ab$
+        r_a = EuclDist1(rvec, avec)
+        r_b = EuclDist1(rvec, bvec)
+        R_ab = EuclDist1(avec, bvec)
+        res = (r_a - r_b) / R_ab
+    end function EllipticalCoord1
+    ! ----------------------------------------------------
+    !.. Distance
+    real(kind(1d0)) function EuclDist(avec, bvec) result(res)
+        real(kind(1d0)), intent(in) :: avec(3), bvec(3)
+        real(kind(1d0)) :: cvec(3)
+        cvec = (avec - bvec)
+        res = sqrt(sum(cvec * cvec))
+    end function EuclDist
+    real(kind(1d0)) function EuclDist1(avec, bvec) result(res)
+        real(kind(1d0)), intent(in) :: avec(3), bvec(3)
+        real(kind(1d0)) :: cvec(3)
+        cvec = (avec - bvec)
+        res = sqrt(sum(cvec * cvec))
+    end function EuclDist1
+    ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
 end program ChargeMigration
 
 
-!*** IDEALLY, SHOULD COMPUTE THE DIPOLE FROM THE AO - AO DIPOLES.
-!!$  !.. Load Dipole matrix element between active MOs
-!!$  call LoadDipoleMO( InpDir, nOrb, ivOrb, MuOrb )
-!!$
-!!$  !.. Check Dipole Matrix Elements between States
-!!$  do iStatei = 1, nStates
-!!$     do iStatej = 1, nStates
-!!$        TME = 0.d0
-!!$        do i = 1, nOrb
-!!$           do j = 1, nOrb
-!!$              TME = TME + TDM(i,j,iStatei,iStatej) * MuOrb(j,i)
-!!$           enddo
-!!$        enddo
-!!$        write(*,*) iStatei, iStatej, TME
-!!$     enddo
-!!$  enddo
-
-
-!        if (R_i < 0.36) then
-!            r_m = R_i
-!        else
-!            r_m = R_i * 0.5d0
-!        end if

@@ -30,7 +30,7 @@ def Write_FieldHelp():
                    "\n[PP010]{ XUV; ( G 25.00 0.18 5 0 0.001 90 0 ); }"
                    "\nEXECUTE{PP010;}")
     logger.info("Field_pulses_template created")
-    sys.exit()
+    exit()
 
 
 # >Writes pulses to Field File ,Pump Probe Experiment (0)
@@ -60,7 +60,7 @@ def Write_Pulses(Field_File, Type_of_Pulse_Pump, Start_Time, Pump_Central_Freque
             #            str(Probe_Periods) + " " + str(Probe_Phase) + " " +
             #            str(Probe_Intensity) + " " + " " + Probe_Polarization + " );}")
             fout.write(f"\n[PP{Time_Delay}]{{ XUV; ( {Type_of_Pulse_Probe} {Time_Delay} {Probe_Central_Frequency} "
-                          f"{Probe_Periods} {Probe_Phase} {Probe_Intensity} {Probe_Polarization} );}}")
+                       f"{Probe_Periods} {Probe_Phase} {Probe_Intensity} {Probe_Polarization} );}}")
 
         fout.write("\nEXECUTE{")
         for Time_Delay in Time_Delay_Range:
@@ -69,6 +69,7 @@ def Write_Pulses(Field_File, Type_of_Pulse_Pump, Start_Time, Pump_Central_Freque
             fout.write("}")
         else:
             fout.write("XUV;}")
+
 
 # # >THIS IS AN EDIT IN PROGRESS DO NOT USE< USE THE ABOVE
 # def Write_Pulses(Field_File, Type_of_Pulse_Pump, Start_Time, Pump_Central_Frequency,
@@ -112,6 +113,7 @@ def Call_Charge_Migration(Bin_Directory, Input_Directory, Output_Directory, Numb
     logger.info(screen_print)
     # >Runs Charge Migration (Fortran Code)
     execute_command(
+        # FIXME : This is a temporary fix for the issue with the MKL library and my pycharm env
         f"export LD_LIBRARY_PATH='/opt/intel/oneapi/mkl/2023.2.0/lib/intel64:/opt/intel/oneapi/compiler/2023.2.0/linux/compiler/lib/intel64_lin:$LD_LIBRARY_PATH' &&"
         f"{Bin_Directory}/"
         f"{debug_mode_decoy}ChargeMigration -i {Input_Directory} -o {Output_Directory} -nt {str(Number_Of_Times)} "
@@ -133,6 +135,9 @@ def Call_Charge_MigrationFT(Bin_Directory, Input_Directory, Output_Directory, ge
     logger.info(screen_print)
     # >Runs Charge Migration FT (Fortran Code)
     execute_command(
+        # FIXME : This is a temporary fix for the issue with the MKL library and pycharm
+        f"export LD_LIBRARY_PATH='/opt/intel/oneapi/mkl/2023.2.0/lib/intel64:/opt/intel/oneapi/compiler/2023.2.0/linux/compiler/lib/intel64_lin:$LD_LIBRARY_PATH' &&"
+        f"{Bin_Directory}/"
         f'{debug_mode_decoy}ChargeMigrationFT -i {str(Input_Directory)} -o {str(Output_Directory)} -xyz '
         f'{str(geometry)} -stept {str(TimeStep_FT)} -stepw {str(WidthStep_FT)} -field {str(Field_File)} -nw '
         f'{str(Number_of_Omegas)} -wmax {str(Min_Omegas)} -wmin {str(Max_Omegas)} -ntw {str(Number_of_TauOmega)} '
@@ -190,10 +195,17 @@ def Call_Spectrum_Reconstruction_n_Difference(Bin_Directory, MolcasOut, SimOut, 
     # Momentary , needs work
 
     logger.info("Running SpectrumReconstruction ...")
-    system(
-        debug_mode_decoy + 'SpectrumReconstruction -i ' + MolcasOut + ' -o ' + SimOut + ' -xyz ' + Geometry +
-        ' -nw ' + str(Number_of_Omegas) + ' -wmax ' + str(Max_Omegas) + ' -wmin ' + str(Min_Omegas) + ' -ntw ' + str(
-            Number_of_TauOmega) + ' -twmax ' + str(Max_TauOmega) + ' -twmin ' + str(Min_TauOmega))
+    # system(
+    #     debug_mode_decoy + 'SpectrumReconstruction -i ' + MolcasOut + ' -o ' + SimOut + ' -xyz ' + Geometry +
+    #     ' -nw ' + str(Number_of_Omegas) + ' -wmax ' + str(Max_Omegas) + ' -wmin ' + str(Min_Omegas) + ' -ntw ' + str(
+    #         Number_of_TauOmega) + ' -twmax ' + str(Max_TauOmega) + ' -twmin ' + str(Min_TauOmega))
+    execute_command(
+        # FIXME : This is a temporary fix for the issue with the MKL library and pycharm
+        f"export LD_LIBRARY_PATH='/opt/intel/oneapi/mkl/2023.2.0/lib/intel64:/opt/intel/oneapi/compiler/2023.2.0/linux/compiler/lib/intel64_lin:$LD_LIBRARY_PATH' &&"
+        f"{Bin_Directory}/"
+        f'{debug_mode_decoy}SpectrumReconstruction -i {str(MolcasOut)} -o {str(SimOut)} -xyz '
+        f'{str(Geometry)} -nw {str(Number_of_Omegas)} -wmax {str(Max_Omegas)} -wmin {str(Min_Omegas)} -ntw {str(Number_of_TauOmega)} -twmax {str(Max_TauOmega)} -twmin {str(Min_TauOmega)}'
+    )
 
     logger.info("Creating difference_" + SimOut + " to compare the Dipole and Charge Spectra")
     Dipole_Charge_Comparison(SimOut + '/Dipole/DipoleFT_ww', SimOut +

@@ -11,8 +11,8 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 
-from densitypy.project_utils.def_functions import ExecutePymolcasWithErrorPrint, ExecuteNoWrite, Find, \
-    GetDipoleValuesAsArray, file_len
+from densitypy.project_utils.def_functions import execute_pymolcas_with_error_print, find, \
+    get_dipole_values_as_array, file_len
 from densitypy.project_utils.logger import logger
 
 
@@ -21,28 +21,30 @@ def CreateHelpInputFile():
     # >Creates helpful input file guide for pymolcas
     with open('inputhelp.input', 'w') as fout:
         fout.write("&GATEWAY"
-                   " \n Title = _name_of_project_"
-                   " \n coord = _geometry_file_"
-                   " \n basis = _name_of_basis_"
+                   " \n Title = NMA //  _name_of_project_"
+                   " \n coord = NMA.xyz //  _geometry_file_"
+                   " \n basis = 6-31+g_st__st_.1.molcas //  _name_of_basis_"
                    " \n group = c1 //this prevents use of symmetry"
                    "\n&SEWARD\n&SCF"
                    "\n&RASSCF"
-                   "\n Ras1   = _number_of_RAS1_orbitals_"
-                   "\n Ras2   = _number_of_RAS2_orbitals_"
-                   "\n RAS3   = _number_of_RAS3_orbitals_"
-                   "\n Inactive = _number_of_Inactive_orbitals_"
-                   "\n nactel   = _total_ _RAS1_ _RAS3_ "
-                   "//# of active electrons, allowed holes, allowed excitations"
+                   "\n Ras1   = 0 //  _number_of_RAS1_orbitals_"
+                   "\n Ras2   = 4 //  _number_of_RAS2_orbitals_"
+                   "\n RAS3   = 0 //  _number_of_RAS3_orbitals_"
+                   "\n Inactive = 17 //  _number_of_Inactive_orbitals_"
+                   "\n nactel   = 6 0 0 "
+                   "//# of active electrons, allowed holes, allowed excitations.  _total_ _RAS1_ _RAS3_ "
                    "\n TDM       //writes DM and TDM to RASSCF.h5"
-                   "\n CIRoot\n _highest_root_needed_ _dimention_of_CI_matrix_ _weight_ "
+                   "\n CIRoot\n 5 5 1 "
                    "//e.g. 10 10 1 will do a state average calculation of the ground state "
-                   "and the lower 4 excited states"
+                   "and the lower 4 excited states.  _highest_root_needed_ _dimention_of_CI_matrix_ _weight_"
                    "\n&RASSI"
                    "\nNr of JobIph"
                    "\n 1 ALL "
                    "    //e.g. # of job files, # of states in that file ==>> 1 10 or 1 ALL "
-                   "\nMEES //writes one-electron properties")
-    logger.info("inputhelp.input created")
+                   "\nMEES //writes one-electron properties"
+                   )
+
+        logger.info("inputhelp.input created")
     sys.exit()
 
 
@@ -230,7 +232,7 @@ def Call_OpenMolcas(Project_Name, Molcas_Directory):
     os.chdir(Molcas_Directory)
 
     # rfunc.ExecutePymolcasWithErrorPrint("pymolcas " + Project_Name + ".input -f", Project_Name)
-    ExecutePymolcasWithErrorPrint("pymolcas " + Project_Name + ".input -f", Project_Name)
+    execute_pymolcas_with_error_print("pymolcas " + Project_Name + ".input -f", Project_Name)
     # rfunc.execute_command("rm " + Project_Name + ".input")
 
     os.chdir(current_directory)
@@ -240,14 +242,14 @@ def Call_OpenMolcas(Project_Name, Molcas_Directory):
 def FetchFromh5_File(Project_Name, Molcas_Directory, pathtofile, filename):
     # >Extracts Information from H5FILEs
     ExecuteNoWrite("h5dump -o " + Molcas_Directory + "/" + filename +
-                         " -y -w 0 -d " + filename + " " + pathtofile + "/" + Project_Name + ".rasscf.h5")
+                   " -y -w 0 -d " + filename + " " + pathtofile + "/" + Project_Name + ".rasscf.h5")
     logger.info("Extracted " + filename)
 
 
 def FetchFromh5_Filewidth1(Project_Name, Molcas_Directory, pathtofile, filename):
     # >Extracts Information from H5FILEs
     ExecuteNoWrite("h5dump -o " + Molcas_Directory + "/" + filename +
-                         " -y -w 1 -d " + filename + " " + pathtofile + "/" + Project_Name + ".rasscf.h5")
+                   " -y -w 1 -d " + filename + " " + pathtofile + "/" + Project_Name + ".rasscf.h5")
     logger.info("Extracted " + filename)
 
 
@@ -256,7 +258,7 @@ def LoadFromh5File(Project_Name, Molcas_Directory, workingdirectory, true_values
                    root_energies, ao_multiple_x, ao_multiple_y, ao_multiple_z,
                    mo_energies, mo_vectors, justh5):
     # >Find <ProjectName>.rasscf.h5
-    rasscf_h5_filepath = Find(Project_Name + ".rasscf.h5", ".", workingdirectory)
+    rasscf_h5_filepath = find(Project_Name + ".rasscf.h5", ".", workingdirectory)
 
     # >Extract Density Matrix, Transition Density Matrix, ENERGIES, AO_Dipoles, MO_energies, MO_vectors
     FetchFromh5_File(Project_Name, Molcas_Directory, rasscf_h5_filepath, density_matrix)
@@ -279,7 +281,7 @@ def ExtractGridDensity(orbital_list, output_filename, directorypath, Molcas_Dire
     stringend = "Title=    0 "
     reset_lines = []
     reset_lines.append(0)
-    gridfilepath = Find(output_filename + '.grid', ".", directorypath)
+    gridfilepath = find(output_filename + '.grid', ".", directorypath)
     with open(gridfilepath + "/" + output_filename + '.grid', 'r') as fin:
         for num, line in enumerate(fin, 1):
             if stringend in line:
@@ -359,7 +361,7 @@ def CopyXYZDipoles(filein, fileout, linestart, linestop, numberofstates):
         for states in range_states:
             states += 1
             string = " " + str(states) + " "
-            value = GetDipoleValuesAsArray(fileout, string, "      ")
+            value = get_dipole_values_as_array(fileout, string, "      ")
             fout.write(' '.join([str(f) for f in value]) + "\n")
     ExecuteNoWrite("cp " + fileout + "temp " + fileout)
     ExecuteNoWrite("rm " + fileout + "temp")
@@ -368,7 +370,7 @@ def CopyXYZDipoles(filein, fileout, linestart, linestop, numberofstates):
 def GetDipolesFromLogFile(Project_Name, outdir, numberofstates, workingdirectory):
     componentlist = list("123")
 
-    logdirectory = Find(Project_Name + ".log", ".", workingdirectory)
+    logdirectory = find(Project_Name + ".log", ".", workingdirectory)
 
     for component in componentlist:
         component1 = str(int(float(component) + 1))
@@ -386,7 +388,7 @@ def GetDipolesFromLogFile(Project_Name, outdir, numberofstates, workingdirectory
 
 # >Makes a color matrix refering to Dipole between each state(1)
 def Make_MU_HeatMap(directory):
-    rows =  file_len(directory + "/X_DIPOLE")
+    rows = file_len(directory + "/X_DIPOLE")
     cols = rows
     direction_list = list("XYZ")
     for direction in direction_list:

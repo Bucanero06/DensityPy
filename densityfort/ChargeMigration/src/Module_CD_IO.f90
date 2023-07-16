@@ -17,20 +17,123 @@ Module Module_CD_IO
             LoadDipoleME, &
             LoadTDMs, &
             LoadDipoleMO, &
+            Save_Dipole, &
+            Save_Q_Charge, &
+            Save_Dipole1, &
+            Save_Q_Charge1, &
             SaveChDen, &
             Write_Weights, &
             Read_Weights, &
             Write_Summary
 
-
 contains
 
+    !>> Commons <<!
     subroutine Set_CD_IO_Verbous(logi)
         logical, intent(in) :: logi
         Verbous = logi
     end subroutine Set_CD_IO_Verbous
+    subroutine replace_char(strn, ch1, ch2)
+        character(len = *), intent(inout) :: strn
+        character, intent(in) :: ch1, ch2
+        integer :: i
+        do
+            i = index(strn, ch1)
+            if(i<=0)exit
+            strn(i:i) = ch2
+        enddo
+    end subroutine replace_char
+    subroutine Write_Summary(FileName, nPts, nAtoms, Volume, Computed_Volume, nTimes, tmin, tmax, AtomName, Radius_BS, nOrb, OrbTab)
+        integer, intent(in) :: npts, nAtoms, nTimes, nOrb
+        real(kind(1d0)), intent(in) :: Volume, Computed_Volume, tmin, tmax, Radius_BS(:), OrbTab(:, :)
+        character(len = 16), intent(in) :: AtomName(:)
+        character(len = *), intent(in) :: FileName
+        real(kind(1d0)) :: Orbital_overlap_self, Orbital_overlap_other
+        integer :: uid, iAtom, iOrb, jOrb, iPts
 
+        write(*, "(a)") "Finished Sim Loop"
+        write(*, *)
+        write(*, *)
+        write(*, "(a)")                     "SUMMARY"
+        write(*, "(a,i0)")                  "    # of Points=", nPts
+        write(*, "(a,i0)")                  "    # of Atoms=", nAtoms
+        write(*, "(a,e14.6,a,e14.6)")       "    Volume =", Volume, " Computed Volume =", Computed_Volume
+        write(*, "(a,i0,e14.6,e14.6)")      "    nTimes, tmin, tmax=", nTimes, tmin, tmax
+        write(*, "(a)")                     "    Bragg-Slater radii fo Becke's Weights"
+        do iAtom = 1, nAtoms
+            if (iAtom .ne. 1)then
+                if (AtomName(iAtom)==AtomName(iAtom - 1)) cycle
+            end if
+            write(*, "(a,a,a,e14.4)")                 "        ", AtomName(iAtom), "=", Radius_BS(iAtom)!write Bragg-Slater radii
+        end do
 
+        write(*, *)
+        do iOrb = 1, nOrb
+            !Compute orbital norm
+            Orbital_overlap_self = 0.d0
+            do iPts = 1, nPts
+                Orbital_overlap_self = Orbital_overlap_self + OrbTab(iPts, iOrb) * OrbTab(iPts, iOrb)
+            end do
+            Orbital_overlap_self = Orbital_overlap_self * Computed_Volume
+
+            !Compute Overlap with other Orbitals
+            Orbital_overlap_other = 0.d0
+            do jOrb = 1, nOrb
+                if (jOrb==iOrb) cycle
+                do iPts = 1, nPts
+                    Orbital_overlap_other = Orbital_overlap_other + OrbTab(iPts, iOrb) * OrbTab(iPts, jOrb)
+                end do
+            end do
+            Orbital_overlap_other = Orbital_overlap_other * Volume
+
+            !Write Results to Screen
+            write(*, "(a,i0,a,e14.6,a,e14.6)") "    Norm(", iOrb, ") =", Orbital_overlap_self, "    Overlap other =", Orbital_overlap_other
+        end do
+        !__________________________________________________________________________________
+        !>>Write Summary to File
+        !..
+        open(newunit = uid, &
+                file = FileName, &
+                form = "formatted", &
+                status = "unknown", &
+                action = "write")
+        write(uid, "(a)")                     "SUMMARY"
+        write(uid, "(a,i0)")                  "    # of Points=", nPts
+        write(uid, "(a,i0)")                  "    # of Atoms=", nAtoms
+        write(uid, "(a,e14.6,a,e14.6)")       "    Volume =", Volume, " Computed Volume =", Computed_Volume
+        write(uid, "(a,i0,e14.6,e14.6)")      "    nTimes, tmin, tmax=", nTimes, tmin, tmax
+        write(uid, "(a)")                     "    Bragg-Slater radii fo Becke's Weights"
+        do iAtom = 1, nAtoms
+            write(uid, "(a,a,a,e14.4)")                 "        ", AtomName(iAtom), "=", Radius_BS(iAtom)!write Bragg-Slater radii
+        end do
+
+        write(uid, *)
+        do iOrb = 1, nOrb
+            !Compute orbital norm
+            Orbital_overlap_self = 0.d0
+            do iPts = 1, nPts
+                Orbital_overlap_self = Orbital_overlap_self + OrbTab(iPts, iOrb) * OrbTab(iPts, iOrb)
+            end do
+            Orbital_overlap_self = Orbital_overlap_self * Computed_Volume
+
+            !Compute Overlap with other Orbitals
+            Orbital_overlap_other = 0.d0
+            do jOrb = 1, nOrb
+                if (jOrb==iOrb) cycle
+                do iPts = 1, nPts
+                    Orbital_overlap_other = Orbital_overlap_other + OrbTab(iPts, iOrb) * OrbTab(iPts, jOrb)
+                end do
+            end do
+            Orbital_overlap_other = Orbital_overlap_other * Volume
+
+            !Write Results to Screen
+            write(uid, "(a,i0,a,e14.6,a,e14.6)") "    Norm(", iOrb, ") =", Orbital_overlap_self, "    Overlap other =", Orbital_overlap_other
+        end do
+        close(uid)
+        !_________________________________________
+    end subroutine Write_Summary
+
+    !>> Load Subroutines <<!
     !> Load the position of the atomic nuclei
     subroutine LoadGeometry(nAtoms, AtCoord, FileName, AtomName)
         !
@@ -59,8 +162,7 @@ contains
         close(uid)
         write(*, *) "nAtoms", nAtoms
     end subroutine LoadGeometry
-
-
+    !
     !> Loads the Energies found inside the InpDir
     subroutine LoadEnergies(FileName, nStates, Evec)
         !
@@ -109,8 +211,7 @@ contains
         close(uid)
         !
     end subroutine LoadEnergies
-
-
+    !
     !> Loads the Grid found inside the InpDir
     subroutine LoadGrid(FileName, npts, gridv)
         !
@@ -157,7 +258,7 @@ contains
         close(uid)
         !
     end subroutine LoadGrid
-
+    !
     !> Loads the Orbitals found inside the InpDir
     subroutine LoadOrbitals(Dir, nOrb, ivOrb, npts, OrbTab)
         !
@@ -199,8 +300,7 @@ contains
             !
         enddo
     end subroutine LoadOrbitals
-
-
+    !
     !> Loads all the Dipoles found inside the InpDir
     subroutine LoadDipoleME(Dmat, InpDir, nStates)
         use ModuleErrorHandling
@@ -226,7 +326,7 @@ contains
         call LoadDipoles (InpDir // "/Z_DIPOLE", nStates, dBufM)
         Dmat(:, :, 3) = dBufM
     end subroutine LoadDipoleME
-
+    !
     !> Loads the Dipoles found inside the InpDir
     subroutine LoadDipoles(FileName, nStates, Dmat)
         !
@@ -266,8 +366,7 @@ contains
         close(uid)
         !
     end subroutine LoadDipoles
-
-
+    !
     !> Loads the TDM found inside the InpDir
     subroutine LoadTDMs(FileNameDM, FileNameTDM, nStates, nOrb, TDM)
         !
@@ -385,10 +484,9 @@ contains
         endif
 
     end subroutine LoadTDMs
-
-
+    !
     !> Loads Dipole Matrix Elements between molecular orbitals
-    subroutine LoadDipoleMO(InpDir, nOrb, ivOrb, MuOrb)
+    subroutine LoadDipoleMO(InpDir, nOrb, ivOrb, MuOrb) !*** IDEALLY, SHOULD COMPUTE THE DIPOLE FROM THE AO - AO DIPOLES.
         !
         use ModuleErrorHandling
         use ModuleString
@@ -494,8 +592,103 @@ contains
 
     end subroutine LoadDipoleMO
 
+    !>> Save Subroutines
+    subroutine Save_Dipole(FileName, Dipole, nTimes, tmin, dt)
+        character(len = *), intent(in) :: FileName
+        complex(kind(1d0)), intent(in) :: Dipole(:, :)
+        real   (kind(1d0)), intent(in) :: tmin, dt
+        integer, intent(in) :: nTimes
 
-    !> SaveCheDen subroutine
+        real   (kind(1d0)) :: t
+        integer :: uid_dipole, iPol, it
+
+        open(newunit = uid_dipole, &
+                file = FileName, &
+                form = "formatted", &
+                status = "unknown", &
+                action = "write")
+        do it = 1, nTimes
+            t = tmin + dt * dble(it - 1)
+            write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((dble(Dipole(iPol, it)), aimag(Dipole(iPol, it))), iPol = 1, 3)
+        enddo
+        close(uid_dipole)
+    end subroutine Save_Dipole
+    subroutine Save_Q_Charge(FileName, Charge, nTimes, tmin, dt, nAtoms)
+        character(len = *), intent(in) :: FileName
+        real(kind(1d0)), intent(in) :: Charge(:, :)
+        real   (kind(1d0)), intent(in) :: tmin, dt
+        integer, intent(in) :: nTimes, nAtoms
+
+        real   (kind(1d0)) :: t
+        integer :: uid_AtomicCharge, iPol, it, iAtom
+
+        !.. Save Q_Charge
+        open(newunit = uid_AtomicCharge, &
+                file = FileName, &
+                form = "formatted", &
+                status = "unknown", &
+                action = "write")
+        !..Regular
+        do it = 1, nTimes
+            t = tmin + dt * dble(it - 1)
+            write(uid_AtomicCharge, "(*(x,e24.16))") t, sum(Charge(:, it)), (Charge(iAtom, it), iAtom = 1, nAtoms)
+        enddo
+        !
+        !
+        !..New
+        !        do it = 1, nTimes
+        !            t = tmin + dt * dble(it - 1)
+        !            write(uid_AtomicCharge, "(*(x,e24.16))") t, sum(Charge(:, :, it)), ((Charge(iPol, iAtom, it), iPol = 1, 3), iAtom = 1, nAtoms)
+        !        enddo
+        !        !
+        close(uid_AtomicCharge)
+    end subroutine Save_Q_Charge
+    subroutine Save_Dipole1(FileName, Dipole, nTimes, tmin, dt)
+        character(len = *), intent(in) :: FileName
+        real(kind(1d0)), intent(in) :: Dipole(:, :)
+        !        complex(kind(1d0)), intent(in) :: Dipole(:, :)
+        real   (kind(1d0)), intent(in) :: tmin, dt
+        integer, intent(in) :: nTimes
+
+        real   (kind(1d0)) :: t
+        integer :: uid_dipole, iPol, it
+
+        open(newunit = uid_dipole, &
+                file = FileName, &
+                form = "formatted", &
+                status = "unknown", &
+                action = "write")
+        do it = 1, nTimes
+            t = tmin + dt * dble(it - 1)
+            !            write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((dble(Dipole(iPol, it)), aimag(Dipole(iPol, it))), iPol = 1, 3)
+            write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((Dipole(iPol, it), 0.d0), iPol = 1, 3)
+        enddo
+        close(uid_dipole)
+    end subroutine Save_Dipole1
+    subroutine Save_Q_Charge1(FileName, Charge, nTimes, tmin, dt, nAtoms)
+        character(len = *), intent(in) :: FileName
+        real(kind(1d0)), intent(in) :: Charge(:, :, :)
+        real   (kind(1d0)), intent(in) :: tmin, dt
+        integer, intent(in) :: nTimes, nAtoms
+
+        real   (kind(1d0)) :: t
+        integer :: uid_AtomicCharge, iPol, it, iAtom
+
+        !.. Save Q_Charge
+        open(newunit = uid_AtomicCharge, &
+                file = FileName, &
+                form = "formatted", &
+                status = "unknown", &
+                action = "write")
+
+        !..New
+        do it = 1, nTimes
+            t = tmin + dt * dble(it - 1)
+            write(uid_AtomicCharge, "(*(x,e24.16))") t, sum(Charge(:, :, it)), ((Charge(iPol, iAtom, it), iPol = 1, 3), iAtom = 1, nAtoms)
+        enddo
+        !
+        close(uid_AtomicCharge)
+    end subroutine Save_Q_Charge1
     subroutine SaveChDen(FileName, npts, gridv, ChDen, Weightv, nAtoms)
         !
         use ModuleErrorHandling
@@ -538,6 +731,7 @@ contains
         !
     end subroutine SaveChDen
 
+    !..Write and Read Weights Subroutines
     subroutine Write_Weights(FileName, WEIGHTV, gridv, nAtoms, nPts)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: gridv(:, :)
@@ -558,8 +752,6 @@ contains
         end do
         close(uid)
     end subroutine Write_Weights
-
-
     subroutine Read_Weights(FileName, WEIGHTV, nAtoms, nPts)
         character(len = *), intent(in) :: FileName
         integer, intent(in) :: nPts, nAtoms
@@ -582,105 +774,5 @@ contains
         close(uid)
     end subroutine Read_Weights
 
-    subroutine replace_char(strn, ch1, ch2)
-        character(len = *), intent(inout) :: strn
-        character, intent(in) :: ch1, ch2
-        integer :: i
-        do
-            i = index(strn, ch1)
-            if(i<=0)exit
-            strn(i:i) = ch2
-        enddo
-    end subroutine replace_char
 
-
-    subroutine Write_Summary(FileName, nPts, nAtoms, Volume, Computed_Volume, nTimes, tmin, tmax, AtomName, Radius_BS, nOrb, OrbTab)
-        integer, intent(in) :: npts, nAtoms, nTimes, nOrb
-        real(kind(1d0)), intent(in) :: Volume, Computed_Volume, tmin, tmax, Radius_BS(:), OrbTab(:, :)
-        character(len = 16), intent(in) :: AtomName(:)
-        character(len = *), intent(in) :: FileName
-        real(kind(1d0)) :: Orbital_overlap_self, Orbital_overlap_other
-        integer :: uid, iAtom, iOrb, jOrb, iPts
-
-        write(*, "(a)") "Finished Sim Loop"
-        write(*, *)
-        write(*, *)
-        write(*, "(a)")                     "SUMMARY"
-        write(*, "(a,i0)")                  "    # of Points=", nPts
-        write(*, "(a,i0)")                  "    # of Atoms=", nAtoms
-        write(*, "(a,e14.6,a,e14.6)")       "    Volume =", Volume, " Computed Volume =", Computed_Volume
-        write(*, "(a,i0,e14.6,e14.6)")      "    nTimes, tmin, tmax=", nTimes, tmin, tmax
-        write(*, "(a)")                     "    Bragg-Slater radii fo Becke's Weights"
-        do iAtom = 1, nAtoms
-            if (iAtom .ne. 1)then
-                if (AtomName(iAtom)==AtomName(iAtom - 1)) cycle
-            end if
-            write(*, "(a,a,a,e14.4)")                 "        ", AtomName(iAtom), "=", Radius_BS(iAtom)!write Bragg-Slater radii
-        end do
-
-        write(*, *)
-        do iOrb = 1, nOrb
-            !Compute orbital norm
-            Orbital_overlap_self = 0.d0
-            do iPts = 1, nPts
-                Orbital_overlap_self = Orbital_overlap_self + OrbTab(iPts, iOrb) * OrbTab(iPts, iOrb)
-            end do
-            Orbital_overlap_self = Orbital_overlap_self * Computed_Volume
-
-            !Compute Overlap with other Orbitals
-            Orbital_overlap_other = 0.d0
-            do jOrb = 1, nOrb
-                if (jOrb==iOrb) cycle
-                do iPts = 1, nPts
-                    Orbital_overlap_other = Orbital_overlap_other + OrbTab(iPts, iOrb) * OrbTab(iPts, jOrb)
-                end do
-            end do
-            Orbital_overlap_other = Orbital_overlap_other * Volume
-
-            !Write Results to Screen
-            write(*, "(a,i0,a,e14.6,a,e14.6)") "    Norm(", iOrb, ") =", Orbital_overlap_self, "    Overlap other =", Orbital_overlap_other
-        end do
-        !__________________________________________________________________________________
-        !>>Write Summary to File
-        !..
-        open(newunit = uid, &
-                file = FileName, &
-                form = "formatted", &
-                status = "unknown", &
-                action = "write")
-        write(uid, "(a)")                     "SUMMARY"
-        write(uid, "(a,i0)")                  "    # of Points=", nPts
-        write(uid, "(a,i0)")                  "    # of Atoms=", nAtoms
-        write(uid, "(a,e14.6,a,e14.6)")       "    Volume =", Volume, " Computed Volume =", Computed_Volume
-        write(uid, "(a,i0,e14.6,e14.6)")      "    nTimes, tmin, tmax=", nTimes, tmin, tmax
-        write(uid, "(a)")                     "    Bragg-Slater radii fo Becke's Weights"
-        do iAtom = 1, nAtoms
-            write(uid, "(a,a,a,e14.4)")                 "        ", AtomName(iAtom), "=", Radius_BS(iAtom)!write Bragg-Slater radii
-        end do
-
-        write(uid, *)
-        do iOrb = 1, nOrb
-            !Compute orbital norm
-            Orbital_overlap_self = 0.d0
-            do iPts = 1, nPts
-                Orbital_overlap_self = Orbital_overlap_self + OrbTab(iPts, iOrb) * OrbTab(iPts, iOrb)
-            end do
-            Orbital_overlap_self = Orbital_overlap_self * Computed_Volume
-
-            !Compute Overlap with other Orbitals
-            Orbital_overlap_other = 0.d0
-            do jOrb = 1, nOrb
-                if (jOrb==iOrb) cycle
-                do iPts = 1, nPts
-                    Orbital_overlap_other = Orbital_overlap_other + OrbTab(iPts, iOrb) * OrbTab(iPts, jOrb)
-                end do
-            end do
-            Orbital_overlap_other = Orbital_overlap_other * Volume
-
-            !Write Results to Screen
-            write(uid, "(a,i0,a,e14.6,a,e14.6)") "    Norm(", iOrb, ") =", Orbital_overlap_self, "    Overlap other =", Orbital_overlap_other
-        end do
-        close(uid)
-        !_________________________________________
-    end subroutine Write_Summary
 end Module Module_CD_IO

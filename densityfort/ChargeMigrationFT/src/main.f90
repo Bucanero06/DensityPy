@@ -19,7 +19,7 @@
 !!
 !!
 ! }}}
-program ChargeMigration
+program ChargeMigrationFT
 
     use, intrinsic :: ISO_FORTRAN_ENV
     use ModuleErrorHandling
@@ -859,10 +859,9 @@ contains
         enddo
         close(uid_AtomicChargeFT)
     end subroutine Write_BidimentionalChargeFTww1
-end program ChargeMigration
+end program ChargeMigrationFT
 
 !!!!!this are notes and aspirations .. :]
-
 !    DipoleFTminus = DipoleFTminus * dt / (2.d0 * PI)
 !     AtomicChargeFT=AtomicChargeFT * dt / (2.d0 * PI)
 !
@@ -902,3 +901,74 @@ end program ChargeMigration
 
 
 !     DipoleFTtotal = DipoleFTminus + DipoleFTplus
+
+
+
+!!*** APPARENTLY, IT IS NOT WORKING YET!
+!    subroutine ComputeDipoleFTplus(&
+!            L0_Eval, L0_LEvec, L0_REvec, &
+!            OmegaVec, zStatRho0, DipoleFTplus, &
+!            StepTime, StepWidth)
+!
+!        complex(kind(1d0)), intent(in) :: L0_LEvec(:, :), L0_REvec(:, :), L0_Eval(:), zStatRho0(:, :)
+!        real   (kind(1d0)), intent(in) :: OmegaVec(:)
+!        complex(kind(1d0)), intent(out) :: DipoleFTplus(:, :)
+!        real   (kind(1d0)), intent(in) :: StepTime, StepWidth
+!
+!        real(kind(1d0)), parameter :: DIPOLE_THRESHOLD = 1.d-49
+!
+!        logical, save :: FIRST_CALL = .TRUE.
+!        integer, save :: nliou, nStates, nOmegas
+!        complex(kind(1d0)), allocatable, save :: zmat1(:, :), zmat2(:, :), zvec1(:), zvec2(:), zvec3(:)
+!        integer :: iPol, iOmega, iLiou, iState
+!        real(kind(1d0)) :: w, sigma
+!
+!        if(FIRST_CALL)then
+!
+!            nliou = size(L0_Eval, 1)
+!            nStates = size(zStatRho0, 1)
+!            nOmegas = size(OmegaVec)
+!            allocate(zvec1(nLiou))
+!            allocate(zvec2(nLiou))
+!            allocate(zvec3(nLiou))
+!            allocate(zmat1(nStates, nStates))
+!            allocate(zmat2(nStates, nStates))
+!            zmat1 = Z0
+!            zmat2 = Z0
+!            zvec1 = Z0
+!            zvec2 = Z0
+!            zvec3 = Z0
+!
+!            FIRST_CALL = .FALSE.
+!
+!        endif
+!
+!        sigma = StepWidth / sqrt(2.d0)
+!
+!        do iPol = 1, 3
+!            call ZGEMM("N", "N", nStates, nStates, nStates, Z1, zStatRho0, nStates, &
+!                    Dmat(1, 1, iPol), nStates, Z0, zmat1, nStates)
+!            call HilbertToLiouvilleMatrix(zmat1, zvec1)
+!            call ZGEMV("C", nLiou, nLiou, Z1, L0_LEvec, nLiou, zvec1, 1, Z0, zvec2, 1)
+!            do iOmega = 1, nOmegas
+!                w = OmegaVec(iOmega)
+!                do iLiou = 1, nLiou
+!                    !*** CHECK CONSISTENCY OF SIGMA AND STEPWIDTH
+!                    zvec1(iLiou) = exp(-sigma**2 * (w - L0_Eval(iLiou))**2) / (w - L0_Eval(iLiou)) * zvec2(iLiou)
+!                    !***
+!                enddo
+!                call ZGEMV("N", nLiou, nLiou, Z1, L0_REvec, nLiou, zvec1, 1, Z0, zvec3, 1)
+!                call LiouvilleToHilbertMatrix(zvec3, zmat2)
+!                DipoleFTplus(iPol, iOmega) = 0.d0
+!                do iState = 1, nStates
+!                    DipoleFTplus(iPol, iOmega) = DipoleFTplus(iPol, iOmega) + zmat2(iState, iState)
+!                enddo
+!                DipoleFTplus(iPol, iOmega) = DipoleFTplus(iPol, iOmega) * exp(Zi * w * StepTime) / (2.d0 * PI)
+!
+!                if(abs(DipoleFTplus(iPol, iOmega)) < DIPOLE_THRESHOLD) DipoleFTplus(iPol, iOmega) = 0.d0
+!
+!            enddo
+!        enddo
+!
+!    end subroutine ComputeDipoleFTplus
+
