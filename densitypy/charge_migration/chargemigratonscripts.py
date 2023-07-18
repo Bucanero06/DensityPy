@@ -1,10 +1,13 @@
 #! /usr/bin/env python3.6
 # >import chargemigratonscripts as rcms
-import sys
 from os import path, system
 
-from densitypy.project_utils.def_functions import uniquify, execute_command
-from densitypy.project_utils.logger import logger
+from densitypy.project_utils.def_functions import uniquify, execute_command, delete_files_or_directories
+
+from densitypy.project_utils.logger import setup_logger
+
+logger = setup_logger(__name__.split('.')[-1])
+
 
 
 def Write_FieldHelp():
@@ -122,6 +125,8 @@ def Call_Charge_Migration(Bin_Directory, Input_Directory, Output_Directory, Numb
         f"{','.join(map(repr, orbital_list))} -rf {str(relaxing_factor)} -bath {str(bath_temp)} -df "
         f"{str(dephasing_factor)} -s {iExcitation} -e {iEPSILON}")
 
+    logger.info("Finished Executing ChargeMigration")
+
 
 def Call_Charge_MigrationFT(Bin_Directory, Input_Directory, Output_Directory, geometry, Number_of_Omegas,
                             Min_Omegas, Max_Omegas, Number_of_TauOmega, Min_TauOmega, Max_TauOmega,
@@ -142,6 +147,8 @@ def Call_Charge_MigrationFT(Bin_Directory, Input_Directory, Output_Directory, ge
         f'{str(geometry)} -stept {str(TimeStep_FT)} -stepw {str(WidthStep_FT)} -field {str(Field_File)} -nw '
         f'{str(Number_of_Omegas)} -wmax {str(Min_Omegas)} -wmin {str(Max_Omegas)} -ntw {str(Number_of_TauOmega)} '
         f'-twmax {str(Min_TauOmega)} -twmin {str(Max_TauOmega)} -s {iExcitation} -e {iEPSILON}')
+
+    logger.info("Finished Executing ChargeMigrationFT")
 
 
 def Save_Spectrum_Difference(Bin_Directory, Output_Directory, difference_file, Dephasing_Factor, Relaxing_Factor,
@@ -173,7 +180,7 @@ def Save_Spectrum_Difference(Bin_Directory, Output_Directory, difference_file, D
 
 
 def Dipole_Charge_Comparison(dipole_file, charge_file, output_file):
-    system('rm ' + str(output_file))
+    delete_files_or_directories()
     system('cat ' + str(
         dipole_file) + ' | awk \'{print $1\" \"$2\" \"$3**2+$4**2\" \"$5**2+$6**2\" \"$7**2+$8**2}\' > temp_dipole')
     system('cat ' + str(charge_file) + ' | awk \'{print $3**2+$4**2\" \"$5**2+$6**2\" \"$7**2+$8**2}\' > temp_charge')
@@ -195,10 +202,6 @@ def Call_Spectrum_Reconstruction_n_Difference(Bin_Directory, MolcasOut, SimOut, 
     # Momentary , needs work
 
     logger.info("Running SpectrumReconstruction ...")
-    # system(
-    #     debug_mode_decoy + 'SpectrumReconstruction -i ' + MolcasOut + ' -o ' + SimOut + ' -xyz ' + Geometry +
-    #     ' -nw ' + str(Number_of_Omegas) + ' -wmax ' + str(Max_Omegas) + ' -wmin ' + str(Min_Omegas) + ' -ntw ' + str(
-    #         Number_of_TauOmega) + ' -twmax ' + str(Max_TauOmega) + ' -twmin ' + str(Min_TauOmega))
     execute_command(
         # FIXME : This is a temporary fix for the issue with the MKL library and pycharm
         f"export LD_LIBRARY_PATH='/opt/intel/oneapi/mkl/2023.2.0/lib/intel64:/opt/intel/oneapi/compiler/2023.2.0/linux/compiler/lib/intel64_lin:$LD_LIBRARY_PATH' &&"
@@ -207,10 +210,7 @@ def Call_Spectrum_Reconstruction_n_Difference(Bin_Directory, MolcasOut, SimOut, 
         f'{str(Geometry)} -nw {str(Number_of_Omegas)} -wmax {str(Max_Omegas)} -wmin {str(Min_Omegas)} -ntw {str(Number_of_TauOmega)} -twmax {str(Max_TauOmega)} -twmin {str(Min_TauOmega)}'
     )
 
-    logger.info("Creating difference_" + SimOut + " to compare the Dipole and Charge Spectra")
-    Dipole_Charge_Comparison(SimOut + '/Dipole/DipoleFT_ww', SimOut +
-                             '/Dipole/DipoleFT_ww_reconstructed', 'difference_' + SimOut)
-    logger.info("Done")
+    logger.info("Finished Executing SpectrumReconstruction")
 
 
 def Save_Previous_FT(Output_Directory, Dephasing_Factor, Relaxing_Factor, Time_Delay_Start, Time_Delay_Stop, Min_Omegas,

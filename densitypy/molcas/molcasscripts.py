@@ -4,22 +4,27 @@
 #  library
 import os
 import sys
-from os import remove, path
+from os import path
 
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 
-from densitypy.project_utils.def_functions import execute_pymolcas_with_error_print, find, \
-    get_dipole_values_as_array, file_len
-from densitypy.project_utils.logger import logger
+from densitypy.project_utils.def_functions import find, \
+    get_dipole_values_as_array, file_len, execute_command, print_molcas_log_errors, copy_file_to, \
+    delete_files_or_directories
+
+from densitypy.project_utils.logger import setup_logger
+
+logger = setup_logger(__name__.split('.')[-1])
+
 
 
 # Creates Helpful input file for Molcas with comments to help user begin (0)
-def CreateHelpInputFile():
+def create_help_input_file():
     # >Creates helpful input file guide for pymolcas
-    with open('inputhelp.input', 'w') as fout:
+    with open('molcas_input_help.input', 'w') as fout:
         fout.write("&GATEWAY"
                    " \n Title = NMA //  _name_of_project_"
                    " \n coord = NMA.xyz //  _geometry_file_"
@@ -34,7 +39,7 @@ def CreateHelpInputFile():
                    "\n nactel   = 6 0 0 "
                    "//# of active electrons, allowed holes, allowed excitations.  _total_ _RAS1_ _RAS3_ "
                    "\n TDM       //writes DM and TDM to RASSCF.h5"
-                   "\n CIRoot\n 5 5 1 "
+                   "\n CIRoot\n 4 4 1 "
                    "//e.g. 10 10 1 will do a state average calculation of the ground state "
                    "and the lower 4 excited states.  _highest_root_needed_ _dimention_of_CI_matrix_ _weight_"
                    "\n&RASSI"
@@ -44,12 +49,12 @@ def CreateHelpInputFile():
                    "\nMEES //writes one-electron properties"
                    )
 
-        logger.info("inputhelp.input created")
+        logger.info("molcas_input_help.input created")
     sys.exit()
 
 
 # >Makes points to be used for pymolcas input (0)
-def Make_Grid_Coordinates(Molcas_Directory, Nx, Ny, Nz, xmin, xmax, ymin, ymax, zmin, zmax):
+def make_grid_coordinates(Molcas_Directory, Nx, Ny, Nz, xmin, xmax, ymin, ymax, zmin, zmax):
     # >Makes points to be used for pymolcas input
     N_points = Nx * Ny * Nz
     logger.info("Number of Points = " + str(N_points))
@@ -64,7 +69,7 @@ def Make_Grid_Coordinates(Molcas_Directory, Nx, Ny, Nz, xmin, xmax, ymin, ymax, 
 
 
 ##################################################################################
-def Read_xyz(xyz_file):
+def read_xyz(xyz_file):
     atoms = []
     x = []
     y = []
@@ -100,11 +105,11 @@ def distance(avec, bvec):
     return cvec
 
 
-def Make_New_Grid(atomic_coordinates, step_size, Boundary, limitedgrid, np=None):
+def make_new_grid(atomic_coordinates, step_size, Boundary, limitedgrid, np=None):
     # > Define coordinates matrix
     gridcoord = [] * 3
 
-    maxi, mini = Find_Max_and_Min(atomic_coordinates)
+    maxi, mini = find_max_and_min(atomic_coordinates)
     # # > Find Max Boundries of Grid
     xmax = maxi[0] + Boundary
     ymax = maxi[1] + Boundary
@@ -148,7 +153,7 @@ def Make_New_Grid(atomic_coordinates, step_size, Boundary, limitedgrid, np=None)
     return gridcoord, initial_Npoints
 
 
-def Find_Max_and_Min(coords):
+def find_max_and_min(coords):
     maxi = []
     mini = []
     for iPol in range(0, 3):
@@ -167,11 +172,11 @@ def Find_Max_and_Min(coords):
     return maxi, mini
 
 
-def Make_Better_Grid(Molcas_Directory, geometry, step_size, Boundary, limitedgrid, ):
+def make_better_grid(Molcas_Directory, geometry, step_size, Boundary, limitedgrid, ):
     logger.info("Making Grid")
-    atomic_coordinates = Read_xyz(geometry)
+    atomic_coordinates = read_xyz(geometry)
     # > Make_Grid(maxi, mini, Npoints)
-    gridcoord, initial_Npoints = Make_New_Grid(atomic_coordinates, step_size, Boundary, limitedgrid)
+    gridcoord, initial_Npoints = make_new_grid(atomic_coordinates, step_size, Boundary, limitedgrid)
     N_points = len(gridcoord)
     logger.info("Number of Points = " + str(N_points))
     # > Writes to file
@@ -185,7 +190,7 @@ def Make_Better_Grid(Molcas_Directory, geometry, step_size, Boundary, limitedgri
 
 #################################################################################################
 # Creates input from users own input file for pymolcas(0)
-def CopyInputFileToEdit(pymolcas_input, Project_Name, Molcas_Directory):
+def copy_input_file_to_edit(pymolcas_input, Project_Name, Molcas_Directory):
     # Creates input from users own input file for pymolcas
     string_list = ['RASSCF', 'RASSI', 'TDM']
     true_values = []
@@ -205,15 +210,23 @@ def CopyInputFileToEdit(pymolcas_input, Project_Name, Molcas_Directory):
 
 
 # Adds GRID_IT section to copied input file
-def AddGridItToManualInputFile(pymolcas_input, Project_Name, Molcas_Directory, orbital_list, N_points):
+def add_grid_it_to_manual_input_file(pymolcas_input, Project_Name, Molcas_Directory, orbital_list, N_points):
     # Creates input from users own input file for pymolcas
     Lowest_orbital = min(orbital_list)
     Highest_orbital = max(orbital_list)
+
+    print('&Grid_it '
+                       '\n select '
+                       # fixme i changes to iterable in the jason config and to digits rather than strings, so ihave to update codebase
+                       '\n 1:' + str(Lowest_orbital) + '-' + str(Highest_orbital) +
+                       '\n NOLUSCUS '
+                       '\n GRID'
+                       '\n ')
     with open(Molcas_Directory + '/gridcoord', 'r') as fin:
         # with open(Project_Name + '.input', 'a') as fout:
         with open(f'{Molcas_Directory}/{Project_Name}.input', 'a') as fout:
             logger.info('Adding Grid_it to ' + Project_Name + '.input')
-            fout.write('&Grid_it '
+            fout.write('\n&GRIDIT '
                        '\n select '
                        '\n 1:' + str(Lowest_orbital) + '-' + str(Highest_orbital) +
                        '\n NOLUSCUS '
@@ -224,7 +237,7 @@ def AddGridItToManualInputFile(pymolcas_input, Project_Name, Molcas_Directory, o
 
 
 # >Calls pymolcas and writes to scrach folder and log file(1)
-def Call_OpenMolcas(Project_Name, Molcas_Directory):
+def call_open_molcas(Project_Name, Molcas_Directory):
     # >Calls pymolcas and writes to scrach folder and log file
     logger.info("Running OpenMolcas")
     #
@@ -232,51 +245,58 @@ def Call_OpenMolcas(Project_Name, Molcas_Directory):
     os.chdir(Molcas_Directory)
 
     # rfunc.ExecutePymolcasWithErrorPrint("pymolcas " + Project_Name + ".input -f", Project_Name)
-    execute_pymolcas_with_error_print("pymolcas " + Project_Name + ".input -f", Project_Name)
-    # rfunc.execute_command("rm " + Project_Name + ".input")
+    # execute_pymolcas_with_error_print("pymolcas " + Project_Name + ".input -f", Project_Name)
+    # execute_pymolcas_with_error_print(f'pymolcas {Project_Name}.input -f', Project_Name)
+    try:
+        execute_command(f'pymolcas {Project_Name}.input -f')
+    except Exception as e:
+        logger.error('Error in call_open_molcas')
+        print_molcas_log_errors(Project_Name + ".log", "Timing")
+        raise e
 
+    logger.info("Done Running OpenMolcas")
     os.chdir(current_directory)
 
 
 # >Extract Density Matrix, Transition Density Matrix, ENERGIES, AO_Dipoles, MO_energies, MO_vectors(1,1,2)
-def FetchFromh5_File(Project_Name, Molcas_Directory, pathtofile, filename):
+def fetch_fromh5_file(Project_Name, Molcas_Directory, pathtofile, filename):
     # >Extracts Information from H5FILEs
-    ExecuteNoWrite("h5dump -o " + Molcas_Directory + "/" + filename +
-                   " -y -w 0 -d " + filename + " " + pathtofile + "/" + Project_Name + ".rasscf.h5")
+    execute_command("h5dump -o " + Molcas_Directory + "/" + filename +
+                    " -y -w 0 -d " + filename + " " + pathtofile + "/" + Project_Name + ".rasscf.h5")
     logger.info("Extracted " + filename)
 
 
-def FetchFromh5_Filewidth1(Project_Name, Molcas_Directory, pathtofile, filename):
+def fetch_fromh5_filewidth1(Project_Name, Molcas_Directory, pathtofile, filename):
     # >Extracts Information from H5FILEs
-    ExecuteNoWrite("h5dump -o " + Molcas_Directory + "/" + filename +
-                   " -y -w 1 -d " + filename + " " + pathtofile + "/" + Project_Name + ".rasscf.h5")
+    execute_command("h5dump -o " + Molcas_Directory + "/" + filename +
+                    " -y -w 1 -d " + filename + " " + pathtofile + "/" + Project_Name + ".rasscf.h5")
     logger.info("Extracted " + filename)
 
 
-def LoadFromh5File(Project_Name, Molcas_Directory, workingdirectory, true_values, density_matrix,
-                   transition_density_matrix,
-                   root_energies, ao_multiple_x, ao_multiple_y, ao_multiple_z,
-                   mo_energies, mo_vectors, justh5):
+def load_fromh5_file(Project_Name, Molcas_Directory, workingdirectory, true_values, density_matrix,
+                     transition_density_matrix,
+                     root_energies, ao_multiple_x, ao_multiple_y, ao_multiple_z,
+                     mo_energies, mo_vectors, justh5):
     # >Find <ProjectName>.rasscf.h5
     rasscf_h5_filepath = find(Project_Name + ".rasscf.h5", ".", workingdirectory)
 
     # >Extract Density Matrix, Transition Density Matrix, ENERGIES, AO_Dipoles, MO_energies, MO_vectors
-    FetchFromh5_File(Project_Name, Molcas_Directory, rasscf_h5_filepath, density_matrix)
+    fetch_fromh5_file(Project_Name, Molcas_Directory, rasscf_h5_filepath, density_matrix)
     if "TDM" in true_values or justh5:
-        FetchFromh5_File(Project_Name, Molcas_Directory, rasscf_h5_filepath, transition_density_matrix)
+        fetch_fromh5_file(Project_Name, Molcas_Directory, rasscf_h5_filepath, transition_density_matrix)
     else:
         logger.info(f'Found {Project_Name}".rasscf.h5" but TDM keyword was not found in Molcas input file, '
                     f'thus no Transition Density Matrix printed')
-    FetchFromh5_Filewidth1(Project_Name, Molcas_Directory, rasscf_h5_filepath, root_energies)
-    FetchFromh5_File(Project_Name, Molcas_Directory, rasscf_h5_filepath, ao_multiple_x)
-    FetchFromh5_File(Project_Name, Molcas_Directory, rasscf_h5_filepath, ao_multiple_y)
-    FetchFromh5_File(Project_Name, Molcas_Directory, rasscf_h5_filepath, ao_multiple_z)
-    FetchFromh5_Filewidth1(Project_Name, Molcas_Directory, rasscf_h5_filepath, mo_energies)
-    FetchFromh5_Filewidth1(Project_Name, Molcas_Directory, rasscf_h5_filepath, mo_vectors)
+    fetch_fromh5_filewidth1(Project_Name, Molcas_Directory, rasscf_h5_filepath, root_energies)
+    fetch_fromh5_file(Project_Name, Molcas_Directory, rasscf_h5_filepath, ao_multiple_x)
+    fetch_fromh5_file(Project_Name, Molcas_Directory, rasscf_h5_filepath, ao_multiple_y)
+    fetch_fromh5_file(Project_Name, Molcas_Directory, rasscf_h5_filepath, ao_multiple_z)
+    fetch_fromh5_filewidth1(Project_Name, Molcas_Directory, rasscf_h5_filepath, mo_energies)
+    fetch_fromh5_filewidth1(Project_Name, Molcas_Directory, rasscf_h5_filepath, mo_vectors)
 
 
 # >Extracts Density for the grids of each Orbital found oin <Project>.grid (0)
-def ExtractGridDensity(orbital_list, output_filename, directorypath, Molcas_Directory):
+def extract_grid_density(orbital_list, output_filename, directorypath, Molcas_Directory):
     Highest_orbital = max(orbital_list)
     stringend = "Title=    0 "
     reset_lines = []
@@ -307,7 +327,7 @@ def ExtractGridDensity(orbital_list, output_filename, directorypath, Molcas_Dire
         # Deletes Previous Orbital Density Grids
         Orbital_Grid = Molcas_Directory + '/grid' + str(orbital)
         if path.exists(Orbital_Grid):
-            remove(Orbital_Grid)
+            delete_files_or_directories()
 
         # Reads and Writes Densities Orbital by Orbital
         with open(gridfilepath + "/" + output_filename + '.grid', 'r') as fin:
@@ -336,7 +356,7 @@ def ExtractGridDensity(orbital_list, output_filename, directorypath, Molcas_Dire
 
 
 # Gets Dipoles found inside of <Project>.log "RASSI" (2,0)
-def CopyXYZDipoles(filein, fileout, linestart, linestop, numberofstates):
+def copy_xyz_dipoles(filein, fileout, linestart, linestop, numberofstates):
     linestop2 = "PROPERTY: MLTPL  2"
     with open(filein, 'r') as fin:
         with open(fileout, 'w') as fout:
@@ -363,11 +383,15 @@ def CopyXYZDipoles(filein, fileout, linestart, linestop, numberofstates):
             string = " " + str(states) + " "
             value = get_dipole_values_as_array(fileout, string, "      ")
             fout.write(' '.join([str(f) for f in value]) + "\n")
-    ExecuteNoWrite("cp " + fileout + "temp " + fileout)
-    ExecuteNoWrite("rm " + fileout + "temp")
+
+    # execute_command("cp " + fileout + "temp " + fileout)
+    # execute_command("rm " + fileout + "temp")
+
+    copy_file_to(fileout + "temp", fileout)
+    delete_files_or_directories()
 
 
-def GetDipolesFromLogFile(Project_Name, outdir, numberofstates, workingdirectory):
+def get_dipoles_from_log_file(Project_Name, outdir, numberofstates, workingdirectory):
     componentlist = list("123")
 
     logdirectory = find(Project_Name + ".log", ".", workingdirectory)
@@ -380,14 +404,14 @@ def GetDipolesFromLogFile(Project_Name, outdir, numberofstates, workingdirectory
             dipolename = "Y_DIPOLE"
         elif component == "3":
             dipolename = "Z_DIPOLE"
-        CopyXYZDipoles(logdirectory + "/" + Project_Name + ".log", outdir + "/" + dipolename,
-                       "PROPERTY: MLTPL  1   COMPONENT:   " + component,
-                       "PROPERTY: MLTPL  1   COMPONENT:   " + component1, numberofstates)
+        copy_xyz_dipoles(logdirectory + "/" + Project_Name + ".log", outdir + "/" + dipolename,
+                         "PROPERTY: MLTPL  1   COMPONENT:   " + component,
+                         "PROPERTY: MLTPL  1   COMPONENT:   " + component1, numberofstates)
         logger.info("Extracted " + dipolename)
 
 
 # >Makes a color matrix refering to Dipole between each state(1)
-def Make_MU_HeatMap(directory):
+def make_mu_heat_map(directory):
     rows = file_len(directory + "/X_DIPOLE")
     cols = rows
     direction_list = list("XYZ")

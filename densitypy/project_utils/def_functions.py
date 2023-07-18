@@ -1,12 +1,17 @@
 #! /usr/bin/env python3.10
 import decimal
 import json
+import os
 import re
+import shutil
 import sys
 from os import path
 from subprocess import Popen, PIPE, CalledProcessError
 
-from .logger import logger
+from densitypy.project_utils.logger import setup_logger, get_caller_logger
+
+# logger = setup_logger(__name__.split('.')[-1])
+logger = get_caller_logger()
 
 
 def execute_command(command: str, write_stream=True) -> None:
@@ -23,6 +28,7 @@ def execute_command(command: str, write_stream=True) -> None:
 
     >>> execute_command("ls -l")
     """
+
     logger.info(f"Executing command: {command}")
     # Execute command in a new subprocess
     with Popen(command, stdout=PIPE, bufsize=1, universal_newlines=True, shell=True) as p:
@@ -30,7 +36,7 @@ def execute_command(command: str, write_stream=True) -> None:
         # todo accept errors and warning
         if write_stream:
             for line in p.stdout:
-                logger.info(line.strip())
+                logger.info(f' ---> {line.strip()}')
 
     # If the subprocess exited with an error, raise an exception
     if p.returncode != 0:
@@ -53,33 +59,6 @@ def execute_pymolcas_with_error_print(command, nameofproject):
     p_status = p.wait()
     if p_status > 0:
         print_molcas_log_errors(nameofproject + ".log", "Timing")
-
-
-def make_directory(outputdir):
-    """
-    Creates a new directory. If the directory already exists, it removes it first.
-
-    :param outputdir: The path to the directory to be created.
-    :type outputdir: str
-    """
-    if path.exists(outputdir):
-        execute_command(f'rm -r {outputdir}')
-        execute_command(f'mkdir {outputdir}')
-    else:
-        execute_command(f'mkdir {outputdir}')
-
-
-def make_directory_no_delete(outputdir):
-    """
-    Creates a new directory. If the directory already exists, it does nothing.
-
-    :param outputdir: The path to the directory to be created.
-    :type outputdir: str
-    """
-    if path.exists(outputdir):
-        pass
-    else:
-        execute_command("mkdir " + outputdir)
 
 
 def get_value_of_as_string(filename, string, delimiter):
@@ -146,6 +125,7 @@ def copy_file_to(input, output):
     :type output: str
     """
     try:
+        logger.info(f"Copying file: {input} to {output}")
         execute_command(f'cp {input} {output}')
     except Exception as e:
         logger.info("Error copying file: " + str(e))
@@ -369,3 +349,42 @@ def natural_sort(iterable, key=None, reverse=False):
         key = lambda x: (__float_convert(match) for match in re.finditer(r'\d+|\D+', key(x)))
 
     return sorted(iterable, key=key, reverse=reverse)
+
+
+def delete_files_or_directories(*paths):
+    """
+    Deletes the files or directories specified by the given paths.
+
+    :param paths: The paths of files or directories to be deleted.
+    :type paths: str
+    :raises FileNotFoundError: If the given path does not exist.
+
+    Usage::
+
+        delete_files_or_directories('/path/to/file', '/path/to/directory')  # Deletes specified file and directory
+    """
+    for paths in paths:
+        if os.path.isfile(paths):
+            os.remove(paths)  # Delete the file
+        elif os.path.isdir(paths):
+            shutil.rmtree(paths)  # Delete the directory and its contents
+        else:
+            raise FileNotFoundError(f"Path '{paths}' does not exist.")
+
+
+def make_directory(output_dir: str, delete_if_exists: bool = False):
+    """
+    Creates a directory at the specified path. If the directory already exists and 'delete_if_exists' is True,
+    it deletes the existing directory before creating a new one.
+
+    :param output_dir: The path where the directory is to be created.
+    :type output_dir: str
+    :param delete_if_exists: If True, deletes the directory at 'output_dir' if it exists. Default is False.
+    :type delete_if_exists: bool
+
+    Usage::
+
+        make_directory('/path/to/directory', delete_if_exists=True)  # Creates directory, deleting existing one if necessary
+    """
+    if delete_if_exists and os.path.exists(output_dir):  delete_files_or_directories(output_dir)
+    os.makedirs(output_dir, exist_ok=True)  # Create the directory

@@ -1,37 +1,52 @@
+import inspect
 import logging
 import sys
 from datetime import datetime
+
 class ColoredLogger(logging.Formatter):
     """Custom logger formatter to add colors to log messages"""
 
-    COLOR_CODES = {
-        "RESET": "\033[0m",
-        "INFO": "\033[94m",   # Blue
-        "WARNING": "\033[93m",   # Yellow
-        "ERROR": "\033[91m",   # Red
-    }
-
     def format(self, record):
+        COLOR_CODES = {
+            "DEBUG": "\033[92m",   # Green
+            "INFO": "\033[94m",   # Blue
+            "WARNING": "\033[93m",   # Yellow
+            "ERROR": "\033[91m",   # Red
+            "RESET": "\033[0m"
+        }
+
         log_time = datetime.utcnow().isoformat() + "Z"
         log_level = record.levelname
-        log_message = record.msg
+        log_message = record.getMessage()
+        log_name = record.name
 
-        if log_level == "INFO":
-            log_level = self.COLOR_CODES["INFO"] + log_level + self.COLOR_CODES["RESET"]
-        elif log_level == "WARNING":
-            log_level = self.COLOR_CODES["WARNING"] + log_level + self.COLOR_CODES["RESET"]
-        elif log_level == "ERROR":
-            log_level = self.COLOR_CODES["ERROR"] + log_level + self.COLOR_CODES["RESET"]
+        color_code = COLOR_CODES.get(log_level, COLOR_CODES["RESET"])
+        colored_log_level = color_code + log_level + COLOR_CODES["RESET"]
 
-        return f"{log_time} [{log_level}] {log_message}"
+        return f"{log_time} [{colored_log_level}] {log_name}: {log_message}"
 
-# Create logger instance
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+def setup_logger(name, level=logging.DEBUG):
+    # Create logger instance
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
 
-# Create console handler and set formatter
-console_handler = logging.StreamHandler(sys.stdout)
-console_handler.setFormatter(ColoredLogger())
+    # Create console handler and set formatter
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(ColoredLogger())
 
-# Add console handler to the logger
-logger.addHandler(console_handler)
+    # Add console handler to the logger
+    logger.addHandler(console_handler)
+
+    return logger
+
+def get_caller_logger():
+    # Get the name of the script or module that called the current function
+    caller_frame = inspect.stack()[1]
+    caller_module = inspect.getmodule(caller_frame[0])
+    caller_name = caller_module.__name__.split('.')[-1]
+
+    # Set up the logger with the name of the calling script or module
+    return setup_logger(caller_name)
+
+# Setup a logger
+logger = setup_logger(__name__.split('.')[-1])
