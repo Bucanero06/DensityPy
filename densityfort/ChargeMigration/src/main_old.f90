@@ -40,7 +40,7 @@ program ChargeMigration
   real(kind(1d0)), parameter    :: BATH_TEMPERATURE    = WATER_MELTING_POINT + 3000
   real(kind(1d0)), parameter    :: BETA = 1.d0 / ( BOLTZMANN_CONSTANT_auK * BATH_TEMPERATURE )
 
-  real(kind(1d0)), parameter    :: DEPHASING_FACTOR  = 1.d-2
+  real(kind(1d0)), parameter    :: dephasing_factor  = 1.d-2
   real(kind(1d0)), parameter    :: RELAXATION_FACTOR = 0.d-2
 
   !.. Run-time parameters
@@ -52,7 +52,7 @@ program ChargeMigration
   real(kind(1d0))               :: Tmin
   real(kind(1d0))               :: Tmax
   real(kind(1d0))               :: PolVec(3)
-  character(len=:), allocatable :: Ext_Field_File
+  character(len=:), allocatable :: Ext_field_file
   logical                       :: Verbous
   integer         , allocatable :: ivorb(:)
 
@@ -249,7 +249,7 @@ program ChargeMigration
      enddo
      !
      !.. Dephasing Factor
-     PairGamma(i,i) = DEPHASING_FACTOR * sqrt(dBuf)
+     PairGamma(i,i) = dephasing_factor * sqrt(dBuf)
      !
   enddo
   !
@@ -391,7 +391,7 @@ program ChargeMigration
         !.. Save Charge Density
 
         write(istrn,"(f12.4)")t
-        call SaveChDen(OutDir// "/ChDen"//trim(adjustl(istrn)), nPts, gridv, ChDen, Weightv, nAtoms)   
+        call Write_Charge_Density(OutDir// "/ChDen"//trim(adjustl(istrn)), nPts, gridv, ChDen, Weightv, nAtoms)
 
         !.. 
         call Compute_Q_Charge(nAtoms, nPts, ChDen, Weightv, Volume, Q_Charge) 

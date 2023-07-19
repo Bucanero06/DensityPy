@@ -45,7 +45,7 @@ program ChargeMigration
     integer :: nTimes
     real(kind(1d0)) :: Tmin
     real(kind(1d0)) :: Tmax
-    character(len = :), allocatable :: Ext_Field_File
+    character(len = :), allocatable :: Ext_field_file
     character(len = :), allocatable :: Weight_File
     logical :: Verbous
     logical :: Weight_File_flag
@@ -53,7 +53,7 @@ program ChargeMigration
     integer, allocatable :: ivorb(:)
     integer :: OrbNumber
     real(kind(1d0)) :: Volume
-    real(kind(1d0)) :: DEPHASING_FACTOR
+    real(kind(1d0)) :: dephasing_factor
     real(kind(1d0)) :: RELAXATION_FACTOR
     real(kind(1d0)) :: BATH_TEMPERATURE
     integer, parameter :: GS_IDX = 1
@@ -106,13 +106,13 @@ program ChargeMigration
     real(kind(1d0)), allocatable :: ChargeTotal1(:), ChargeTotal2(:), Becke_new(:, :, :, :), Dipole_new(:, :), Dipole_new_(:), Becke_new1(:, :, :, :), data(:, :, :, :)
     real(kind(1d0)) :: data1, data2, data3, Orbital_overlap_self, Orbital_overlap_other, Computed_Volume, MASK
     real   (kind(1d0)), allocatable :: AtomicChargeVec_new(:, :), AtomicChargeEvolution_new(:, :, :)
-    integer :: iOrb, jOrb, nOrbs, iExcitation
+    integer :: iOrb, jOrb, nOrbs, i_excitation
     real(kind(1d0)), allocatable :: QchargeVec_new    (:, :), R_el(:, :)
     character(len = 64) :: excitation_string
 
     call GetRunTimeParameters(InpDir, OutDir, FileGeometry, &
-            nTimes, Tmin, Tmax, Ext_Field_File, Verbous, Weight_File, Weight_File_flag, &
-            SaveDensity, ivorb, OrbNumber, Volume, DEPHASING_FACTOR, RELAXATION_FACTOR, BATH_TEMPERATURE)
+            nTimes, Tmin, Tmax, Ext_field_file, Verbous, Weight_File, Weight_File_flag, &
+            SaveDensity, ivorb, OrbNumber, Volume, dephasing_factor, RELAXATION_FACTOR, BATH_TEMPERATURE)
 
     call system("mkdir -p " // trim(OutDir))
     call system("mkdir -p " // OutDir // "/Dipole")
@@ -168,16 +168,16 @@ program ChargeMigration
     call ComputeVolume(nPts, Computed_Volume, gridv)
     call LoadOrbitals(InpDir, nOrb, ivOrb, npts, OrbTab)! $\varphi_n(\vec{r}_i)$
     !.. Compute Liouvillian and Diagonalizes it
-    call ComputeLiouvillian01(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, DEPHASING_FACTOR, RELAXATION_FACTOR)
+    call ComputeLiouvillian01(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, dephasing_factor, RELAXATION_FACTOR)
     call DiagonalizeLindblad0(Liouvillian0, L0_Eval, L0_LEvec, L0_REvec)
 
     !..Computes Real and Imaginary Components of the Dipole for each Molecular Excitation and the Ground State with no Excitations
     !    nStates = 3!
-    Single_Excitation_Loop : do iExcitation = 1, nStates
-        write(excitation_string, '(a,i0.2)') 'mkdir -p ' // OutDir // '/Dipole/Dipole_State_', iExcitation
+    Single_Excitation_Loop : do i_excitation = 1, nStates
+        write(excitation_string, '(a,i0.2)') 'mkdir -p ' // OutDir // '/Dipole/Dipole_State_', i_excitation
         call system(excitation_string)
-        write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', iExcitation
-        call EMULATE(excitation_string, N_Simulations, zMuEV, zDmat_t, L0_Eval, L0_LEvec, L0_REvec, GS_IDX, iExcitation, nTimes, tmin, dt, nStates)
+        write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', i_excitation
+        call EMULATE(excitation_string, N_Simulations, zMuEV, zDmat_t, L0_Eval, L0_LEvec, L0_REvec, GS_IDX, i_excitation, nTimes, tmin, dt, nStates)
     end do Single_Excitation_Loop
     stop
     !
@@ -199,22 +199,22 @@ contains
         complex(kind(1d0)), allocatable :: zStatRho(:, :), zMuEV(:, :)
         complex   (kind(1d0)) :: EPSILON
         character(len = 64) :: PART, excitation_string, file
-        integer :: iEPSILON
+        integer :: i_epsilon
         !
         real   (kind(1d0)) :: Mean, Variance, StdDev   ! results
         integer :: n, i
         EPSILON = 10e-5
         !
-        EPSILON_loop : do iEPSILON = 1, 2
+        EPSILON_loop : do i_epsilon = 1, 2
             !
-            if (iEPSILON == 1) then
+            if (i_epsilon == 1) then
                 PART = "Real"
-            elseif (iEPSILON == 2) then
+            elseif (i_epsilon == 2) then
                 PART = "Imaginary"
                 EPSILON = EPSILON * Zi
             end if
             !
-            if ((STATE_TO_EXCITE == GS_IDX) .and. (iEPSILON == 2)) cycle
+            if ((STATE_TO_EXCITE == GS_IDX) .and. (i_epsilon == 2)) cycle
             !
             if(allocated(zStatRho))deallocate(zStatRho)
             allocate(zStatRho(nStates, nStates))
@@ -261,7 +261,7 @@ contains
                 !
                 !.. Save Dipole to file
                 excitation_string = trim(FileName) // "/Dipole" // trim(Simulation_tagv(iSim)) // "_" // trim(PART)
-                call Save_Dipole(excitation_string, zMuEV, nTimes, tmin, dt)
+                call Write_Dipole(excitation_string, zMuEV, nTimes, tmin, dt)
                 !
             end do Sim_loop
             !
@@ -1113,7 +1113,7 @@ contains
         real(kind(1d0)), parameter :: WATER_MELTING_POINT = 273.15
         real(kind(1d0)), parameter :: BATH_TEMPERATURE = WATER_MELTING_POINT + 3000
         real(kind(1d0)), parameter :: BETA = 1.d0 / (BOLTZMANN_CONSTANT_auK * BATH_TEMPERATURE)
-        real(kind(1d0)), parameter :: DEPHASING_FACTOR = 1.d-3
+        real(kind(1d0)), parameter :: dephasing_factor = 1.d-3
         real(kind(1d0)), parameter :: RELAXATION_FACTOR = 1.d-3
 
         integer :: nLiou, nStates, i, j, iLiou, i1, i2, iLiou1, iLiou2
@@ -1152,7 +1152,7 @@ contains
             enddo
             !
             !.. Dephasing Factor
-            PairGamma(i, i) = DEPHASING_FACTOR * sqrt(dBuf)
+            PairGamma(i, i) = dephasing_factor * sqrt(dBuf)
             !
         enddo
         !
@@ -1178,12 +1178,12 @@ contains
     end subroutine ComputeLiouvillian0
     !###########################################
 
-    subroutine ComputeLiouvillian01(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, DEPHASING_FACTOR, RELAXATION_FACTOR)
+    subroutine ComputeLiouvillian01(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, dephasing_factor, RELAXATION_FACTOR)
         real   (kind(1d0)), intent(in) :: Evec(:)
         real   (kind(1d0)), intent(in) :: Dmat(:, :, :)
         complex(kind(1d0)), allocatable, intent(out) :: Liouvillian0(:, :)
 
-        real(kind(1d0)), intent(in) :: DEPHASING_FACTOR
+        real(kind(1d0)), intent(in) :: dephasing_factor
         real(kind(1d0)), intent(in) :: RELAXATION_FACTOR
         real(kind(1d0)), intent(in) :: BATH_TEMPERATURE
 
@@ -1226,7 +1226,7 @@ contains
             enddo
             !
             !.. Dephasing Factor
-            PairGamma(i, i) = DEPHASING_FACTOR * sqrt(dBuf)
+            PairGamma(i, i) = dephasing_factor * sqrt(dBuf)
             !
         enddo
         !
@@ -1284,7 +1284,7 @@ contains
     end subroutine DiagonalizeLindblad0
 
     !>>
-    subroutine Save_Dipole(FileName, Dipole, nTimes, tmin, dt)
+    subroutine Write_Dipole(FileName, Dipole, nTimes, tmin, dt)
         character(len = *), intent(in) :: FileName
         complex(kind(1d0)), intent(in) :: Dipole(:, :)
         real   (kind(1d0)), intent(in) :: tmin, dt
@@ -1303,10 +1303,10 @@ contains
             write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((dble(Dipole(iPol, it)), aimag(Dipole(iPol, it))), iPol = 1, 3)
         enddo
         close(uid_dipole)
-    end subroutine Save_Dipole
+    end subroutine Write_Dipole
     !
     !
-    subroutine Save_Dipole1(FileName, Dipole, nTimes, tmin, dt)
+    subroutine Write_Dipole1(FileName, Dipole, nTimes, tmin, dt)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: Dipole(:, :)
         !        complex(kind(1d0)), intent(in) :: Dipole(:, :)
@@ -1327,9 +1327,9 @@ contains
             write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((Dipole(iPol, it), 0.d0), iPol = 1, 3)
         enddo
         close(uid_dipole)
-    end subroutine Save_Dipole1
+    end subroutine Write_Dipole1
 
-    subroutine Save_Q_Charge(FileName, Charge, nTimes, tmin, dt, nAtoms)
+    subroutine Write_Q_Charge(FileName, Charge, nTimes, tmin, dt, nAtoms)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: Charge(:, :)
         real   (kind(1d0)), intent(in) :: tmin, dt
@@ -1358,10 +1358,10 @@ contains
         !        enddo
         !        !
         close(uid_AtomicCharge)
-    end subroutine Save_Q_Charge
+    end subroutine Write_Q_Charge
     !
     !
-    subroutine Save_Q_Charge1(FileName, Charge, nTimes, tmin, dt, nAtoms)
+    subroutine Write_Q_Charge1(FileName, Charge, nTimes, tmin, dt, nAtoms)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: Charge(:, :, :)
         real   (kind(1d0)), intent(in) :: tmin, dt
@@ -1384,7 +1384,7 @@ contains
         enddo
         !
         close(uid_AtomicCharge)
-    end subroutine Save_Q_Charge1
+    end subroutine Write_Q_Charge1
 
     !    !*** APPARENTLY, IT IS NOT WORKING YET!
     !    subroutine ComputeDipoleFTplus(&

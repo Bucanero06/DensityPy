@@ -10,7 +10,7 @@ contains
   !> Reads the run time parameters specified in the command line.
   subroutine GetRunTimeParameters( InpDir, OutDir, FileGeometry, &
                 nTimes, Tmin, Tmax, FieldFile, Verbous, Weight_File, Weight_File_flag, &
-                SaveDensity, ivorb, OrbNumber, Volume, DEPHASING_FACTOR, RELAXATION_FACTOR, BATH_TEMPERATURE)
+                SaveDensity, ivorb, OrbNumber, Volume, dephasing_factor, RELAXATION_FACTOR, BATH_TEMPERATURE)
     !
     use ModuleErrorHandling
     use ModuleCommandLineParameterList
@@ -31,7 +31,7 @@ contains
     logical                      , intent(out) :: SaveDensity
     integer         , allocatable, intent(out) :: ivorb(:)
     real(kind(1d0))              , intent(out) :: Volume
-    real(kind(1d0))              , intent(out) :: DEPHASING_FACTOR
+    real(kind(1d0))              , intent(out) :: dephasing_factor
     real(kind(1d0))              , intent(out) :: RELAXATION_FACTOR
     real(kind(1d0))              , intent(out) :: BATH_TEMPERATURE
     !
@@ -80,7 +80,7 @@ contains
     call List%Get( "-tmax", Tmax  )
     call List%Get( "-vol", Volume  )
     call List%Get( "-rf", RELAXATION_FACTOR  )
-    call List%Get( "-df", DEPHASING_FACTOR  )
+    call List%Get( "-df", dephasing_factor  )
     call List%Get( "-bath", BATH_TEMPERATURE  )
     Verbous = List%Present("-v")
 

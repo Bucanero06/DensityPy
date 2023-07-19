@@ -37,75 +37,79 @@ def Write_FieldHelp():
 
 
 # >Writes pulses to Field File ,Pump Probe Experiment (0)
-def Write_Pulses(Field_File, Type_of_Pulse_Pump, Start_Time, Pump_Central_Frequency,
-                 Pump_Periods, Pump_Phase, Pump_Intensity, Pump_Polarization,
-                 Type_of_Pulse_Probe, Time_Delay_Range, Probe_Central_Frequency,
-                 Probe_Periods, Probe_Phase, Probe_Intensity, Probe_Polarization, writeCM):
-    with open(Field_File, 'w') as fout:
-        Pump_Polarization = " ".join(map(str, Pump_Polarization))
-        Probe_Polarization = " ".join(map(str, Probe_Polarization))
+def Write_Pulses(field_file, type_of_pulse_pump, start_time, pump_central_frequency,
+                 pump_periods, pump_phase, pump_intensity, pump_polarization,
+                 type_of_pulse_probe, time_delay_range, probe_central_frequency,
+                 probe_periods, probe_phase, probe_intensity, probe_polarization, write_charge_migration):
+
+    print(f'{field_file = }')
+
+    with open(field_file, 'w') as fout:
+        pump_polarization = " ".join(map(str, pump_polarization))
+        probe_polarization = " ".join(map(str, probe_polarization))
 
         # >Writes Pump Pulse
-        fout.write("[XUV]{( " + str(Type_of_Pulse_Pump) + " " +
-                   str(Start_Time) + " " +
-                   str(Pump_Central_Frequency) + " " +
-                   str(Pump_Periods) + " " +
-                   str(Pump_Phase) + "  " +
-                   str(Pump_Intensity) + " " +
-                   str(Pump_Polarization) + " );}")
-        for Time_Delay in Time_Delay_Range:
-            # split Probe_Polarization from list to string of the form "theta phi"
+        fout.write("[XUV]{( " + str(type_of_pulse_pump) + " " +
+                   str(start_time) + " " +
+                   str(pump_central_frequency) + " " +
+                   str(pump_periods) + " " +
+                   str(pump_phase) + "  " +
+                   str(pump_intensity) + " " +
+                   str(pump_polarization) + " );}")
+        for Time_Delay in time_delay_range:
+            # split probe_polarization from list to string of the form "theta phi"
 
             # >Writes Probe Pulse
-            # fout.write("\n[PP" + str(Time_Delay) + "]{ XUV; ( " + str(Type_of_Pulse_Probe) + " " +
+            # fout.write("\n[PP" + str(Time_Delay) + "]{ XUV; ( " + str(type_of_pulse_probe) + " " +
             #            str(Time_Delay) + " " +
-            #            str(Probe_Central_Frequency) + " " +
-            #            str(Probe_Periods) + " " + str(Probe_Phase) + " " +
-            #            str(Probe_Intensity) + " " + " " + Probe_Polarization + " );}")
-            fout.write(f"\n[PP{Time_Delay}]{{ XUV; ( {Type_of_Pulse_Probe} {Time_Delay} {Probe_Central_Frequency} "
-                       f"{Probe_Periods} {Probe_Phase} {Probe_Intensity} {Probe_Polarization} );}}")
+            #            str(probe_central_frequency) + " " +
+            #            str(probe_periods) + " " + str(probe_phase) + " " +
+            #            str(probe_intensity) + " " + " " + probe_polarization + " );}")
+            fout.write(f"\n[PP{Time_Delay}]{{ XUV; ( {type_of_pulse_probe} {Time_Delay} {probe_central_frequency} "
+                       f"{probe_periods} {probe_phase} {probe_intensity} {probe_polarization} );}}")
 
         fout.write("\nEXECUTE{")
-        for Time_Delay in Time_Delay_Range:
+        for Time_Delay in time_delay_range:
             fout.write("PP" + str(Time_Delay) + "; ")
-        if writeCM:
+        if write_charge_migration:
             fout.write("}")
         else:
             fout.write("XUV;}")
 
 
 # # >THIS IS AN EDIT IN PROGRESS DO NOT USE< USE THE ABOVE
-# def Write_Pulses(Field_File, Type_of_Pulse_Pump, Start_Time, Pump_Central_Frequency,
-#                  Pump_Periods, Pump_Phase, Pump_Intensity, Pump_Polarization,
-#                  Type_of_Pulse_Probe, Time_Delay_Range, Probe_Central_Frequency,
-#                  Probe_Periods, Probe_Phase, Probe_Intensity, Probe_Polarization, writeCM):
-#     with open(Field_File, 'w') as fout:
-#         for Time_Delay in Time_Delay_Range:
+# def Write_Pulses(field_file, type_of_pulse_pump, start_time, pump_central_frequency,
+#                  pump_periods, pump_phase, pump_intensity, pump_polarization,
+#                  type_of_pulse_probe, time_delay_range, probe_central_frequency,
+#                  probe_periods, probe_phase, probe_intensity, probe_polarization, write_charge_migration):
+#     with open(field_file, 'w') as fout:
+#         for Time_Delay in time_delay_range:
 #             # >Writes Probe Pulse
-#             fout.write("\n[PP" + str(Time_Delay) + "]{( " + str(Type_of_Pulse_Probe) + " " +
+#             fout.write("\n[PP" + str(Time_Delay) + "]{( " + str(type_of_pulse_probe) + " " +
 #                        str(Time_Delay) + " " +
-#                        str(Probe_Central_Frequency) + " " +
-#                        str(Probe_Periods) + " " + str(Probe_Phase) + " " +
-#                        str(Probe_Intensity) + " " + " " + Probe_Polarization + " );}")
+#                        str(probe_central_frequency) + " " +
+#                        str(probe_periods) + " " + str(probe_phase) + " " +
+#                        str(probe_intensity) + " " + " " + probe_polarization + " );}")
 #         fout.write("\nEXECUTE{")
-#         for Time_Delay in Time_Delay_Range:
+#         for Time_Delay in time_delay_range:
 #             fout.write("PP" + str(Time_Delay) + "; ")
 #         else:
 #             fout.write("}")
 
 
 # >Calls Charge Migration Code and gives command line arguements (1)
-def Call_Charge_Migration(Bin_Directory, Input_Directory, Output_Directory, Number_Of_Times,
-                          Min_Time, Max_Time, Field_File, stept, stepw,
-                          geometry, orbital_list, writeCMflag, Volume, debug_mode, weights_file, dephasing_factor,
-                          relaxing_factor, bath_temp, iExcitation, iEPSILON):
+def Call_Charge_Migration(Bin_Directory, input_directory, experiment_directory, number_of_times,
+                          min_time, max_time, field_file, stept, stepw,
+                          geometry, orbital_list, write_charge_migrationflag, Volume, debug_mode, weights_file, dephasing_factor,
+                          relaxation_factor, bath_temp, i_excitation, i_epsilon):
+
     weights_file_decoy = ""
     if weights_file:
         weights_file_decoy = "-w " + weights_file
 
-    writeCMflag_decoy = ""
-    if writeCMflag:
-        writeCMflag_decoy = "-sden"
+    write_charge_migrationflag_decoy = ""
+    if write_charge_migrationflag:
+        write_charge_migrationflag_decoy = "-sden"
 
     screen_print = "Calling ChargeMigration"
     debug_mode_decoy = ""
@@ -119,18 +123,19 @@ def Call_Charge_Migration(Bin_Directory, Input_Directory, Output_Directory, Numb
         # FIXME : This is a temporary fix for the issue with the MKL library and my pycharm env
         f"export LD_LIBRARY_PATH='/opt/intel/oneapi/mkl/2023.2.0/lib/intel64:/opt/intel/oneapi/compiler/2023.2.0/linux/compiler/lib/intel64_lin:$LD_LIBRARY_PATH' &&"
         f"{Bin_Directory}/"
-        f"{debug_mode_decoy}ChargeMigration -i {Input_Directory} -o {Output_Directory} -nt {str(Number_Of_Times)} "
-        f"-tmin {str(Min_Time)} -tmax {str(Max_Time)} -field {Field_File} -vol {str(Volume)} -stept {str(stept)} "
-        f"-stepw {str(stepw)} -xyz {str(geometry)} {weights_file_decoy} {writeCMflag_decoy} -iorb "
-        f"{','.join(map(repr, orbital_list))} -rf {str(relaxing_factor)} -bath {str(bath_temp)} -df "
-        f"{str(dephasing_factor)} -s {iExcitation} -e {iEPSILON}")
+        f"{debug_mode_decoy}ChargeMigration -i {input_directory} -o {experiment_directory} -nt {str(number_of_times)} "
+        f"-tmin {str(min_time)} -tmax {str(max_time)} -field {field_file} -vol {str(Volume)} -stept {str(stept)} "
+        f"-stepw {str(stepw)} -xyz {str(geometry)} {weights_file_decoy} {write_charge_migrationflag_decoy} -iorb "
+        f"{','.join(map(repr, orbital_list))} -rf {str(relaxation_factor)} -bath {str(bath_temp)} -df "
+        f"{str(dephasing_factor)} -s {i_excitation} -e {i_epsilon}"
+    , _logger=logger)
 
     logger.info("Finished Executing ChargeMigration")
 
 
-def Call_Charge_MigrationFT(Bin_Directory, Input_Directory, Output_Directory, geometry, Number_of_Omegas,
-                            Min_Omegas, Max_Omegas, Number_of_TauOmega, Min_TauOmega, Max_TauOmega,
-                            TimeStep_FT, WidthStep_FT, Field_File, debug_mode, iExcitation, iEPSILON):
+def Call_Charge_MigrationFT(Bin_Directory, input_directory, experiment_directory, geometry, Number_of_Omegas,
+                            min_omegas, max_omegas, number_of_tau_omega, min_tau_omega, max_tau_omega,
+                            ft_time_step, ft_width_step, field_file, debug_mode, i_excitation, i_epsilon):
     screen_print = "Running ChargeMigrationFT"
     debug_mode_decoy = ""
     if debug_mode:
@@ -143,31 +148,32 @@ def Call_Charge_MigrationFT(Bin_Directory, Input_Directory, Output_Directory, ge
         # FIXME : This is a temporary fix for the issue with the MKL library and pycharm
         f"export LD_LIBRARY_PATH='/opt/intel/oneapi/mkl/2023.2.0/lib/intel64:/opt/intel/oneapi/compiler/2023.2.0/linux/compiler/lib/intel64_lin:$LD_LIBRARY_PATH' &&"
         f"{Bin_Directory}/"
-        f'{debug_mode_decoy}ChargeMigrationFT -i {str(Input_Directory)} -o {str(Output_Directory)} -xyz '
-        f'{str(geometry)} -stept {str(TimeStep_FT)} -stepw {str(WidthStep_FT)} -field {str(Field_File)} -nw '
-        f'{str(Number_of_Omegas)} -wmax {str(Min_Omegas)} -wmin {str(Max_Omegas)} -ntw {str(Number_of_TauOmega)} '
-        f'-twmax {str(Min_TauOmega)} -twmin {str(Max_TauOmega)} -s {iExcitation} -e {iEPSILON}')
+        f'{debug_mode_decoy}ChargeMigrationFT -i {str(input_directory)} -o {str(experiment_directory)} -xyz '
+        f'{str(geometry)} -stept {str(ft_time_step)} -stepw {str(ft_width_step)} -field {str(field_file)} -nw '
+        f'{str(Number_of_Omegas)} -wmax {str(min_omegas)} -wmin {str(max_omegas)} -ntw {str(number_of_tau_omega)} '
+        f'-twmax {str(min_tau_omega)} -twmin {str(max_tau_omega)} -s {i_excitation} -e {i_epsilon}'
+    , _logger=logger)
 
     logger.info("Finished Executing ChargeMigrationFT")
 
 
-def Save_Spectrum_Difference(Bin_Directory, Output_Directory, difference_file, Dephasing_Factor, Relaxing_Factor,
-                             Time_Delay_Start,
-                             Time_Delay_Stop, Min_Omegas,
-                             Max_Omegas, Pump_Periods, Probe_Periods, Pump_Intensity,
-                             Probe_Intensity, Number_Of_PP, Pump_Phase, Probe_Phase, TimeStep_FT, WidthStep_FT,
-                             Pump_Polarization, Probe_Polarization, Number_of_Omegas, Min_TauOmega,
-                             Max_TauOmega):
-    FT_WW_TAIL = f'DephasingFactor_{Dephasing_Factor}_' \
-                 f'RelaxingFactor_{Relaxing_Factor}_Tau_{Time_Delay_Start}_{Time_Delay_Stop}_' \
-                 f'W_{Min_Omegas}_{Max_Omegas}_PumpPeriods_{Pump_Periods}_ProbePeriods_{Probe_Periods}_' \
-                 f'PumpIntensity_{Pump_Intensity}_ProbeIntensity_{Probe_Intensity}_' \
-                 f'PumpPhase_{Pump_Phase}_ProbePhase_{Probe_Phase}_TimeStep_FT_{TimeStep_FT}_WidthStep_FT_{WidthStep_FT}'
+def Save_Spectrum_Difference(Bin_Directory, experiment_directory, difference_file, dephasing_factor, relaxation_factor,
+                             time_delay_start,
+                             time_delay_stop, min_omegas,
+                             max_omegas, pump_periods, probe_periods, pump_intensity,
+                             probe_intensity, Number_Of_PP, pump_phase, probe_phase, ft_time_step, ft_width_step,
+                             pump_polarization, probe_polarization, Number_of_Omegas, min_tau_omega,
+                             max_tau_omega):
+    FT_WW_TAIL = f'DephasingFactor_{dephasing_factor}_' \
+                 f'RelaxingFactor_{relaxation_factor}_Tau_{time_delay_start}_{time_delay_stop}_' \
+                 f'W_{min_omegas}_{max_omegas}_PumpPeriods_{pump_periods}_ProbePeriods_{probe_periods}_' \
+                 f'PumpIntensity_{pump_intensity}_ProbeIntensity_{probe_intensity}_' \
+                 f'PumpPhase_{pump_phase}_ProbePhase_{probe_phase}_ft_time_step_{ft_time_step}_ft_width_step_{ft_width_step}'
 
-    oldpath = f'{Output_Directory}/DipoleFT_ww_reconstructed'
+    oldpath = f'{experiment_directory}/DipoleFT_ww_reconstructed'
     if path.exists(oldpath):
         #
-        newfilepath = f'{Output_Directory}/Dipole/DipoleFT_ww_reconstructed_{FT_WW_TAIL}'
+        newfilepath = f'{experiment_directory}/Dipole/DipoleFT_ww_reconstructed_{FT_WW_TAIL}'
         newfilepath = uniquify(newfilepath)
         system(f'mv {oldpath} {newfilepath}')
 
@@ -191,8 +197,8 @@ def Dipole_Charge_Comparison(dipole_file, charge_file, output_file):
     system('rm temp_charge temp_dipole temp_difference')
 
 
-def Call_Spectrum_Reconstruction_n_Difference(Bin_Directory, MolcasOut, SimOut, Geometry, Number_of_Omegas,
-                                              Min_Omegas, Max_Omegas, Number_of_TauOmega, Min_TauOmega, Max_TauOmega,
+def Call_Spectrum_Reconstruction_n_Difference(Bin_Directory, molcas_output_directory, experiment_directory, xyz_file_path, Number_of_Omegas,
+                                              min_omegas, max_omegas, number_of_tau_omega, min_tau_omega, max_tau_omega,
                                               debug_mode):
     screen_print = "Running Spectrum Reconstruction"
     debug_mode_decoy = ""
@@ -206,55 +212,56 @@ def Call_Spectrum_Reconstruction_n_Difference(Bin_Directory, MolcasOut, SimOut, 
         # FIXME : This is a temporary fix for the issue with the MKL library and pycharm
         f"export LD_LIBRARY_PATH='/opt/intel/oneapi/mkl/2023.2.0/lib/intel64:/opt/intel/oneapi/compiler/2023.2.0/linux/compiler/lib/intel64_lin:$LD_LIBRARY_PATH' &&"
         f"{Bin_Directory}/"
-        f'{debug_mode_decoy}SpectrumReconstruction -i {str(MolcasOut)} -o {str(SimOut)} -xyz '
-        f'{str(Geometry)} -nw {str(Number_of_Omegas)} -wmax {str(Max_Omegas)} -wmin {str(Min_Omegas)} -ntw {str(Number_of_TauOmega)} -twmax {str(Max_TauOmega)} -twmin {str(Min_TauOmega)}'
+        f'{debug_mode_decoy}SpectrumReconstruction -i {str(molcas_output_directory)} -o {str(experiment_directory)} -xyz '
+        f'{str(xyz_file_path)} -nw {str(Number_of_Omegas)} -wmax {str(max_omegas)} -wmin {str(min_omegas)} -ntw {str(number_of_tau_omega)} -twmax {str(max_tau_omega)} -twmin {str(min_tau_omega)}'
+        , _logger=logger
     )
 
     logger.info("Finished Executing SpectrumReconstruction")
 
 
-def Save_Previous_FT(Output_Directory, Dephasing_Factor, Relaxing_Factor, Time_Delay_Start, Time_Delay_Stop, Min_Omegas,
-                     Max_Omegas, Pump_Periods, Probe_Periods, Pump_Intensity,
-                     Probe_Intensity, Number_Of_PP, Pump_Phase, Probe_Phase, TimeStep_FT, WidthStep_FT,
-                     Pump_Polarization, Probe_Polarization, Number_of_Omegas, Min_TauOmega,
-                     Max_TauOmega):
+def Save_Previous_FT(experiment_directory, dephasing_factor, relaxation_factor, time_delay_start, time_delay_stop, min_omegas,
+                     max_omegas, pump_periods, probe_periods, pump_intensity,
+                     probe_intensity, Number_Of_PP, pump_phase, probe_phase, ft_time_step, ft_width_step,
+                     pump_polarization, probe_polarization, Number_of_Omegas, min_tau_omega,
+                     max_tau_omega):
     #
-    FT_WW_TAIL = f'DephasingFactor_{Dephasing_Factor}_' \
-                 f'RelaxingFactor_{Relaxing_Factor}_Tau_{Time_Delay_Start}_{Time_Delay_Stop}_' \
-                 f'W_{Min_Omegas}_{Max_Omegas}_PumpPeriods_{Pump_Periods}_ProbePeriods_{Probe_Periods}_' \
-                 f'PumpIntensity_{Pump_Intensity}_ProbeIntensity_{Probe_Intensity}_' \
-                 f'PumpPhase_{Pump_Phase}_ProbePhase_{Probe_Phase}_TimeStep_FT_{TimeStep_FT}_WidthStep_FT_{WidthStep_FT}'
+    FT_WW_TAIL = f'DephasingFactor_{dephasing_factor}_' \
+                 f'RelaxingFactor_{relaxation_factor}_Tau_{time_delay_start}_{time_delay_stop}_' \
+                 f'W_{min_omegas}_{max_omegas}_PumpPeriods_{pump_periods}_ProbePeriods_{probe_periods}_' \
+                 f'PumpIntensity_{pump_intensity}_ProbeIntensity_{probe_intensity}_' \
+                 f'PumpPhase_{pump_phase}_ProbePhase_{probe_phase}_ft_time_step_{ft_time_step}_ft_width_step_{ft_width_step}'
     #
-    FT_ALL_TAIL = f'DephasingFactor_{Dephasing_Factor}_' \
-                  f'RelaxingFactor_{Relaxing_Factor}_tau_{Time_Delay_Start}_{Time_Delay_Stop}_' \
-                  f'w_{Min_Omegas}_{Max_Omegas}_PumpPeriods_{Pump_Periods}_ProbePeriods_{Probe_Periods}_' \
-                  f'PumpIntensity_{Pump_Intensity}_ProbeIntensity_{Probe_Intensity}_' \
-                  f'PumpPhase_{Pump_Phase}_ProbePhase_{Probe_Phase}_TimeStep_FT_{TimeStep_FT}_WidthStep_FT_{WidthStep_FT}'
+    FT_ALL_TAIL = f'DephasingFactor_{dephasing_factor}_' \
+                  f'RelaxingFactor_{relaxation_factor}_tau_{time_delay_start}_{time_delay_stop}_' \
+                  f'w_{min_omegas}_{max_omegas}_PumpPeriods_{pump_periods}_ProbePeriods_{probe_periods}_' \
+                  f'PumpIntensity_{pump_intensity}_ProbeIntensity_{probe_intensity}_' \
+                  f'PumpPhase_{pump_phase}_ProbePhase_{probe_phase}_ft_time_step_{ft_time_step}_ft_width_step_{ft_width_step}'
     #
-    oldpath = f'{Output_Directory}/AtomicCharge/AtomicChargeFT_ww'
+    oldpath = f'{experiment_directory}/AtomicCharge/AtomicChargeFT_ww'
     if path.exists(oldpath):
         #
-        newfilepath = f'{Output_Directory}/AtomicCharge/AtomicChargeFT_ww_{FT_WW_TAIL}'
+        newfilepath = f'{experiment_directory}/AtomicCharge/AtomicChargeFT_ww_{FT_WW_TAIL}'
         newfilepath = uniquify(newfilepath)
         system(f'mv {oldpath} {newfilepath}')
     #
-    oldpath = f'{Output_Directory}/AtomicCharge/AtomicChargeFT_ALL'
+    oldpath = f'{experiment_directory}/AtomicCharge/AtomicChargeFT_ALL'
     if path.exists(oldpath):
         #
-        newfilepath = f'{Output_Directory}/AtomicCharge/AtomicChargeFT_ALL_{FT_ALL_TAIL}'
+        newfilepath = f'{experiment_directory}/AtomicCharge/AtomicChargeFT_ALL_{FT_ALL_TAIL}'
         newfilepath = uniquify(newfilepath)
         system(f'mv {oldpath} {newfilepath}')
     #
-    oldpath = f'{Output_Directory}/Dipole/DipoleFT_ww'
+    oldpath = f'{experiment_directory}/Dipole/DipoleFT_ww'
     if path.exists(oldpath):
         #
-        newfilepath = f'{Output_Directory}/Dipole/DipoleFT_ww_{FT_WW_TAIL}'
+        newfilepath = f'{experiment_directory}/Dipole/DipoleFT_ww_{FT_WW_TAIL}'
         newfilepath = uniquify(newfilepath)
         system(f'mv {oldpath} {newfilepath}')
     #
-    oldpath = f'{Output_Directory}/Dipole/DipoleFT_ALL'
+    oldpath = f'{experiment_directory}/Dipole/DipoleFT_ALL'
     if path.exists(oldpath):
         #
-        newfilepath = f'{Output_Directory}/Dipole/DipoleFT_ALL_{FT_ALL_TAIL}'
+        newfilepath = f'{experiment_directory}/Dipole/DipoleFT_ALL_{FT_ALL_TAIL}'
         newfilepath = uniquify(newfilepath)
         system(f'mv {oldpath} {newfilepath}')

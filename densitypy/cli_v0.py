@@ -31,7 +31,7 @@ def run(args):
     justh5 = args.justh5
     justgetdipoles = args.justgetdipoles
     justgetdensity = args.justgetdensity
-    writeCM = args.writeCM
+    write_charge_migration = args.write_charge_migration
     givenfieldfile = args.givenfieldfile
     weights_file = args.weights_file
     fieldfilehelp = args.fieldfilehelp
@@ -63,11 +63,11 @@ def run(args):
         parser.read('chargemigration.ini')
 
     # Name of Project
-    Project_Name = parser.get('Project settings', 'Project_Name')
+    project_name = parser.get('Project settings', 'project_name')
     XYZ_Geometry = parser.get('Project settings', 'XYZ Molecule Geometry')
     Number_of_States = parser.getint('Project settings', 'Number of States')
     List_of_Orbitals = list(map(int, parser.get('Project settings', 'List_of_Active_Orbitals').split()))
-    Molcas_Directory = parser.get('Project settings', 'Molcas Output Directory')
+    molcas_directory = parser.get('Project settings', 'Molcas Output Directory')
 
     # Grid Settings
     Nx = parser.getint('GRID settings', 'Number of Points, X axis')
@@ -83,50 +83,50 @@ def run(args):
     Boundary = parser.getfloat('GRID settings', 'Boundary')
 
     # Charge Migration Parameters
-    Output_Directory = parser.get('Charge Migration settings', 'Output Directory')
-    Config_Field_File = parser.get('Charge Migration settings', 'Field File')
-    Number_of_Times = parser.getfloat('Charge Migration settings', 'Number of Times')
-    Min_Time = parser.getfloat('Charge Migration settings', 'Min Time')
-    Max_Time = parser.getfloat('Charge Migration settings', 'Max Time')
+    output_directory = parser.get('Charge Migration settings', 'Output Directory')
+    Config_field_file = parser.get('Charge Migration settings', 'Field File')
+    number_of_times = parser.getfloat('Charge Migration settings', 'Number of Times')
+    min_time = parser.getfloat('Charge Migration settings', 'Min Time')
+    max_time = parser.getfloat('Charge Migration settings', 'Max Time')
     Bath_Temp = parser.getfloat('Charge Migration settings', 'Bath Temperature')
-    Dephasing_Factor = parser.getfloat('Charge Migration settings', 'Dephasing Factor')
-    Relaxing_Factor = parser.getfloat('Charge Migration settings', 'Relaxation Factor')
+    dephasing_factor = parser.getfloat('Charge Migration settings', 'Dephasing Factor')
+    relaxation_factor = parser.getfloat('Charge Migration settings', 'Relaxation Factor')
 
     # Pump Settings
-    Type_of_Pulse_Pump = parser.get('Pulses settings (Pump)', 'Type of Pulse')
-    Start_Time = parser.getfloat('Pulses settings (Pump)', 'Start_Time')
-    Pump_Central_Frequency = parser.getfloat('Pulses settings (Pump)', 'Pump Central Frequency')
-    Pump_Periods = parser.getfloat('Pulses settings (Pump)', 'Pump Periods')
-    Pump_Phase = parser.getfloat('Pulses settings (Pump)', 'Pump Phase')
-    Pump_Intensity = parser.getfloat('Pulses settings (Pump)', 'Pump Intensity')
-    Pump_Polarization = parser.get('Pulses settings (Pump)', 'Pump Polarization')
+    type_of_pulse_pump = parser.get('Pulses settings (Pump)', 'Type of Pulse')
+    start_time = parser.getfloat('Pulses settings (Pump)', 'start_time')
+    pump_central_frequency = parser.getfloat('Pulses settings (Pump)', 'Pump Central Frequency')
+    pump_periods = parser.getfloat('Pulses settings (Pump)', 'Pump Periods')
+    pump_phase = parser.getfloat('Pulses settings (Pump)', 'Pump Phase')
+    pump_intensity = parser.getfloat('Pulses settings (Pump)', 'Pump Intensity')
+    pump_polarization = parser.get('Pulses settings (Pump)', 'Pump Polarization')
     # Probe Settings
-    Type_of_Pulse_Probe = parser.get('Pulses settings (Probe)', 'Type of Pulse')
-    Time_Delay_Start = parser.getint('Pulses settings (Probe)', 'Time Delay Start')
-    Time_Delay_Stop = parser.getint('Pulses settings (Probe)', 'Time Delay Stop')
+    type_of_pulse_probe = parser.get('Pulses settings (Probe)', 'Type of Pulse')
+    time_delay_start = parser.getint('Pulses settings (Probe)', 'Time Delay Start')
+    time_delay_stop = parser.getint('Pulses settings (Probe)', 'Time Delay Stop')
     Number_Of_PP = parser.getint('Pulses settings (Probe)', 'Number Of PP')
-    Probe_Central_Frequency = parser.getfloat('Pulses settings (Probe)', 'Probe Central Frequency')
-    Probe_Periods = parser.getfloat('Pulses settings (Probe)', 'Probe Periods')
-    Probe_Phase = parser.getfloat('Pulses settings (Probe)', 'Probe Phase')
-    Probe_Intensity = parser.getfloat('Pulses settings (Probe)', 'Probe Intensity')
-    Probe_Polarization = parser.get('Pulses settings (Probe)', 'Probe Polarization')
+    probe_central_frequency = parser.getfloat('Pulses settings (Probe)', 'Probe Central Frequency')
+    probe_periods = parser.getfloat('Pulses settings (Probe)', 'Probe Periods')
+    probe_phase = parser.getfloat('Pulses settings (Probe)', 'Probe Phase')
+    probe_intensity = parser.getfloat('Pulses settings (Probe)', 'Probe Intensity')
+    probe_polarization = parser.get('Pulses settings (Probe)', 'Probe Polarization')
 
-    if writeCM:
-        Time_Delay_Range = writeCM
+    if write_charge_migration:
+        time_delay_range = write_charge_migration
     else:
-        Change_In_Delay = (Time_Delay_Stop - Time_Delay_Start) / (Number_Of_PP - 1)
-        Time_Delay_Range = list(Float_Range(Time_Delay_Start,
-                                                  Time_Delay_Stop + Change_In_Delay, Change_In_Delay))
+        Change_In_Delay = (time_delay_stop - time_delay_start) / (Number_Of_PP - 1)
+        time_delay_range = list(Float_Range(time_delay_start,
+                                                  time_delay_stop + Change_In_Delay, Change_In_Delay))
 
     # Charge Migration FT Parameters
     Number_of_Omegas = parser.getfloat('Charge Migration FT settings', 'Number of Omegas')
-    Min_Omegas = parser.getfloat('Charge Migration FT settings', 'Min Omega')
-    Max_Omegas = parser.getfloat('Charge Migration FT settings', 'Max Omega')
-    Number_of_TauOmegas = parser.getfloat('Charge Migration FT settings', 'Number of TauOmegas')
-    Min_TauOmega = parser.getfloat('Charge Migration FT settings', 'Min TauOmega')
-    Max_TauOmega = parser.getfloat('Charge Migration FT settings', 'Max TauOmega')
-    TimeStep_FT = parser.getfloat('Charge Migration FT settings', 'TimeStep (FT)')
-    WidthStep_FT = parser.getfloat('Charge Migration FT settings', 'WidthStep (FT)')
+    min_omegas = parser.getfloat('Charge Migration FT settings', 'Min Omega')
+    max_omegas = parser.getfloat('Charge Migration FT settings', 'Max Omega')
+    number_of_tau_omegas = parser.getfloat('Charge Migration FT settings', 'Number of TauOmegas')
+    min_tau_omega = parser.getfloat('Charge Migration FT settings', 'Min TauOmega')
+    max_tau_omega = parser.getfloat('Charge Migration FT settings', 'Max TauOmega')
+    ft_time_step = parser.getfloat('Charge Migration FT settings', 'TimeStep (FT)')
+    ft_width_step = parser.getfloat('Charge Migration FT settings', 'WidthStep (FT)')
     Volume = step_size * step_size * step_size
     # print("Unit of Volume = " + str(Volume))
 
@@ -146,52 +146,52 @@ def run(args):
         gridflag= True
     # >OpenMolcas
     if pymolcas_input:
-        N_points = 0
+        n_points = 0
         # Prepare Input
-        MakeDirectory(Molcas_Directory)
+        MakeDirectory(molcas_directory)
         true_values = CopyInputFileToEdit(pymolcas_input,
-                                                 Project_Name)  # Copies input file and returns keywords in input file
+                                                 project_name)  # Copies input file and returns keywords in input file
 
-        # MakeDirectoryNoDelete(Molcas_Directory)
+        # MakeDirectoryNoDelete(molcas_directory)
         grid_time = time.time()
         if smartgrid and gridflag:
-            N_points = Make_Better_Grid(Molcas_Directory, XYZ_Geometry, step_size, Boundary, limitedgrid)
+            n_points = Make_Better_Grid(molcas_directory, XYZ_Geometry, step_size, Boundary, limitedgrid)
         elif gridfile:
-            system(f"cp {gridfile} {Molcas_Directory}/gridcoord")
-            N_points = File_Lenth(f'{Molcas_Directory}/gridcoord')
-            print(f"Number of Points = {N_points}")
+            system(f"cp {gridfile} {molcas_directory}/gridcoord")
+            n_points = File_Lenth(f'{molcas_directory}/gridcoord')
+            print(f"Number of Points = {n_points}")
         elif gridflag:
-            Make_Grid_Coordinates(Molcas_Directory, Nx, Ny, Nz, xmin, xmax, ymin, ymax, zmin, zmax)
-            N_points = Nx * Ny * Nz
+            Make_Grid_Coordinates(molcas_directory, Nx, Ny, Nz, xmin, xmax, ymin, ymax, zmin, zmax)
+            n_points = Nx * Ny * Nz
         grid_time = (time.time() - grid_time)
         with open("Sim_Time_Log", 'a') as fout:
             fout.write(f"Time to Make Grid {grid_time}                          time = {time.time()}")
         if gridflag or gridfile:
-            AddGridItToManualInputFile(pymolcas_input, Project_Name, Molcas_Directory, List_of_Orbitals,
-                                              N_points)
+            AddGridItToManualInputFile(pymolcas_input, project_name, molcas_directory, List_of_Orbitals,
+                                              n_points)
         # >Run Open Molcas
         pymol_time = time.time()
-        Call_OpenMolcas(Project_Name)
+        Call_OpenMolcas(project_name)
         pymol_time = (time.time() - pymol_time)
         with open("Sim_Time_Log", 'a') as fout:
             fout.write("\nTime to Run Pymolcas" + str(pymol_time) +
                        "                          time = " + str(time.time()))
         # Extract Data Required for Charge Migration
         extract_time = time.time()
-        SaveFile(pymolcas_input, Molcas_Directory + "/")
-        logfilepath = Find(Project_Name + ".log", ".", molcas_workdir)
-        SaveFile(logfilepath + "/" + Project_Name + ".log ", Molcas_Directory + "/")
-        SaveFile(XYZ_Geometry, Molcas_Directory + "/")
+        SaveFile(pymolcas_input, molcas_directory + "/")
+        logfilepath = Find(project_name + ".log", ".", molcas_workdir)
+        SaveFile(logfilepath + "/" + project_name + ".log ", molcas_directory + "/")
+        SaveFile(XYZ_Geometry, molcas_directory + "/")
 
         if "RASSI" in true_values:
-            GetDipolesFromLogFile(Project_Name, Molcas_Directory, Number_of_States, molcas_workdir)
-        # Make_MU_HeatMap(Molcas_Directory)
+            GetDipolesFromLogFile(project_name, molcas_directory, Number_of_States, molcas_workdir)
+        # Make_MU_HeatMap(molcas_directory)
 
         if gridflag:
-            ExtractGridDensity(List_of_Orbitals, Project_Name, molcas_workdir, Molcas_Directory)
+            ExtractGridDensity(List_of_Orbitals, project_name, molcas_workdir, molcas_directory)
 
         if "RASSCF" in true_values:
-            LoadFromh5File(Project_Name, Molcas_Directory, molcas_workdir, true_values, "DENSITY_MATRIX",
+            LoadFromh5File(project_name, molcas_directory, molcas_workdir, true_values, "DENSITY_MATRIX",
                                   "TRANSITION_DENSITY_MATRIX", "ROOT_ENERGIES", "AO_MLTPL_X", "AO_MLTPL_Y",
                                   "AO_MLTPL_Z", "MO_ENERGIES", "MO_VECTORS", justh5)
         extract_time = (time.time() - extract_time)
@@ -202,22 +202,22 @@ def run(args):
     # Useful Flags for e.g. debugging
     if justh5:
         true_values = []
-        LoadFromh5File(Project_Name, Molcas_Directory, molcas_workdir, true_values, "DENSITY_MATRIX",
+        LoadFromh5File(project_name, molcas_directory, molcas_workdir, true_values, "DENSITY_MATRIX",
                               "TRANSITION_DENSITY_MATRIX", "ROOT_ENERGIES", "AO_MLTPL_X", "AO_MLTPL_Y", "AO_MLTPL_Z",
                               "MO_ENERGIES", "MO_VECTORS", justh5)
     if justgetdensity:
-        ExtractGridDensity(List_of_Orbitals, Project_Name, molcas_workdir, Molcas_Directory)
+        ExtractGridDensity(List_of_Orbitals, project_name, molcas_workdir, molcas_directory)
 
     if justgetdipoles:
-        GetDipolesFromLogFile(Project_Name, Molcas_Directory, Number_of_States, molcas_workdir)
-        Make_MU_HeatMap(Molcas_Directory)
+        GetDipolesFromLogFile(project_name, molcas_directory, Number_of_States, molcas_workdir)
+        Make_MU_HeatMap(molcas_directory)
 
     if cleandirectory:  ######################################################
-        remove(Project_Name + '.status')
-        remove(Project_Name + '.err')
-        remove(Project_Name + '.log')
-        remove(Project_Name + '.input')
-        rmdir(f'{Output_Directory}/Pulses')
+        remove(project_name + '.status')
+        remove(project_name + '.err')
+        remove(project_name + '.log')
+        remove(project_name + '.input')
+        rmdir(f'{output_directory}/Pulses')
         rmdir(molcas_workdir)
 
     # >ChargeMigration
@@ -225,7 +225,7 @@ def run(args):
         Write_FieldHelp()
     if run_ChargeMigration:
         cm_time = time.time()
-        # if writeCM:
+        # if write_charge_migration:
         #     pass
         # elif (weights_file == None):
         #     if path.exists("Weights_File"):
@@ -237,23 +237,23 @@ def run(args):
         #             weights_file = "Weights_File"
         #             print("Using \"-w\" flag")
         if givenfieldfile:
-            Field_File = givenfieldfile
+            field_file = givenfieldfile
         else:
-            Field_File = "Field_pulses"
+            field_file = "Field_pulses"
             # Make Field File
-            Write_Pulses(Field_File, Type_of_Pulse_Pump, Start_Time, Pump_Central_Frequency,
-                              Pump_Periods, Pump_Phase, Pump_Intensity, Pump_Polarization,
-                              Type_of_Pulse_Probe, Time_Delay_Range, Probe_Central_Frequency,
-                              Probe_Periods, Probe_Phase, Probe_Intensity, Probe_Polarization, writeCM)
+            Write_Pulses(field_file, type_of_pulse_pump, start_time, pump_central_frequency,
+                              pump_periods, pump_phase, pump_intensity, pump_polarization,
+                              type_of_pulse_probe, time_delay_range, probe_central_frequency,
+                              probe_periods, probe_phase, probe_intensity, probe_polarization, write_charge_migration)
         # Run Charge Migration
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         #
-        iExcitation = -1  # Just Ground and Prepare
-        iEPSILON = -1  # Just Ground and Prepare
-        Call_Charge_Migration(Molcas_Directory, Output_Directory, Number_of_Times,
-                                   Min_Time, Max_Time, Field_File, TimeStep_FT, WidthStep_FT, XYZ_Geometry,
-                                   List_of_Orbitals, writeCM, Volume, debug_mode, weights_file, Dephasing_Factor,
-                                   Relaxing_Factor, Bath_Temp, iExcitation, iEPSILON)
+        i_excitation = -1  # Just Ground and Prepare
+        i_epsilon = -1  # Just Ground and Prepare
+        Call_Charge_Migration(molcas_directory, output_directory, number_of_times,
+                                   min_time, max_time, field_file, ft_time_step, ft_width_step, XYZ_Geometry,
+                                   List_of_Orbitals, write_charge_migration, Volume, debug_mode, weights_file, dephasing_factor,
+                                   relaxation_factor, Bath_Temp, i_excitation, i_epsilon)
 
         if old_main:
             pass
@@ -262,98 +262,98 @@ def run(args):
             #
             INDEX_MAT = []
             #
-            for iExcitation in range(1, Number_of_States + 1):  # begin iteration
-                for iEPSILON in range(1, 3):  # begin iteration
+            for i_excitation in range(1, Number_of_States + 1):  # begin iteration
+                for i_epsilon in range(1, 3):  # begin iteration
                     #
-                    INDEX_MAT.append((iExcitation, iEPSILON))
+                    INDEX_MAT.append((i_excitation, i_epsilon))
                     #
             Number_CPU = min(((Number_of_States) * 2), cpu_count())
             print(f'\nRunning in Parallel')
             print(f'Using {Number_CPU} CPU\'s out of {cpu_count()} available\n')
             pool = Pool(Number_CPU)
             pool.starmap_async(Call_Charge_Migration,
-                               [(Molcas_Directory, Output_Directory, Number_of_Times,
-                                 Min_Time, Max_Time, Field_File, TimeStep_FT, WidthStep_FT, XYZ_Geometry,
-                                 List_of_Orbitals, writeCM, Volume, debug_mode, weights_file, Dephasing_Factor,
-                                 Relaxing_Factor, Bath_Temp, iExcitation, iEPSILON) for iExcitation, iEPSILON in
+                               [(molcas_directory, output_directory, number_of_times,
+                                 min_time, max_time, field_file, ft_time_step, ft_width_step, XYZ_Geometry,
+                                 List_of_Orbitals, write_charge_migration, Volume, debug_mode, weights_file, dephasing_factor,
+                                 relaxation_factor, Bath_Temp, i_excitation, i_epsilon) for i_excitation, i_epsilon in
                                 INDEX_MAT]).get()
             pool.close()
             # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         else:
-            iExcitation = 0
-            iEPSILON = 0
-            Call_Charge_Migration(Molcas_Directory, Output_Directory, Number_of_Times,
-                                       Min_Time, Max_Time, Field_File, TimeStep_FT, WidthStep_FT, XYZ_Geometry,
-                                       List_of_Orbitals, writeCM, Volume, debug_mode, weights_file, Dephasing_Factor,
-                                       Relaxing_Factor, Bath_Temp, iExcitation, iEPSILON)
+            i_excitation = 0
+            i_epsilon = 0
+            Call_Charge_Migration(molcas_directory, output_directory, number_of_times,
+                                       min_time, max_time, field_file, ft_time_step, ft_width_step, XYZ_Geometry,
+                                       List_of_Orbitals, write_charge_migration, Volume, debug_mode, weights_file, dephasing_factor,
+                                       relaxation_factor, Bath_Temp, i_excitation, i_epsilon)
         cm_time = (time.time() - cm_time)
         with open("Sim_Time_Log", 'a') as fout:
             fout.write(f"\nTime to Run ChargeMigration {str(cm_time / 60)} minutes")
-        SaveFile(ini_file, f"{Output_Directory}/")
+        SaveFile(ini_file, f"{output_directory}/")
     # >ChargeMigrationFT
     if run_ChargeMigrationFT:
         cmft_time = time.time()
         ##
         if save_previous:
-            Save_Previous_FT(Output_Directory, Dephasing_Factor, Relaxing_Factor, Time_Delay_Start,
-                                  Time_Delay_Stop,
-                                  Min_Omegas, Max_Omegas, Pump_Periods, Probe_Periods, Pump_Intensity,
-                                  Probe_Intensity, Number_Of_PP, Pump_Phase, Probe_Phase, TimeStep_FT, WidthStep_FT,
-                                  Pump_Polarization, Probe_Polarization, Number_of_Omegas, Min_TauOmega,
-                                  Max_TauOmega)
+            Save_Previous_FT(output_directory, dephasing_factor, relaxation_factor, time_delay_start,
+                                  time_delay_stop,
+                                  min_omegas, max_omegas, pump_periods, probe_periods, pump_intensity,
+                                  probe_intensity, Number_Of_PP, pump_phase, probe_phase, ft_time_step, ft_width_step,
+                                  pump_polarization, probe_polarization, Number_of_Omegas, min_tau_omega,
+                                  max_tau_omega)
         if givenfieldfile:
-            Field_File = givenfieldfile
+            field_file = givenfieldfile
         else:
-            Field_File = Config_Field_File
+            field_file = Config_field_file
             # Make Field File
-            Write_Pulses(Field_File, Type_of_Pulse_Pump, Start_Time, Pump_Central_Frequency,
-                              Pump_Periods, Pump_Phase, Pump_Intensity, Pump_Polarization,
-                              Type_of_Pulse_Probe, Time_Delay_Range, Probe_Central_Frequency,
-                              Probe_Periods, Probe_Phase, Probe_Intensity, Probe_Polarization, writeCM)
+            Write_Pulses(field_file, type_of_pulse_pump, start_time, pump_central_frequency,
+                              pump_periods, pump_phase, pump_intensity, pump_polarization,
+                              type_of_pulse_probe, time_delay_range, probe_central_frequency,
+                              probe_periods, probe_phase, probe_intensity, probe_polarization, write_charge_migration)
         # Run Charge Migration FT
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if parallel:
             #
             INDEX_MAT = []
             #
-            for iExcitation in range(1, Number_of_States + 1):  # begin iteration
-                for iEPSILON in range(1, 3):  # begin iteration
+            for i_excitation in range(1, Number_of_States + 1):  # begin iteration
+                for i_epsilon in range(1, 3):  # begin iteration
                     #
-                    INDEX_MAT.append((iExcitation, iEPSILON))
+                    INDEX_MAT.append((i_excitation, i_epsilon))
                     #
-            # system(f'rm OutDir/Dipole/Dipole_State_iExcitation')
+            # system(f'rm OutDir/Dipole/Dipole_State_i_excitation')
             Number_CPU = min(((Number_of_States) * 2), (cpu_count()) / 2)
             print(f'\nRunning in Parallel')
             print(f'Using {Number_CPU} CPU\'s out of {cpu_count()} available\n')
             pool = Pool(Number_CPU)
             pool.starmap_async(Call_Charge_MigrationFT,
-                               [(Molcas_Directory, Output_Directory, XYZ_Geometry, Number_of_Omegas,
-                                 Min_Omegas, Max_Omegas, Number_of_TauOmegas, Min_TauOmega, Max_TauOmega,
-                                 TimeStep_FT, WidthStep_FT, Field_File, debug_mode, iExcitation, iEPSILON) for
-                                iExcitation, iEPSILON in INDEX_MAT]).get()
+                               [(molcas_directory, output_directory, XYZ_Geometry, Number_of_Omegas,
+                                 min_omegas, max_omegas, number_of_tau_omegas, min_tau_omega, max_tau_omega,
+                                 ft_time_step, ft_width_step, field_file, debug_mode, i_excitation, i_epsilon) for
+                                i_excitation, i_epsilon in INDEX_MAT]).get()
             pool.close()
             # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         else:
-            iExcitation = 0
-            iEPSILON = 0
-            Call_Charge_MigrationFT(Molcas_Directory, Output_Directory, XYZ_Geometry, Number_of_Omegas,
-                                         Min_Omegas, Max_Omegas, Number_of_TauOmegas, Min_TauOmega, Max_TauOmega,
-                                         TimeStep_FT, WidthStep_FT, Field_File, debug_mode, iExcitation, iEPSILON)
+            i_excitation = 0
+            i_epsilon = 0
+            Call_Charge_MigrationFT(molcas_directory, output_directory, XYZ_Geometry, Number_of_Omegas,
+                                         min_omegas, max_omegas, number_of_tau_omegas, min_tau_omega, max_tau_omega,
+                                         ft_time_step, ft_width_step, field_file, debug_mode, i_excitation, i_epsilon)
         cmft_time = (time.time() - cmft_time)
         with open("Sim_Time_Log", 'a') as fout:
             fout.write(f"\nTime to Run ChargeMigrationFT {str(cmft_time / 60)} minutes")
     # >SpectrumReconstruction
     if run_SpectrumReconstruction:
         if save_previous:
-            Save_Spectrum_Difference(Output_Directory, 'difference_' + Output_Directory, Dephasing_Factor,
-                                          Relaxing_Factor, Time_Delay_Start, Time_Delay_Stop, Min_Omegas, Max_Omegas,
-                                          Pump_Periods, Probe_Periods, Pump_Intensity, Probe_Intensity, Number_Of_PP,
-                                          Pump_Phase, Probe_Phase, TimeStep_FT, WidthStep_FT, Pump_Polarization,
-                                          Probe_Polarization, Number_of_Omegas, Min_TauOmega, Max_TauOmega)
+            Save_Spectrum_Difference(output_directory, 'difference_' + output_directory, dephasing_factor,
+                                          relaxation_factor, time_delay_start, time_delay_stop, min_omegas, max_omegas,
+                                          pump_periods, probe_periods, pump_intensity, probe_intensity, Number_Of_PP,
+                                          pump_phase, probe_phase, ft_time_step, ft_width_step, pump_polarization,
+                                          probe_polarization, Number_of_Omegas, min_tau_omega, max_tau_omega)
         #
-        Call_Spectrum_Reconstruction_n_Difference(Molcas_Directory, Output_Directory, XYZ_Geometry,
-                                                       Number_of_Omegas, Min_Omegas, Max_Omegas, Number_of_TauOmegas,
-                                                       Min_TauOmega, Max_TauOmega, debug_mode)
+        Call_Spectrum_Reconstruction_n_Difference(molcas_directory, output_directory, XYZ_Geometry,
+                                                       Number_of_Omegas, min_omegas, max_omegas, number_of_tau_omegas,
+                                                       min_tau_omega, max_tau_omega, debug_mode)
 
 
 def cli_main():
@@ -427,7 +427,7 @@ def cli_main():
                                         "sequences of pulses to be used by ChargeMigration.",
                         dest="fieldfilehelp", action='store_true')
     group2.add_argument("-sden", help="Save Charge Density to file when running '-cm'(time consuming !)",
-                        dest="writeCM", nargs="+", type=float, action='store')
+                        dest="write_charge_migration", nargs="+", type=float, action='store')
     group2.add_argument("-p", help="run in parallel",
                         dest="parallel", action='store_true')
     group2.add_argument("-debug", help="Runs ChargeMigration or ChargeMigrationFT in debug mode",
@@ -453,7 +453,7 @@ def cli_main():
     #                                     "sequences of pulses to be used by ChargeMigration.",
     #                     dest="fieldfilehelp", action='store_true')
     # group3.add_argument("-sden", help="Save Charge Density to file when running '-cm'(time consuming !)",
-    #                     dest="writeCM", action='store_true')
+    #                     dest="write_charge_migration", action='store_true')
 
     parser.set_defaults(func=run)
     args = parser.parse_args()

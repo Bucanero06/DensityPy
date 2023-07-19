@@ -33,7 +33,7 @@ program ChargeMigration
     use Module_CD_IO
     implicit none
     !.. Run-time parameters
-    character(len = :), allocatable :: InpDir, OutDir, FileGeometry, Ext_Field_File
+    character(len = :), allocatable :: InpDir, OutDir, FileGeometry, Ext_field_file
     real   (kind(1d0)) :: OmegaMin, OmegaMax, TauOmegaMin, TauOmegaMax, StepTime, StepWidth
     integer :: nOmegas, nTauOmegas
     logical :: Verbous

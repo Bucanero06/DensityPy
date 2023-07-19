@@ -43,7 +43,7 @@ program ChargeMigration
     character(len = :), allocatable :: FileGeometry
     real(kind(1d0)) :: StepTime
     real(kind(1d0)) :: StepWidth
-    character(len = :), allocatable :: Ext_Field_File
+    character(len = :), allocatable :: Ext_field_file
     logical :: Verbous
     integer :: nOmegas
     real   (kind(1d0)) :: OmegaMin

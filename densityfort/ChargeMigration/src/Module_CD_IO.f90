@@ -17,11 +17,12 @@ Module Module_CD_IO
             LoadDipoleME, &
             LoadTDMs, &
             LoadDipoleMO, &
-            Save_Dipole, &
-            Save_Q_Charge, &
-            Save_Dipole1, &
-            Save_Q_Charge1, &
-            SaveChDen, &
+            Write_R_el_bc, &
+            Write_Dipole, &
+            Write_Q_Charge, &
+            Write_Dipole1, &
+            Write_Q_Charge1, &
+            Write_Charge_Density, &
             Write_Weights, &
             Read_Weights, &
             Write_Summary
@@ -593,7 +594,20 @@ contains
     end subroutine LoadDipoleMO
 
     !>> Save Subroutines
-    subroutine Save_Dipole(FileName, Dipole, nTimes, tmin, dt)
+    subroutine Write_R_el_bc(OutDir, nAtoms, R_el)
+        integer :: uid
+        character(len = *), intent(in) :: OutDir
+        integer, intent(in) :: nAtoms
+        real(kind(1d0)), allocatable, intent(in) :: R_el(:, :)
+        integer :: iAtom, iPol
+
+        open(newunit = uid, file = OutDir // "/" // "R_el_bc", form = "formatted", status = "unknown")
+        do iAtom = 1, nAtoms
+            write(uid, "(*(x,e24.14e3))") (R_el(iPol, iAtom), iPol = 1, 3)
+        end do
+        close(uid)
+    end subroutine Write_R_el_bc
+    subroutine Write_Dipole(FileName, Dipole, nTimes, tmin, dt)
         character(len = *), intent(in) :: FileName
         complex(kind(1d0)), intent(in) :: Dipole(:, :)
         real   (kind(1d0)), intent(in) :: tmin, dt
@@ -612,8 +626,8 @@ contains
             write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((dble(Dipole(iPol, it)), aimag(Dipole(iPol, it))), iPol = 1, 3)
         enddo
         close(uid_dipole)
-    end subroutine Save_Dipole
-    subroutine Save_Q_Charge(FileName, Charge, nTimes, tmin, dt, nAtoms)
+    end subroutine Write_Dipole
+    subroutine Write_Q_Charge(FileName, Charge, nTimes, tmin, dt, nAtoms)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: Charge(:, :)
         real   (kind(1d0)), intent(in) :: tmin, dt
@@ -642,8 +656,8 @@ contains
         !        enddo
         !        !
         close(uid_AtomicCharge)
-    end subroutine Save_Q_Charge
-    subroutine Save_Dipole1(FileName, Dipole, nTimes, tmin, dt)
+    end subroutine Write_Q_Charge
+    subroutine Write_Dipole1(FileName, Dipole, nTimes, tmin, dt)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: Dipole(:, :)
         !        complex(kind(1d0)), intent(in) :: Dipole(:, :)
@@ -664,8 +678,8 @@ contains
             write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((Dipole(iPol, it), 0.d0), iPol = 1, 3)
         enddo
         close(uid_dipole)
-    end subroutine Save_Dipole1
-    subroutine Save_Q_Charge1(FileName, Charge, nTimes, tmin, dt, nAtoms)
+    end subroutine Write_Dipole1
+    subroutine Write_Q_Charge1(FileName, Charge, nTimes, tmin, dt, nAtoms)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: Charge(:, :, :)
         real   (kind(1d0)), intent(in) :: tmin, dt
@@ -688,8 +702,8 @@ contains
         enddo
         !
         close(uid_AtomicCharge)
-    end subroutine Save_Q_Charge1
-    subroutine SaveChDen(FileName, npts, gridv, ChDen, Weightv, nAtoms)
+    end subroutine Write_Q_Charge1
+    subroutine Write_Charge_Density(FileName, npts, gridv, ChDen, Weightv, nAtoms)
         !
         use ModuleErrorHandling
         use ModuleString
@@ -729,7 +743,7 @@ contains
 
         close(uid)
         !
-    end subroutine SaveChDen
+    end subroutine Write_Charge_Density
 
     !..Write and Read Weights Subroutines
     subroutine Write_Weights(FileName, WEIGHTV, gridv, nAtoms, nPts)

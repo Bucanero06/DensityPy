@@ -10,7 +10,7 @@ contains
   !> Reads the run time parameters specified in the command line.
   subroutine GetRunTimeParameters( InpDir, OutDir, FileGeometry, &
        StepTime, StepWidth, FieldFile, Verbous, &
-       nOmegas, OmegaMin, OmegaMax, nTauOmegas, TauOmegaMin, TauOmegaMax , iExcitation, iEPSILON)
+       nOmegas, OmegaMin, OmegaMax, nTauOmegas, TauOmegaMin, TauOmegaMax , i_excitation, i_epsilon)
     !
     use ModuleErrorHandling
     use ModuleCommandLineParameterList
@@ -32,8 +32,8 @@ contains
     real(kind(1d0))              , intent(out) :: TauOmegaMin
     real(kind(1d0))              , intent(out) :: TauOmegaMax
     !
-    integer                      , intent(out) :: iExcitation
-    integer                      , intent(out) :: iEPSILON
+    integer                      , intent(out) :: i_excitation
+    integer                      , intent(out) :: i_epsilon
     !
     character(len=*), parameter :: PROGRAM_DESCRIPTION=&
          "Computes the FT of the dipole and charge response"
@@ -75,8 +75,8 @@ contains
     call List%Get( "-stept", StepTime  )
     call List%Get( "-stepw", StepWidth )
     !
-    call List%Get( "-s", iExcitation  )
-    call List%Get( "-e", iEPSILON  )
+    call List%Get( "-s", i_excitation  )
+    call List%Get( "-e", i_epsilon  )
     Verbous = List%Present("-v")
     call List%Get( "-field",  strnBuf  )
     allocate(FieldFile,source=trim(adjustl(strnBuf)))

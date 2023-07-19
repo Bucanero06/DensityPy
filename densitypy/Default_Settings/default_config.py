@@ -2,9 +2,9 @@ DEFAULT_CONFIG_FILE_PATH = 'configuration_help.json'
 DEFAULT_BIN_FILE_PATH = '/home/ruben/PycharmProjects/DensityPy/bin'
 DEFAULT_CONFIG_CONTENT = {
     "Project settings": {
-        "Project_Name": "NMA",
+        "project_name": "NMA",
         "XYZ Molecule Geometry": "NMA.xyz",
-        "Basis": "ANO-L-MB",
+        # "Basis": "ANO-L-MB",
         "Number of States": 4,
         "List_of_Active_Orbitals": [ 18, 19, 20, 21],
         "Molcas Output Directory": "NMA_output",
@@ -23,8 +23,8 @@ DEFAULT_CONFIG_CONTENT = {
         "Boundary": 2
     },
     "Charge Migration settings": {
-        "Output Directory": "sim",
-        "Field File": "Field_File",
+        "Experiment Directory": "sim",
+        "Field File": "field_file",
         "Number of Times": 1001,
         "Min Time": -4000,
         "Max Time": 5000,
@@ -34,7 +34,7 @@ DEFAULT_CONFIG_CONTENT = {
     },
     "Pump Pulses settings": {
         "Type of Pulse": "G",
-        "Start_Time": 0.000,
+        "start_time": 0.000,
         "Pump Central Frequency": 0.4537,
         "Pump Periods": 5,
         "Pump Phase": 0,

@@ -45,7 +45,7 @@ program ChargeMigration
     integer :: nTimes
     real(kind(1d0)) :: Tmin
     real(kind(1d0)) :: Tmax
-    character(len = :), allocatable :: Ext_Field_File
+    character(len = :), allocatable :: Ext_field_file
     logical :: Verbous
     logical :: SaveDensity
     integer, allocatable :: ivorb(:)
@@ -1181,7 +1181,7 @@ contains
         real(kind(1d0)), parameter :: WATER_MELTING_POINT = 273.15
         real(kind(1d0)), parameter :: BATH_TEMPERATURE = WATER_MELTING_POINT + 3000
         real(kind(1d0)), parameter :: BETA = 1.d0 / (BOLTZMANN_CONSTANT_auK * BATH_TEMPERATURE)
-        real(kind(1d0)), parameter :: DEPHASING_FACTOR = 1.d-3
+        real(kind(1d0)), parameter :: dephasing_factor = 1.d-3
         real(kind(1d0)), parameter :: RELAXATION_FACTOR = 1.d-3
 
         integer :: nLiou, nStates, i, j, iLiou, i1, i2, iLiou1, iLiou2
@@ -1220,7 +1220,7 @@ contains
             enddo
             !
             !.. Dephasing Factor
-            PairGamma(i, i) = DEPHASING_FACTOR * sqrt(dBuf)
+            PairGamma(i, i) = dephasing_factor * sqrt(dBuf)
             !
         enddo
         !

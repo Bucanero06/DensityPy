@@ -40,7 +40,7 @@ program ChargeMigration
     !..
     character(len = :), allocatable :: InpDir, OutDir, FileGeometry
     real(kind(1d0)) :: StepTime, StepWidth
-    character(len = :), allocatable :: Ext_Field_File
+    character(len = :), allocatable :: Ext_field_file
     logical :: Verbous
     integer :: nOmegas, nTauOmegas
     real   (kind(1d0)) :: OmegaMin, OmegaMax, TauOmegaMin, TauOmegaMax
@@ -101,7 +101,7 @@ program ChargeMigration
     real   (kind(1d0)), allocatable :: AtomicChargeEvolution_new(:, :, :)
     complex(kind(1d0)), allocatable :: Debug(:, :, :)
     external :: system
-    integer :: iPol, iAtom, it, iCoord, iExcitation, icomponent_RI
+    integer :: iPol, iAtom, it, iCoord, i_excitation, icomponent_RI
     character(len = 64) :: PART, excitation_string
     !#######################################################################!
     real   (kind(1d0)) :: Mean, Variance, StdDev, Tau_Time, MASK  ! results
@@ -112,7 +112,7 @@ program ChargeMigration
     !#######################################################################!
 
     call GetRunTimeParameters(InpDir, OutDir, FileGeometry, StepTime, StepWidth, &
-            Ext_field_file, verbous, nOmegas, OmegaMin, OmegaMax, nTauOmegas, TauOmegaMin, TauOmegaMax, iExcitation, icomponent_RI)
+            Ext_field_file, verbous, nOmegas, OmegaMin, OmegaMax, nTauOmegas, TauOmegaMin, TauOmegaMax, i_excitation, icomponent_RI)
 
     allocate(OmegaVec, source = [(OmegaMin + (OmegaMax - OmegaMin) / dble(nOmegas - 1) * dble(iOmega - 1), iOmega = 1, nOmegas)])
     allocate(TauOmegaVec, source = [(TauOmegaMin + (TauOmegaMax - TauOmegaMin) / dble(nTauOmegas - 1) * dble(iOmega - 1), iOmega = 1, nTauOmegas)])
@@ -135,31 +135,31 @@ program ChargeMigration
     call DetermineNumberofTimes (trim(excitation_string) // "/Dipole" // trim(Simulation_tagv(1)) // "_Real", tmin, tmax, nTimes)
     dt = (tmax - tmin) / dble(nTimes - 1)
 
-    if (iExcitation ==0 .and. icomponent_RI==0)  then !non_parallel
+    if (i_excitation ==0 .and. icomponent_RI==0)  then !non_parallel
         write(excitation_string, '(a)') trim('rm ' // OutDir // '/Dipole/Dipole_State_01/DipoleFT_ALL_Real')
         call system(excitation_string)
         write(excitation_string, '(a)') trim('rm ' // OutDir // '/Dipole/Dipole_State_01/DipoleFT_ww_Real')
         call system(excitation_string)
-        do iExcitation = 2, nStates
-            write(excitation_string, '(a,i0.2, a)') 'rm ' // OutDir // '/Dipole/Dipole_State_', iExcitation, '/DipoleFT_ALL_Real'
+        do i_excitation = 2, nStates
+            write(excitation_string, '(a,i0.2, a)') 'rm ' // OutDir // '/Dipole/Dipole_State_', i_excitation, '/DipoleFT_ALL_Real'
             call system(excitation_string)
-            !            write(excitation_string, '(a,i0.2, a)') 'rm ' // OutDir // '/Dipole/Dipole_State_', iExcitation, '/DipoleFT_ALL_Imaginary'
+            !            write(excitation_string, '(a,i0.2, a)') 'rm ' // OutDir // '/Dipole/Dipole_State_', i_excitation, '/DipoleFT_ALL_Imaginary'
             !            call system(excitation_string)
-            write(excitation_string, '(a,i0.2, a)') 'rm ' // OutDir // '/Dipole/Dipole_State_', iExcitation, '/DipoleFT_ww_Real'
+            write(excitation_string, '(a,i0.2, a)') 'rm ' // OutDir // '/Dipole/Dipole_State_', i_excitation, '/DipoleFT_ww_Real'
             call system(excitation_string)
-            write(excitation_string, '(a,i0.2, a)') 'rm ' // OutDir // '/Dipole/Dipole_State_', iExcitation, '/DipoleFT_ww_Imaginary'
+            write(excitation_string, '(a,i0.2, a)') 'rm ' // OutDir // '/Dipole/Dipole_State_', i_excitation, '/DipoleFT_ww_Imaginary'
             call system(excitation_string)
         end do
-        iExcitation = 0
+        i_excitation = 0
         icomponent_RI = 0
     else !parallel
-        write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', iExcitation
+        write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', i_excitation
         call system("rm " // excitation_string // "/DipoleFT_ALL")
         call system("rm " // excitation_string // "/DipoleFT_ww")
     end if
 
     write(*, *) nStates
-    write(*, *) iExcitation, icomponent_RI
+    write(*, *) i_excitation, icomponent_RI
 
     !#######################################################################!
     allocate(Tau_Time_Vec(N_Simulations - 1))
@@ -211,17 +211,17 @@ program ChargeMigration
     !#  Loads and Regularizes the Response to the XUV alone for each molecular excitation (Re and Im)
     allocate(XUVDipole_I(3, ntimes, (nStates - 1) * 2, 2))
     !
-    if (iExcitation ==0 .and. icomponent_RI==0)  then !Non_Parallel
-        XUV_Excitation_Loop : do iExcitation = 1, nStates
+    if (i_excitation ==0 .and. icomponent_RI==0)  then !Non_Parallel
+        XUV_Excitation_Loop : do i_excitation = 1, nStates
             !
             do icomponent_RI = 1, 2
                 !
-                if ((iExcitation == GS_IDX) .and. (icomponent_RI == 2)) cycle
+                if ((i_excitation == GS_IDX) .and. (icomponent_RI == 2)) cycle
                 !
                 if (icomponent_RI == 1) PART = "Real"
                 if (icomponent_RI == 2) PART = "Imaginary"
                 !
-                write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', iExcitation
+                write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', i_excitation
                 !#
                 !############################################################################################
                 !.. Load XUVDipole from file, Regularize it and Compute FT of XUVDipole
@@ -229,20 +229,20 @@ program ChargeMigration
                 call Regularize_XUVDipole(XUVDipole, tmin, dt, nTimes, StepTime, StepWidth)
                 !############################################################################################
                 !#
-                XUVDipole_I(:, :, iExcitation, icomponent_RI) = XUVDipole
+                XUVDipole_I(:, :, i_excitation, icomponent_RI) = XUVDipole
                 !
             end do
             !
         end do XUV_Excitation_Loop
-        iExcitation = 0
+        i_excitation = 0
         icomponent_RI = 0
     else
         if (icomponent_RI == 1) PART = "Real"
         if (icomponent_RI == 2) PART = "Imaginary"
         !
-        if ((iExcitation == GS_IDX) .and. (icomponent_RI == 2)) stop !stop the rest of the code for imaginary ground state
+        if ((i_excitation == GS_IDX) .and. (icomponent_RI == 2)) stop !stop the rest of the code for imaginary ground state
         !
-        write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', iExcitation
+        write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', i_excitation
         !#
         !############################################################################################
         !.. Load XUVDipole from file, Regularize it and Compute FT of XUVDipole
@@ -250,7 +250,7 @@ program ChargeMigration
         call Regularize_XUVDipole(XUVDipole, tmin, dt, nTimes, StepTime, StepWidth)
         !############################################################################################
         !#
-        XUVDipole_I(:, :, iExcitation, icomponent_RI) = XUVDipole
+        XUVDipole_I(:, :, i_excitation, icomponent_RI) = XUVDipole
     end if
     !#
     !############################################################################################
@@ -267,29 +267,29 @@ program ChargeMigration
     !
     !############################################################################################
     !#
-    if (iExcitation ==0 .and. icomponent_RI==0) then !Non_Parallel
-        Single_Excitation_Loop : do iExcitation = 1, nStates
+    if (i_excitation ==0 .and. icomponent_RI==0) then !Non_Parallel
+        Single_Excitation_Loop : do i_excitation = 1, nStates
             !
             do icomponent_RI = 1, 2
                 !
-                if ((iExcitation == GS_IDX) .and. (icomponent_RI == 2)) cycle
+                if ((i_excitation == GS_IDX) .and. (icomponent_RI == 2)) cycle
                 !
                 if (icomponent_RI == 1) PART = "Real"
                 if (icomponent_RI == 2) PART = "Imaginary"
                 !
-                write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', iExcitation
-                write(*, '(a,i0.2,a)') "Starting Sim Loop for Molecular Excitation ", iExcitation, " " // trim(PART)
+                write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', i_excitation
+                write(*, '(a,i0.2,a)') "Starting Sim Loop for Molecular Excitation ", i_excitation, " " // trim(PART)
                 !
                 !############################################################################################
                 !#
                 Sim_loop : do iSim = 1, N_Simulations
-                    write(*, *) "State", iExcitation, PART
+                    write(*, *) "State", i_excitation, PART
                     write(*, *) "iSimFT =", iSim, "   N_Simulations =", N_Simulations
                     !..
                     call LoadDipoles(trim(excitation_string) // "/Dipole" // trim(Simulation_tagv(iSim)) // "_" // trim(PART), nTimes, zMuEV)
                     !.. Compute the regularized dipole $\mu_-(t)$ and Atomic Charges and FT
                     call Regularize_Dipole(zMuEV, tmin, dt, nTimes, StepTime, StepWidth)
-                    zMuEV = zMuEV - XUVDipole_I(:, :, iExcitation, icomponent_RI)
+                    zMuEV = zMuEV - XUVDipole_I(:, :, i_excitation, icomponent_RI)
                     call ComputeFT_Dipole(DipoleFTminus, zMuEV, OmegaVec, tmin, dt, nTimes, nOmegas)
                     !..Compute DipoleFTtotal
                     DipoleFTplus = Z0
@@ -314,24 +314,24 @@ program ChargeMigration
             end do
             !
         end do Single_Excitation_Loop
-        iExcitation = 0
+        i_excitation = 0
         icomponent_RI = 0
     else
         !
         if (icomponent_RI == 1) PART = "Real"
         if (icomponent_RI == 2) PART = "Imaginary"
         !
-        write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', iExcitation
-        write(*, '(a,i0.2,a)') "1Starting Sim Loop for Molecular Excitation ", iExcitation, " " // trim(PART)
+        write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', i_excitation
+        write(*, '(a,i0.2,a)') "1Starting Sim Loop for Molecular Excitation ", i_excitation, " " // trim(PART)
         !
         Sim_loop_parallel : do iSim = 1, N_Simulations
-            write(*, *) "State", iExcitation, PART
+            write(*, *) "State", i_excitation, PART
             write(*, *) "iSimFT =", iSim, "   N_Simulations =", N_Simulations
             !..
             call LoadDipoles(trim(excitation_string) // "/Dipole" // trim(Simulation_tagv(iSim)) // "_" // trim(PART), nTimes, zMuEV)
             !.. Compute the regularized dipole $\mu_-(t)$ and Atomic Charges and FT
             call Regularize_Dipole(zMuEV, tmin, dt, nTimes, StepTime, StepWidth)
-            zMuEV = zMuEV - XUVDipole_I(:, :, iExcitation, icomponent_RI)
+            zMuEV = zMuEV - XUVDipole_I(:, :, i_excitation, icomponent_RI)
             call ComputeFT_Dipole(DipoleFTminus, zMuEV, OmegaVec, tmin, dt, nTimes, nOmegas)
             !..Compute DipoleFTtotal
             DipoleFTplus = Z0
@@ -356,16 +356,16 @@ program ChargeMigration
 
     !############################################################################################
     !#
-    if (iExcitation ==0 .and. icomponent_RI==0) then !Non_Parallel
-        Single_Excitation_Loop_FT : do iExcitation = 1, nStates
+    if (i_excitation ==0 .and. icomponent_RI==0) then !Non_Parallel
+        Single_Excitation_Loop_FT : do i_excitation = 1, nStates
             do icomponent_RI = 1, 2
                 !
-                if ((iExcitation == GS_IDX) .and. (icomponent_RI == 2)) cycle
+                if ((i_excitation == GS_IDX) .and. (icomponent_RI == 2)) cycle
                 !
                 if (icomponent_RI == 1) PART = "Real"
                 if (icomponent_RI == 2) PART = "Imaginary"
                 !
-                write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', iExcitation
+                write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', i_excitation
                 !############################################################################################
                 !#
                 !.. COMPUTE 2D SPECTRUM DIPOLE
@@ -384,14 +384,14 @@ program ChargeMigration
                 !############################################################################################
             end do
         end do Single_Excitation_Loop_FT
-        iExcitation = 0
+        i_excitation = 0
         icomponent_RI = 0
     else
         !
         if (icomponent_RI == 1) PART = "Real"
         if (icomponent_RI == 2) PART = "Imaginary"
         !
-        write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', iExcitation
+        write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', i_excitation
         !############################################################################################
         !#
         !.. COMPUTE 2D SPECTRUM DIPOLE

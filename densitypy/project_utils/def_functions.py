@@ -8,13 +8,15 @@ import sys
 from os import path
 from subprocess import Popen, PIPE, CalledProcessError
 
-from densitypy.project_utils.logger import setup_logger, get_caller_logger
+from densitypy.project_utils.logger import setup_logger
 
-# logger = setup_logger(__name__.split('.')[-1])
-logger = get_caller_logger()
+logger = setup_logger(__name__.split('.')[-1])
 
 
-def execute_command(command: str, write_stream=True) -> None:
+# logger = get_caller_logger()
+
+
+def execute_command(command: str, write_stream=True, _logger=None) -> None:
     """
     Executes a command line instruction and streams the output to a logger.
 
@@ -29,19 +31,22 @@ def execute_command(command: str, write_stream=True) -> None:
     >>> execute_command("ls -l")
     """
 
-    logger.info(f"Executing command: {command}")
+    if _logger is None:
+        _logger = logger
+
+    _logger.info(f"Executing command: {command}")
     # Execute command in a new subprocess
     with Popen(command, stdout=PIPE, bufsize=1, universal_newlines=True, shell=True) as p:
         # Read and log each line of output as it becomes available
         # todo accept errors and warning
         if write_stream:
             for line in p.stdout:
-                logger.info(f' ---> {line.strip()}')
+                _logger.info(f' ---> {line.strip()}')
 
     # If the subprocess exited with an error, raise an exception
     if p.returncode != 0:
         error_msg = f"Command '{command}' returned non-zero exit status {p.returncode}"
-        logger.error(error_msg)
+        _logger.error(error_msg)
         raise CalledProcessError(p.returncode, p.args, output=p.stdout, stderr=p.stderr)
 
 

@@ -45,7 +45,7 @@ program ChargeMigration
     integer :: nTimes
     real(kind(1d0)) :: Tmin
     real(kind(1d0)) :: Tmax
-    character(len = :), allocatable :: Ext_Field_File
+    character(len = :), allocatable :: Ext_field_file
     character(len = :), allocatable :: Weight_File
     logical :: Verbous
     logical :: Weight_File_flag
@@ -53,7 +53,7 @@ program ChargeMigration
     integer, allocatable :: ivorb(:)
     integer :: OrbNumber
     real(kind(1d0)) :: Volume
-    real(kind(1d0)) :: DEPHASING_FACTOR
+    real(kind(1d0)) :: dephasing_factor
     real(kind(1d0)) :: RELAXATION_FACTOR
     real(kind(1d0)) :: BATH_TEMPERATURE
     integer, parameter :: GS_IDX = 1
@@ -109,8 +109,8 @@ program ChargeMigration
     integer :: iOrb, jOrb
 
     call GetRunTimeParameters(InpDir, OutDir, FileGeometry, &
-            nTimes, Tmin, Tmax, Ext_Field_File, Verbous, Weight_File, Weight_File_flag, &
-            SaveDensity, ivorb, OrbNumber, Volume, DEPHASING_FACTOR, RELAXATION_FACTOR, BATH_TEMPERATURE)
+            nTimes, Tmin, Tmax, Ext_field_file, Verbous, Weight_File, Weight_File_flag, &
+            SaveDensity, ivorb, OrbNumber, Volume, dephasing_factor, RELAXATION_FACTOR, BATH_TEMPERATURE)
 
     call MKDIR(OutDir)
     !    call system("mkdir -p " // trim(OutDir))
@@ -186,7 +186,7 @@ program ChargeMigration
 
 
     !.. Compute Liouvillian and Diagonalizes it
-    call ComputeLiouvillian0(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, DEPHASING_FACTOR, RELAXATION_FACTOR)
+    call ComputeLiouvillian0(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, dephasing_factor, RELAXATION_FACTOR)
     call DiagonalizeLindblad0(Liouvillian0, L0_Eval, L0_LEvec, L0_REvec)
 
     allocate(zStatRho (nStates, nStates), zStatRho0(nStates, nStates))
@@ -245,7 +245,7 @@ program ChargeMigration
                 write(istrn, "(f12.4)")t
                 !..Makes new directory inside of ChargeDensity directory for each simulation
                 call system("mkdir -p " // OutDir // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)))
-                call SaveChDen(OutDir // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)) // "/ChDen" // trim(adjustl(istrn)), &
+                call Write_Charge_Density(OutDir // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)) // "/ChDen" // trim(adjustl(istrn)), &
                         nPts, gridv, ChDen, Weightv, nAtoms)
             endif
             !
@@ -257,12 +257,12 @@ program ChargeMigration
             !
         enddo time_loop
         !.. Save Dipole to file
-        call Save_Dipole(OutDir // "/Dipole/Dipole" // trim(Simulation_tagv(iSim)), zMuEV, nTimes, tmin, dt)
-        !        call Save_Dipole1(OutDir // "/Dipole/Dipole" // trim(Simulation_tagv(iSim)), Dipole_new, nTimes, tmin, dt)
+        call Write_Dipole(OutDir // "/Dipole/Dipole" // trim(Simulation_tagv(iSim)), zMuEV, nTimes, tmin, dt)
+        !        call Write_Dipole1(OutDir // "/Dipole/Dipole" // trim(Simulation_tagv(iSim)), Dipole_new, nTimes, tmin, dt)
 
         !.. Save Q_Charge
-        !        call Save_Q_Charge(OutDir // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)), AtomicChargeEvolution, nTimes, tmin, dt, nAtoms)
-        call Save_Q_Charge1(OutDir // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)), AtomicChargeEvolution_new, nTimes, tmin, dt, nAtoms)
+        !        call Write_Q_Charge(OutDir // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)), AtomicChargeEvolution, nTimes, tmin, dt, nAtoms)
+        call Write_Q_Charge1(OutDir // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)), AtomicChargeEvolution_new, nTimes, tmin, dt, nAtoms)
 
     end do Sim_loop
     !
@@ -1073,12 +1073,12 @@ contains
     !
     !   where \beta = 1/(k_B T)
     !
-    subroutine ComputeLiouvillian0(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, DEPHASING_FACTOR, RELAXATION_FACTOR)
+    subroutine ComputeLiouvillian0(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, dephasing_factor, RELAXATION_FACTOR)
         real   (kind(1d0)), intent(in) :: Evec(:)
         real   (kind(1d0)), intent(in) :: Dmat(:, :, :)
         complex(kind(1d0)), allocatable, intent(out) :: Liouvillian0(:, :)
 
-        real(kind(1d0)), intent(in) :: DEPHASING_FACTOR
+        real(kind(1d0)), intent(in) :: dephasing_factor
         real(kind(1d0)), intent(in) :: RELAXATION_FACTOR
         real(kind(1d0)), intent(in) :: BATH_TEMPERATURE
 
@@ -1124,7 +1124,7 @@ contains
             enddo
             !
             !.. Dephasing Factor
-            PairGamma(i, i) = DEPHASING_FACTOR * sqrt(dBuf)
+            PairGamma(i, i) = dephasing_factor * sqrt(dBuf)
             !
         enddo
         !
@@ -1185,7 +1185,7 @@ contains
     end subroutine DiagonalizeLindblad0
 
     !>>
-    subroutine Save_Dipole(FileName, Dipole, nTimes, tmin, dt)
+    subroutine Write_Dipole(FileName, Dipole, nTimes, tmin, dt)
         character(len = *), intent(in) :: FileName
         complex(kind(1d0)), intent(in) :: Dipole(:, :)
         real   (kind(1d0)), intent(in) :: tmin, dt
@@ -1204,10 +1204,10 @@ contains
             write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((dble(Dipole(iPol, it)), aimag(Dipole(iPol, it))), iPol = 1, 3)
         enddo
         close(uid_dipole)
-    end subroutine Save_Dipole
+    end subroutine Write_Dipole
     !
     !
-    subroutine Save_Dipole1(FileName, Dipole, nTimes, tmin, dt)
+    subroutine Write_Dipole1(FileName, Dipole, nTimes, tmin, dt)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: Dipole(:, :)
         !        complex(kind(1d0)), intent(in) :: Dipole(:, :)
@@ -1228,9 +1228,9 @@ contains
             write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((Dipole(iPol, it), 0.d0), iPol = 1, 3)
         enddo
         close(uid_dipole)
-    end subroutine Save_Dipole1
+    end subroutine Write_Dipole1
 
-    subroutine Save_Q_Charge(FileName, Charge, nTimes, tmin, dt, nAtoms)
+    subroutine Write_Q_Charge(FileName, Charge, nTimes, tmin, dt, nAtoms)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: Charge(:, :)
         real   (kind(1d0)), intent(in) :: tmin, dt
@@ -1259,10 +1259,10 @@ contains
         !        enddo
         !        !
         close(uid_AtomicCharge)
-    end subroutine Save_Q_Charge
+    end subroutine Write_Q_Charge
     !
     !
-    subroutine Save_Q_Charge1(FileName, Charge, nTimes, tmin, dt, nAtoms)
+    subroutine Write_Q_Charge1(FileName, Charge, nTimes, tmin, dt, nAtoms)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: Charge(:, :, :)
         real   (kind(1d0)), intent(in) :: tmin, dt
@@ -1285,7 +1285,7 @@ contains
         enddo
         !
         close(uid_AtomicCharge)
-    end subroutine Save_Q_Charge1
+    end subroutine Write_Q_Charge1
 
     subroutine ParseFieldFile_(FileName, N_Simulations, Simulation_Tagv, train)
         character(len = *), intent(in) :: FileName

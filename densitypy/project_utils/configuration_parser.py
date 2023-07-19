@@ -1,11 +1,9 @@
 #! /usr/bin/env python3.10
-import json
 from os import path
 
+from densitypy.project_utils.logger import setup_logger
 from .def_functions import load_json_file
 from ..Default_Settings.default_config import DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_CONTENT
-
-from densitypy.project_utils.logger import setup_logger
 
 logger = setup_logger(__name__.split('.')[-1])
 
@@ -54,6 +52,7 @@ def normalize_dict(d: dict) -> dict:
         normalize_key(key): normalize_dict(value) if isinstance(value, dict) else value
         for key, value in d.items()
     }
+
 
 import json
 
@@ -156,10 +155,9 @@ def parse_configuration_file(config_file_path=None):
     for message in log:
         logger.warning(message)
 
-
     assert config, f'Could not load configuration file {config_file_path}'
-    from pprint import pprint
-    pprint(config)
+    from pprint import pformat
+    logger.debug(f'Configuration:\n{pformat(config)}')
     return config
 
 

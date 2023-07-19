@@ -40,7 +40,7 @@ program ChargeMigration
     !..
     character(len = :), allocatable :: InpDir, OutDir, FileGeometry
     real(kind(1d0)) :: StepTime, StepWidth
-    character(len = :), allocatable :: Ext_Field_File
+    character(len = :), allocatable :: Ext_field_file
     logical :: Verbous
     integer :: nOmegas, nTauOmegas
     real   (kind(1d0)) :: OmegaMin, OmegaMax, TauOmegaMin, TauOmegaMax
