@@ -171,7 +171,7 @@ program ChargeMigration
 
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !.. Compute and Write or Read Becke's Weights
+    !.. Compute and Write | or Read Becke's Weights
     if(.not. SaveDensity)then
         !
         call AtomicRadius_Bragg_Slater_Becke(AtomName, nAtoms, Radius_BS)
@@ -183,19 +183,7 @@ program ChargeMigration
         endif
         !.. Compute Berycenter of Atmoic Charges
         call Compute_R_el(gridv, WeightV, OrbTab, R_el)
-        !
-        !!#########>>>>>>
-        !*** move to its own subroutine
-!        open(newunit = uid, &
-!                file = OutDir // "/" // "R_el_bc", &
-!                form = "formatted", &
-!                status = "unknown")
-!        do iAtom = 1, nAtoms
-!            write(uid, "(*(x,e24.14e3))") (R_el(iPol, iAtom), iPol = 1, 3)
-!        end do
-!        close(uid)
         call Write_R_el_bc(OutDir, nAtoms, R_el)
-        !!#########>>>>>>
 
         !.. Compute Becke's Matrix
         call ComputeNewBeckeMatrix(WeightV, OrbTab, Becke_new, R_el) !!using electronic barycenter or AtCoord for the nuclear barycenter
