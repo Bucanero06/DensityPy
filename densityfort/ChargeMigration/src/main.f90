@@ -164,13 +164,9 @@ program ChargeMigration
     !        nxpoints = int(exp(log(nPts + 0.1d0) / 3.d0))
     call ComputeVolume(nPts, Computed_Volume, gridv) ! Should probably check that this computed volume is the same as the one given in the input file
 
-
-
     !.. Load Orbitals
     call LoadOrbitals(InpDir, nOrb, ivOrb, npts, OrbTab)! $\varphi_n(\vec{r}_i)$
 
-
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !.. Compute and Write | or Read Becke's Weights
     if(.not. SaveDensity)then
         !
@@ -188,9 +184,7 @@ program ChargeMigration
         !.. Compute Becke's Matrix
         call ComputeNewBeckeMatrix(WeightV, OrbTab, Becke_new, R_el) !!using electronic barycenter or AtCoord for the nuclear barycenter
         !    BeckeMatrix = BeckeMatrix * Computed_Volume
-
     end if
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     allocate(AtomicChargeVec(nAtoms))
     allocate(AtomicChargeEvolution(nAtoms, nTimes))
@@ -279,7 +273,7 @@ program ChargeMigration
 contains
 
     ! ################################################
-    !... Lindblad
+    !... Lindblad Equation - LiouvillianPropagator
     ! ----------------------------------------------------
     !.. Build the time-independent Lindblad superoperator
     !..
@@ -298,101 +292,38 @@ contains
     !   subject to the constraint \gamma_{mn} = e^{-\beta \omega_{mn}} \gamma_{nm}
     !   where \beta = 1/(k_B T)
     !
-    subroutine ComputeLiouvillian_0(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, dephasing_factor, RELAXATION_FACTOR)
-        real   (kind(1d0)), intent(in) :: Evec(:)
-        real   (kind(1d0)), intent(in) :: Dmat(:, :, :)
-        complex(kind(1d0)), allocatable, intent(out) :: Liouvillian0(:, :)
-
-        real(kind(1d0)), intent(in) :: dephasing_factor
-        real(kind(1d0)), intent(in) :: RELAXATION_FACTOR
-        real(kind(1d0)), intent(in) :: BATH_TEMPERATURE
-
-        integer :: nLiou, nStates, i, j, iLiou, i1, i2, iLiou1, iLiou2
-        !.. Dephasing and Relaxation Constants
-        real   (kind(1d0)), allocatable :: PairGamma(:, :), TotalGamma(:)
-        real   (kind(1d0)) :: AverageDipole, dBuf
-        real(kind(1d0)) :: BETA
-
-        BETA = 1.d0 / (BOLTZMANN_CONSTANT_auK * BATH_TEMPERATURE)
-
-        nStates = size(Evec, 1)
-
-        nLiou = nStates ** 2
-        allocate(Liouvillian0(nLiou, nLiou))
-        Liouvillian0 = Z0
-        !
-        !.. Unitary component
-        do iLiou = 1, nLiou
-            call LiouvilleToHilbertIndexes(iLiou, i, j)
-            Liouvillian0(iLiou, iLiou) = Evec(i) - Evec(j)
-        end do
-        !
-        !.. Determine the factors \gamma_{mn}
-        allocate(PairGamma(nStates, nStates))
-        PairGamma = 0.d0
-        do i = 1, nStates
-            !
-            dBuf = 0.d0
-            do j = 1, nStates
-                if(j==i)cycle
-                !
-                AverageDipole = sqrt(sum(Dmat(i, j, :)**2) / 3.d0)
-                dBuf = dBuf + AverageDipole
-                !
-                !.. Relaxation Factor
-                PairGamma(i, j) = RELAXATION_FACTOR * AverageDipole
-                if(Evec(i)>Evec(j)) PairGamma(i, j) = PairGamma(i, j) * exp(-BETA * (Evec(i) - Evec(j)))
-                !
-            enddo
-            !
-            !.. Dephasing Factor
-            PairGamma(i, i) = dephasing_factor * sqrt(dBuf)
-            !
-        enddo
-        !
-        !.. Determines \Gamma_i = \sum_m \gamma_{mi}
-        allocate(TotalGamma(nStates))
-        do i = 1, nStates
-            TotalGamma(i) = sum(PairGamma(:, i))
-        enddo
-        !
-        !.. Dissipative component
-        do iLiou = 1, nLiou
-            call LiouvilleToHilbertIndexes(iLiou, i, j)
-            Liouvillian0(iLiou, iLiou) = Liouvillian0(iLiou, iLiou) - Zi * (TotalGamma(i) + TotalGamma(j)) / 2.d0
-        enddo
-        do i1 = 1, nStates
-            call HilbertToLiouvilleIndexes(i1, i1, iLiou1)
-            do i2 = 1, nStates
-                call HilbertToLiouvilleIndexes(i2, i2, iLiou2)
-                Liouvillian0(iLiou1, iLiou2) = Liouvillian0(iLiou1, iLiou2) + Zi * PairGamma(i1, i2)
-            enddo
-        enddo
-
-    end subroutine ComputeLiouvillian_0
-    !<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-    ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    ! Hilbert and Liouville space transformations subroutines
-    ! ----------------------------------------------------
-    ! LiouvillianPropagator: This is the main subroutine that performs the propagation of the quantum state, given the initial density matrix and the Liouville operator (in its diagonalized form: eigenvalues and left/right eigenvectors). The density matrix is transformed into Liouville space, evolved under the action of the Liouville operator, then transformed back into Hilbert space. This transformation is performed twice, before and after the interaction with an external field. The action of the field is included as a set of rotations in the Hilbert space.
+    !.. LiouvillianPropagator: The central routine in simulating the dynamics of a quantum system subject to an external field. This routine is named after the concept of the Liouville operator, which in quantum mechanics, describes the time evolution of a quantum system in Liouville space.
+    !
+    ! Input parameters:
+    !
+    ! L0_Eval: a complex array holding the eigenvalues of the Liouville operator.
+    ! L0_LEvec: a complex array holding the left eigenvectors of the Liouville operator.
+    ! L0_REvec: a complex array holding the right eigenvectors of the Liouville operator.
+    ! zStatRho: a complex array holding the initial state density matrix of the quantum system. The array is updated within the subroutine, and hence is an input/output parameter.
+    ! Important variables used within the function:
+    !
+    ! nLiou: the size of the L0_Eval array, which represents the dimension of the Liouville space.
+    ! EFieldX, EFieldY, EFieldZ: real numbers representing the components of the external electric field at time t + dt/2.
+    ! nStates: the size of the zStatRho array, which represents the number of quantum states.
+    ! Various complex arrays (zmat1, zmat2, zPureMat, RhoVec, RhoVec2, etc.) and real arrays (Epure, EVEC_DX, EVEC_DY, EVEC_DZ, etc.) for temporary storage and computation.
+    ! Key steps in the subroutine:
+    !
+    !   Transform the initial density matrix zStatRho into Liouville space.
+    !   Propagate the transformed matrix in the absence of external fields for a time interval dt/2.
+    !   Convert the propagated matrix back into Hilbert space.
+    !   Consider the system's interaction with an external electric field by applying rotations in the Hilbert space.
+    !   Diagonalize the density matrix to determine the pure states it comprises.
+    !   Propagate each individual state under the influence of the external field.
+    !   Re-form the density matrix from the propagated pure states.
+    !   Repeat steps 1-3 for the re-formed density matrix to complete the propagation process over the time interval dt.
+    !   This subroutine heavily relies on various matrix operations and makes use of other subroutines such as HilbertToLiouvilleMatrix, ZGEMV, LiouvilleToHilbertMatrix, DiagonalizeDipole, ZGEMM, Short_ZHEEV, and ExternalElectricFieldCart, which are not defined within this subroutine and are expected to be defined elsewhere.
+    !
+    ! Important to note is that certain variables used within this subroutine, such as dt, t, iSim, train, Z1, Zi, Z0, nStates, and Dmat, are not defined or passed as arguments, implying that they are either global variables or passed from a higher-level routine that calls this function.
+    !
+    ! The FIRST_CALL logical variable is used to execute certain lines of code only during the first invocation of the subroutine, primarily for the allocation and initialization of arrays.
+    !
+    !This subroutine effectively encapsulates a single iteration or time step of the simulation. For a complete simulation over a given time period, this subroutine would typically be called repeatedly in a loop.
     subroutine LiouvillianPropagator(L0_Eval, L0_LEvec, L0_REvec, zStatRho)
-        ! The LiouvillianPropagator subroutine serves as the main propagation function for the quantum state of the system. The subroutine accepts input parameters L0_Eval, L0_LEvec, L0_REvec, and zStatRho - which represent the eigenvalues and left/right eigenvectors of the Liouville operator, and the initial density matrix respectively. The function propagates the quantum state via the following steps:
-        !
-        !The initial density matrix is converted into Liouville space using the HilbertToLiouvilleMatrix subroutine.
-        !The transformed matrix undergoes propagation in the absence of external fields for an interval of dt/2.
-        !The propagated matrix is converted back into Hilbert space using the LiouvilleToHilbertMatrix subroutine.
-        !The system's interaction with an external electric field is taken into account. This is done through a series of rotations in the Hilbert space using the dipole matrices.
-        !The density matrix is diagonalized to determine the pure states it is composed of, with the help of Short_ZHEEV.
-        !Each individual state is propagated under the influence of the external field, by applying rotations that take into account the external electric field at time t + dt/2.
-        !The propagated pure states are used to re-form the density matrix.
-        !Steps 1 to 3 are repeated for the re-formed density matrix to complete the propagation process over the time interval dt.
-        !Note that some variables in this code (e.g. dt, t, iSim, train, Z1, Zi, Z0, nStates, Dmat) are not defined within this subroutine, so they are likely to be global variables or passed from a higher-level routine that calls this function.
-        !
-        !This function also seems to assume that some subroutines (HilbertToLiouvilleMatrix, ZGEMV, LiouvilleToHilbertMatrix, DiagonalizeDipole, ZGEMM, Short_ZHEEV, ExternalElectricFieldCart) and constants (Z1, Z0, Zi) have been defined elsewhere in the program.
-        !
-        !In general, this subroutine is fairly complex and makes extensive use of Fortran's matrix manipulation capabilities to simulate the propagation of a quantum system under the influence of an external field. The subroutine contains both serial and parallel operations (i.e., matrix operations and loops) which could be executed on a variety of hardware architectures including multi-core CPUs and GPUs.
-
         complex(kind(1d0)), intent(in) :: L0_LEvec(:, :), L0_REvec(:, :), L0_Eval(:)
         complex(kind(1d0)), intent(inout) :: zStatRho(:, :)
 
@@ -499,7 +430,125 @@ contains
         call ZGEMV("N", nLiou, nLiou, Z1, L0_REvec, nLiou, RhoVec2, 1, Z0, RhoVec, 1)
         call LiouvilleToHilbertMatrix(RhoVec, zStatRho)
     end subroutine LiouvillianPropagator
-    !.. Diagonalize the time-independent Lindblad superoperator. This subroutine takes as input the Lindblad superoperator and returns its eigenvalues and left and right eigenvectors. This diagonalization is useful for the propagation performed in LiouvillianPropagator.
+    !.. ComputeLiouvillian_0:  Calculates the time-independent Lindblad superoperator (Liouvillian), a crucial element in the Lindblad master equation, used for describing the time evolution of the density matrix of a quantum system in an open quantum system framework.
+    !
+    ! Here's a breakdown of the subroutine:
+    !
+    ! Parameters:
+    ! Evec (input, real array): The array of energy eigenvalues of the system's Hamiltonian.
+    ! Dmat (input, real array): The dipole moment matrix of the system.
+    ! Liouvillian0 (output, complex array): The computed Liouvillian superoperator. It's an output parameter that's updated in the subroutine.
+    ! BATH_TEMPERATURE (input, real): The temperature of the bath or environment interacting with the quantum system.
+    ! dephasing_factor (input, real): The factor representing dephasing effects in the system.
+    ! RELAXATION_FACTOR (input, real): The factor representing relaxation effects in the system.
+    ! Important Variables:
+    ! nLiou and nStates: The size of the Liouvillian and the number of quantum states in the system, respectively.
+    ! PairGamma, TotalGamma: The arrays containing the pair relaxation rates and the total relaxation rates, respectively.
+    ! BETA: The inverse temperature factor (1/kT) with k being the Boltzmann constant and T being the temperature.
+    ! Detailed Steps:
+    ! First, the subroutine initializes parameters and allocates space for the Liouvillian.
+    ! The unitary part of the Liouvillian is computed, based on the system Hamiltonian eigenvalues.
+    ! The subroutine calculates the pair relaxation rates and the dephasing rates for all pairs of states, taking into account the energy levels, dipole moment matrix, and input parameters related to dephasing and relaxation.
+    ! The total relaxation rate for each state is computed as the sum of the pair relaxation rates involving the state.
+    ! Finally, the dissipative part of the Liouvillian, capturing the effects of the interaction of the system with its environment, is computed based on these relaxation rates.
+    ! Please note that this subroutine computes the Lindblad superoperator for a specific case where the relaxation and dephasing rates are assumed to be constants and the Lindblad operators are assumed to be proportional to the dipole moment operator. In more complex or specific cases, modifications would be required.
+    subroutine ComputeLiouvillian_0(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, dephasing_factor, RELAXATION_FACTOR)
+        real   (kind(1d0)), intent(in) :: Evec(:)
+        real   (kind(1d0)), intent(in) :: Dmat(:, :, :)
+        complex(kind(1d0)), allocatable, intent(out) :: Liouvillian0(:, :)
+
+        real(kind(1d0)), intent(in) :: dephasing_factor
+        real(kind(1d0)), intent(in) :: RELAXATION_FACTOR
+        real(kind(1d0)), intent(in) :: BATH_TEMPERATURE
+
+        integer :: nLiou, nStates, i, j, iLiou, i1, i2, iLiou1, iLiou2
+        !.. Dephasing and Relaxation Constants
+        real   (kind(1d0)), allocatable :: PairGamma(:, :), TotalGamma(:)
+        real   (kind(1d0)) :: AverageDipole, dBuf
+        real(kind(1d0)) :: BETA
+
+        BETA = 1.d0 / (BOLTZMANN_CONSTANT_auK * BATH_TEMPERATURE)
+
+        nStates = size(Evec, 1)
+
+        nLiou = nStates ** 2
+        allocate(Liouvillian0(nLiou, nLiou))
+        Liouvillian0 = Z0
+        !
+        !.. Unitary component
+        do iLiou = 1, nLiou
+            call LiouvilleToHilbertIndexes(iLiou, i, j)
+            Liouvillian0(iLiou, iLiou) = Evec(i) - Evec(j)
+        end do
+        !
+        !.. Determine the factors \gamma_{mn}
+        allocate(PairGamma(nStates, nStates))
+        PairGamma = 0.d0
+        do i = 1, nStates
+            !
+            dBuf = 0.d0
+            do j = 1, nStates
+                if(j==i)cycle
+                !
+                AverageDipole = sqrt(sum(Dmat(i, j, :)**2) / 3.d0)
+                dBuf = dBuf + AverageDipole
+                !
+                !.. Relaxation Factor
+                PairGamma(i, j) = RELAXATION_FACTOR * AverageDipole
+                if(Evec(i)>Evec(j)) PairGamma(i, j) = PairGamma(i, j) * exp(-BETA * (Evec(i) - Evec(j)))
+                !
+            enddo
+            !
+            !.. Dephasing Factor
+            PairGamma(i, i) = dephasing_factor * sqrt(dBuf)
+            !
+        enddo
+        !
+        !.. Determines \Gamma_i = \sum_m \gamma_{mi}
+        allocate(TotalGamma(nStates))
+        do i = 1, nStates
+            TotalGamma(i) = sum(PairGamma(:, i))
+        enddo
+        !
+        !.. Dissipative component
+        do iLiou = 1, nLiou
+            call LiouvilleToHilbertIndexes(iLiou, i, j)
+            Liouvillian0(iLiou, iLiou) = Liouvillian0(iLiou, iLiou) - Zi * (TotalGamma(i) + TotalGamma(j)) / 2.d0
+        enddo
+        do i1 = 1, nStates
+            call HilbertToLiouvilleIndexes(i1, i1, iLiou1)
+            do i2 = 1, nStates
+                call HilbertToLiouvilleIndexes(i2, i2, iLiou2)
+                Liouvillian0(iLiou1, iLiou2) = Liouvillian0(iLiou1, iLiou2) + Zi * PairGamma(i1, i2)
+            enddo
+        enddo
+
+    end subroutine ComputeLiouvillian_0
+    !
+    !<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    ! Hilbert and Liouville space transformations subroutines
+    ! ----------------------------------------------------
+    !
+    !*************************************************************************************************
+    !.. DiagonalizeLindblad_0: This subroutine performs the diagonalization of the time-independent
+    ! Lindblad superoperator (Liouvillian0). The diagonalization is performed using the
+    ! Short_Diag subroutine, and the results are printed to the standard output.
+    !
+    ! This routine also checks that the product of right and conjugate transpose of left eigenvectors
+    ! is an identity matrix (a necessary condition for a valid diagonalization).
+    !
+    ! Input:
+    ! Liouvillian0 - A complex square matrix representing the Lindblad superoperator to be diagonalized.
+    !
+    ! Output:
+    ! L0_Eval - A complex vector that will hold the eigenvalues of Liouvillian0.
+    ! L0_LEvec - A complex square matrix that will hold the left eigenvectors of Liouvillian0.
+    ! L0_REvec - A complex square matrix that will hold the right eigenvectors of Liouvillian0.
+    !
+    ! Note: The input matrix Liouvillian0 is also modified during the execution of this subroutine.
+    !*************************************************************************************************
     subroutine DiagonalizeLindblad_0(Liouvillian0, L0_Eval, L0_LEvec, L0_REvec)
         complex(kind(1d0)), intent(inout) :: Liouvillian0(:, :)
         complex(kind(1d0)), allocatable, intent(out) :: L0_LEvec(:, :), L0_REvec(:, :), L0_Eval(:)
@@ -527,9 +576,20 @@ contains
             zmat(i, i) = zmat(i, i) - Z1
         enddo
         write(*, *)"|U_R U_L^+ -1|_1 = ", sum(abs(zmat))
-
     end subroutine DiagonalizeLindblad_0
-    !.. HilbertToLiouvilleMatrix: This subroutine transforms a matrix from Hilbert space into a vector in Liouville space. This transformation is necessary for the application of the Liouville operator, which works in Liouville space.
+    !
+    !*************************************************************************************************
+    !..  HilbertToLiouvilleMatrix: This subroutine transforms a matrix from Hilbert space into a vector
+    ! in Liouville space. The transformation is performed by looping through each element of the input
+    ! matrix and mapping it to the corresponding position in the output vector using the subroutine
+    ! HilbertToLiouvilleIndexes. This transformation is required for the application of the Liouville operator.
+    !
+    ! Input:
+    ! RhoMat - A complex matrix representing the state in Hilbert space.
+    !
+    ! Output:
+    ! RhoVec - A complex vector representing the transformed state in Liouville space.
+    !*************************************************************************************************
     subroutine HilbertToLiouvilleMatrix(RhoMat, RhoVec)
         complex(kind(1d0)), intent(in) :: RhoMat(:, :)
         complex(kind(1d0)), intent(out) :: RhoVec(:)
@@ -542,7 +602,20 @@ contains
             enddo
         enddo
     end subroutine HilbertToLiouvilleMatrix
-    !.. LiouvilleToHilbertMatrix: This subroutine performs the inverse transformation of HilbertToLiouvilleMatrix, i.e., it transforms a vector in Liouville space into a matrix in Hilbert space.
+    !
+    !*************************************************************************************************
+    ! LiouvilleToHilbertMatrix: This subroutine performs the inverse transformation of
+    ! HilbertToLiouvilleMatrix, transforming a vector in Liouville space back into a matrix in
+    ! Hilbert space. The transformation is performed by looping through each element of the output matrix
+    ! and assigning it the corresponding value from the input vector using the subroutine
+    ! HilbertToLiouvilleIndexes.
+    !
+    ! Input:
+    ! RhoVec - A complex vector representing the state in Liouville space.
+    !
+    ! Output:
+    ! RhoMat - A complex matrix representing the transformed state in Hilbert space.
+    !*************************************************************************************************
     subroutine LiouvilleToHilbertMatrix(RhoVec, RhoMat)
         complex(kind(1d0)), intent(in) :: RhoVec(:)
         complex(kind(1d0)), intent(out) :: RhoMat(:, :)
@@ -556,7 +629,19 @@ contains
             enddo
         enddo
     end subroutine LiouvilleToHilbertMatrix
-    !.. HilbertToLiouvilleIndexes: This subroutine converts matrix indexes (in Hilbert space) into a single index (in Liouville space). This is necessary for the transformation from Hilbert to Liouville space.
+    !
+    !*************************************************************************************************
+    ! HilbertToLiouvilleIndexes: This subroutine transforms matrix indices in Hilbert space into a
+    ! single index in Liouville space. The transformation is dependent on the relative values of the
+    ! input indices. The resulting single index is required for the transformation from Hilbert to
+    ! Liouville space.
+    !
+    ! Input:
+    ! i, j - Integers representing the indices in Hilbert space.
+    !
+    ! Output:
+    ! iPair - An integer representing the corresponding single index in Liouville space.
+    !*************************************************************************************************
     subroutine HilbertToLiouvilleIndexes(i, j, iPair)
         integer, intent(in) :: i, j
         integer, intent(out) :: iPair
@@ -568,19 +653,46 @@ contains
             iPair = (i - 1) * i + j
         endif
     end subroutine HilbertToLiouvilleIndexes
-    !.. LiouvilleToHilbertIndexes: This subroutine performs the inverse operation of HilbertToLiouvilleIndexes, i.e., it converts a single index (in Liouville space) into matrix indexes (in Hilbert space).
+    !
+    !*************************************************************************************************
+    ! LiouvilleToHilbertIndexes: This subroutine takes in a single integer index in Liouville space
+    ! and converts it into a pair of matrix indices in Hilbert space. The indices are calculated by
+    ! decomposing the given Liouville index into a square plus a remainder, which are then used to
+    ! calculate the corresponding Hilbert indices.
+    !
+    ! Input:
+    ! iPair - An integer representing a single index in Liouville space.
+    !
+    ! Output:
+    ! i, j - Integers representing the corresponding indices in Hilbert space.
+    !*************************************************************************************************
     subroutine LiouvilleToHilbertIndexes(iPair, i, j)
+        ! Input integer (Liouville space index)
         integer, intent(in) :: iPair
+
+        ! Output integers (Hilbert space indices)
         integer, intent(out) :: i, j
+
+        ! Intermediate variables to hold the square root and square of iPair
         integer :: n, n2
+
+        ! Calculate the integer square root of iPair
         n = int(sqrt(1.d0 * iPair))
+
+        ! Calculate the square of the integer square root
         n2 = n**2
+
+        ! Check if iPair is a perfect square
         if(n2==iPair)then
             i = n
             j = n
+
+            ! Check if the difference between iPair and n2 is less than or equal to n
         elseif(iPair - n2<=n)then
             i = iPair - n2
             j = n + 1
+
+            ! Otherwise, the difference is greater than n
         else
             i = n + 1
             j = iPair - n2 - n

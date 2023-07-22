@@ -394,3 +394,4 @@ if __name__ == "__main__":
 #   -make sure inputs are valid and available (check for existence of files, etc...) before running anything if their appropriate flags are set
 #       - very important specifically is dealing with orbitals, stats, CI roots etc... e.g. only 4 active orbitals with 6 electrons, 3 filled and one excited should limit the max CIroots depending on number of configurations available
 #   reduce code to main__
+# Document my subroutine, keep in mind that the current comments might not actually represent the subroutine, so use them as context but the code is the final word when it comes to documentation:

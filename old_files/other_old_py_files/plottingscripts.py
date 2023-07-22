@@ -4,7 +4,7 @@ import argparse
 import glob
 import os
 
-from densitypy.project_utils.def_functions import execute_command, natural_sort, Execute2
+from densitypy.project_utils.def_functions import execute_command, natural_sort
 
 
 # Main
@@ -38,7 +38,7 @@ def run(args):
         # Do from sim Directory
 
     if mencodertrue:
-        Execute2("apt-cache policy mencoder", "running mencoder", "mencoder not found or not installed")
+        execute_command("apt-cache policy mencoder", "running mencoder", "mencoder not found or not installed")
         execute_command("mencoder mf://@listfiles.txt -mf w=600:h=600:fps=" + str(fps) +
                         ":type=png -ovc lavc -lavcopts vcodec=mpeg4:mbd=2:trell -oac copy -o " + output + ".avi")
 
