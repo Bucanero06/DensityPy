@@ -1,5 +1,6 @@
 import click
 
+
 @click.command()
 @click.argument("json_config_path")
 @click.argument("study_directory")
@@ -22,16 +23,25 @@ import click
 @click.option("--old_main", is_flag=True, help="Enable old main")
 @click.option("--parallel", is_flag=True, help="Enable parallel execution")
 @click.option("--save_previous", is_flag=True, help="Enable saving previous results")
+@click.option("--make", is_flag=True, help="Enable Fortran compilation")
+@click.option("--make_directory", help="Path to the Fortran compilation directory")
+@click.option("--make_flags", help="Path to the Fortran compilation make flags")
 def cli_run(json_config_path, study_directory, molcas_input, run_molcas, run_charge_migration,
-        run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, lus, gridflag,
-        write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file, givenfieldfile,
-        old_main, parallel, save_previous):
+            run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, lus, gridflag,
+            write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file, givenfieldfile,
+            old_main, parallel, save_previous,
+            make, make_directory, make_flags):
     # Modify the run function to include your desired functionality
-    from densitypy.main import run
-    run(json_config_path, study_directory, molcas_input, run_molcas, run_charge_migration,
-        run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, lus, gridflag,
-        write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file, givenfieldfile,
-        old_main, parallel, save_previous)
+    from densitypy.main import run_densitypy
+    run_densitypy(json_config_path, study_directory, molcas_input, run_molcas, run_charge_migration,
+                  run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, lus,
+                  gridflag, write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file,
+                  givenfieldfile, old_main, parallel, save_previous,
+                  make_fortran=make,
+                  make_fortran_config=dict(directory=make_directory, make_flags=make_flags)
+
+                  )
+
 
 if __name__ == "__main__":
     cli_run()

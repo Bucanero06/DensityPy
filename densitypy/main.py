@@ -20,16 +20,20 @@ from densitypy.project_utils.logger import setup_logger
 logger = setup_logger(__name__.split('.')[-1])
 
 
-def run(json_config_path, study_directory, molcas_input,
-        run_molcas=False, run_charge_migration=False, run_charge_migration_ft=False,
-        run_spectrum_reconstruction=False,
-        field_file_help=False, molcas_input_help=False,
-        lus=False, gridflag: bool or str = True, write_charge_migration=None,
-        debug_mode=False, justh5=False, justgetdipoles=False, justgetdensity=False,
-        weights_file=None, givenfieldfile=None,
+def run_densitypy(json_config_path, study_directory, molcas_input,
+                  run_molcas=False, run_charge_migration=False, run_charge_migration_ft=False,
+                  run_spectrum_reconstruction=False,
+                  field_file_help=False, molcas_input_help=False,
+                  lus=False, gridflag: bool or str = True, write_charge_migration=None,
+                  debug_mode=False, justh5=False, justgetdipoles=False, justgetdensity=False,
+                  weights_file=None, givenfieldfile=None,
 
-        old_main=False, parallel=False,
-        save_previous=False):
+                  old_main=False, parallel=False,
+                  save_previous=False, make_fortran=False, make_fortran_config=None):
+    if make_fortran:
+        from densitypy.compiler.fortran_compilation_handler import compile_fortran_code
+        compile_fortran_code(**make_fortran_config)
+
     # TODO too explicit, does not allow for new args to be added easily
     COMMAND_ARGS = [molcas_input, lus, run_charge_migration, run_charge_migration_ft,
                     molcas_input_help, justh5, justgetdensity, justgetdipoles, field_file_help,
@@ -39,8 +43,7 @@ def run(json_config_path, study_directory, molcas_input,
     orig_directory = os.getcwd()
     os.chdir(study_directory)
 
-    # Load Values
-
+    # Load Values # todo fixup the json_config and runnable command behavior, is ugly
     json_config = parse_configuration_file(json_config_path)  # If not passed or does not exist will write example file
     runnable_command_available_bool = True if any(COMMAND_ARGS) else False
 
@@ -367,15 +370,22 @@ def run(json_config_path, study_directory, molcas_input,
 
 
 if __name__ == "__main__":
-    run(json_config_path="configuration_help.json",
-        study_directory="/home/ruben/PycharmProjects/DensityPy/Studies/cluttertest/",
-        molcas_input='molcas_input_help.input', run_molcas=False, run_charge_migration=True,
-        run_charge_migration_ft=False, run_spectrum_reconstruction=False,
-        field_file_help=False, molcas_input_help=False,
-        lus=False, gridflag=True, write_charge_migration=None, debug_mode=True, justh5=False,
-        justgetdipoles=False, justgetdensity=False, weights_file=None, givenfieldfile=None, old_main=True,
-        parallel=False, save_previous=False)
+    make_fortran_config = dict(directory='/home/ruben/PycharmProjects/DensityPy/densityfort',
+                               make_flags='all DEB_FLAG=d',
+                               # ... pther settings but this is mvp
+                               )
 
+    run_densitypy(json_config_path="configuration_help.json",
+                  study_directory="/home/ruben/PycharmProjects/DensityPy/Studies/cluttertest/",
+                  molcas_input='molcas_input_help.input', run_molcas=False, run_charge_migration=True,
+                  run_charge_migration_ft=False, run_spectrum_reconstruction=False, field_file_help=False,
+                  molcas_input_help=False, lus=False, gridflag=True, write_charge_migration=None, debug_mode=True,
+                  justh5=False, justgetdipoles=False, justgetdensity=False, weights_file=None, givenfieldfile=None,
+                  old_main=True, parallel=False, save_previous=False,
+                  make_fortran=True, make_fortran_config=make_fortran_config
+                  )
+# Todo:
+#     refactor the code to avoid using os.chdir entirely, since it changes the state of the Python process and can potentially lead to confusing bugs. This can be achieved by using absolute paths in the shell commands instead of changing the working directory. However, the feasibility of this refactoring depends on the specific codebase and build system.
 # todo
 #   -update documentation
 #   -analytics module (feature-detection, spectrum reconstruction, etc...)

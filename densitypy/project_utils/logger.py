@@ -3,15 +3,46 @@ import logging
 import sys
 from datetime import datetime
 
+
+# DEFAULT LOGGING VALUES
+# CRITICAL: 50
+# ERROR: 40
+# WARNING: 30
+# INFO: 20
+# DEBUG: 10
+# NOTSET: 0
+def remarks(self, message, *args, **kws):
+    if self.isEnabledFor(REMARKS):
+        self._log(REMARKS, message, args, **kws)
+
+
+def unknown(self, message, *args, **kws):
+    if self.isEnabledFor(UNKNOWN):
+        self._log(UNKNOWN, message, args, **kws)
+
+
+# Add the custom levels and methods to the Logger class
+REMARKS = 25
+logging.addLevelName(REMARKS, "REMARKS")
+logging.Logger.remarks = remarks
+
+UNKNOWN = 35
+logging.addLevelName(UNKNOWN, "UNKNOWN")
+logging.Logger.unknown = unknown
+
+
 class ColoredLogger(logging.Formatter):
     """Custom logger formatter to add colors to log messages"""
 
     def format(self, record):
         COLOR_CODES = {
-            "DEBUG": "\033[92m",   # Green
-            "INFO": "\033[94m",   # Blue
-            "WARNING": "\033[93m",   # Yellow
-            "ERROR": "\033[91m",   # Red
+            "DEBUG": "\033[92m",  # Green
+            "INFO": "\033[94m",  # Blue
+            "REMARKS": "\033[95m",  # Purple
+            "WARNING": "\033[93m",  # Yellow
+            "UNKNOWN": "\033[96m",  # Cyan (for unknown messages)
+            "ERROR": "\033[91m",  # Red
+            "CRITICAL": "\033[41m",  # Background Red (for critical messages)
             "RESET": "\033[0m"
         }
 
@@ -24,6 +55,7 @@ class ColoredLogger(logging.Formatter):
         colored_log_level = color_code + log_level + COLOR_CODES["RESET"]
 
         return f"{log_time} [{colored_log_level}] {log_name}: {log_message}"
+
 
 def setup_logger(name, level=logging.DEBUG):
     # Create logger instance
@@ -39,6 +71,7 @@ def setup_logger(name, level=logging.DEBUG):
 
     return logger
 
+
 def get_caller_logger():
     # Get the name of the script or module that called the current function
     caller_frame = inspect.stack()[1]
@@ -47,6 +80,7 @@ def get_caller_logger():
 
     # Set up the logger with the name of the calling script or module
     return setup_logger(caller_name)
+
 
 # Setup a logger
 logger = setup_logger(__name__.split('.')[-1])

@@ -7,13 +7,11 @@ import shutil
 import sys
 from os import path
 from subprocess import Popen, PIPE, CalledProcessError
+from typing import Any
 
 from densitypy.project_utils.logger import setup_logger
 
 logger = setup_logger(__name__.split('.')[-1])
-
-
-# logger = get_caller_logger()
 
 
 def execute_command(command: str, write_stream=True, _logger=None) -> None:
@@ -30,24 +28,71 @@ def execute_command(command: str, write_stream=True, _logger=None) -> None:
 
     >>> execute_command("ls -l")
     """
-
     if _logger is None:
         _logger = logger
 
     _logger.info(f"Executing command: {command}")
-    # Execute command in a new subprocess
-    with Popen(command, stdout=PIPE, bufsize=1, universal_newlines=True, shell=True) as p:
-        # Read and log each line of output as it becomes available
-        # todo accept errors and warning
+    with Popen(command, stdout=PIPE, stderr=PIPE, bufsize=1, universal_newlines=True, shell=True) as p:
         if write_stream:
             for line in p.stdout:
                 _logger.info(f' ---> {line.strip()}')
+            for line in p.stderr:
+                _logger.error(f' ---> {line.strip()}')
 
-    # If the subprocess exited with an error, raise an exception
     if p.returncode != 0:
         error_msg = f"Command '{command}' returned non-zero exit status {p.returncode}"
         _logger.error(error_msg)
         raise CalledProcessError(p.returncode, p.args, output=p.stdout, stderr=p.stderr)
+
+
+def execute_command_with_capture(command: str, write_stream=True, _logger=None):
+    """
+    Executes a command line instruction and streams the output to a logger.
+
+    :param command: The command to be executed.
+    :param write_stream: A boolean flag indicating if the output should be streamed.
+    :type command: str
+    :type write_stream: bool, optional
+    :type command: str
+    :type write_stream: bool, optional
+    :return: Tuple of return code, stdout and stderr of the command.
+    :raises CalledProcessError: If the subprocess exits with a non-zero status.
+
+
+    Usage::
+
+    >>> execute_command("ls -l")
+    """
+    if _logger is None:
+        _logger = logger
+
+    _logger.info(f"Executing command: {command}")
+    stdout_output = []
+    stderr_output = []
+    try:
+        with Popen(command, stdout=PIPE, stderr=PIPE, bufsize=1, universal_newlines=True, shell=True) as p:
+            for line in p.stdout:
+                line = line.strip()
+                stdout_output.append(line)
+                if write_stream:
+                    _logger.info(f' ---> {line}')
+            for line in p.stderr:
+                line = line.strip()
+                stderr_output.append(line)
+                if write_stream:
+                    _logger.error(f' ---> {line}')
+        return_code = p.returncode
+
+        if return_code != 0:
+            error_msg = f"Command '{command}' returned non-zero exit status {return_code}"
+            _logger.error(error_msg)
+            raise CalledProcessError(return_code, p.args, output="\COMMA".join(stdout_output),
+                                     stderr="\COMMA".join(stderr_output))
+
+        return return_code, stdout_output, stderr_output
+
+    except Exception as e:
+        raise
 
 
 def execute_pymolcas_with_error_print(command, nameofproject):
