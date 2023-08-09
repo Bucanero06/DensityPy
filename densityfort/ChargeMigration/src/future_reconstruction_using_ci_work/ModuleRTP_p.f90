@@ -9,10 +9,10 @@ module ModuleRTP_p
 contains
 
   !> Reads the run time parameters specified in the command line.
-  subroutine GetRunTimeParameters( InpDir, OutDir, FileGeometry, &
-                nTimes, Tmin, Tmax, FieldFile, Verbous, Weight_File, Weight_File_flag, &
-                SaveDensity, ivorb, OrbNumber, Volume, dephasing_factor, RELAXATION_FACTOR, &
-                BATH_TEMPERATURE, i_excitation, i_epsilon)
+  subroutine GetRunTimeParameters( input_directory, output_directory, molecular_geometry_file, &
+                n_times, t_min, t_max, FieldFile, Verbous, Weight_File, read_precomputed_weights_flag, &
+                save_charge_migration_flag, ivorb, counted_number_of_orbitals, volume, dephasing_factor, relaxation_factor, &
+                bath_temperature, i_excitation, i_epsilon)
     !
     use ModuleErrorHandling
     use ModuleCommandLineParameterList
@@ -20,22 +20,22 @@ contains
     !
     implicit none
     !
-    character(len=:), allocatable, intent(out) :: InpDir
-    character(len=:), allocatable, intent(out) :: OutDir
-    character(len=:), allocatable, intent(out) :: FileGeometry
-    integer                      , intent(out) :: nTimes
-    real(kind(1d0))              , intent(out) :: Tmin
-    real(kind(1d0))              , intent(out) :: Tmax
+    character(len=:), allocatable, intent(out) :: input_directory
+    character(len=:), allocatable, intent(out) :: output_directory
+    character(len=:), allocatable, intent(out) :: molecular_geometry_file
+    integer                      , intent(out) :: n_times
+    real(kind(1d0))              , intent(out) :: t_min
+    real(kind(1d0))              , intent(out) :: t_max
     character(len=:), allocatable, intent(out) :: FieldFile
     character(len=:), allocatable, intent(out) :: Weight_File
-    logical                      , intent(out) :: Weight_File_flag
+    logical                      , intent(out) :: read_precomputed_weights_flag
     logical                      , intent(out) :: Verbous
-    logical                      , intent(out) :: SaveDensity
+    logical                      , intent(out) :: save_charge_migration_flag
     integer         , allocatable, intent(out) :: ivorb(:)
-    real(kind(1d0))              , intent(out) :: Volume
+    real(kind(1d0))              , intent(out) :: volume
     real(kind(1d0))              , intent(out) :: dephasing_factor
-    real(kind(1d0))              , intent(out) :: RELAXATION_FACTOR
-    real(kind(1d0))              , intent(out) :: BATH_TEMPERATURE
+    real(kind(1d0))              , intent(out) :: relaxation_factor
+    real(kind(1d0))              , intent(out) :: bath_temperature
     !
     integer                      , intent(out) :: i_excitation
     integer                      , intent(out) :: i_epsilon
@@ -47,8 +47,8 @@ contains
     character(len=512) :: strnBuf
 
     CHARACTER(10000)  :: orbital_string
-    integer, intent(out) :: OrbNumber
-    integer ::pos1, pos2 , i, nOrb
+    integer, intent(out) :: counted_number_of_orbitals
+    integer ::pos1, pos2 , i, number_of_orbitals
 
     call List%SetDescription(PROGRAM_DESCRIPTION)
     call List%Add( "--help" , "Print Command Usage" )
@@ -56,14 +56,14 @@ contains
     call List%Add( "-o"     , "Output Dir" ,"CD_out", "optional" )
     call List%Add( "-xyz"   , "Mol Geom File in Inp Dir" ,"geom.xyz", "optional" )
     call List%Add( "-nt"    , "n times"    ,    101 , "optional" )
-    call List%Add( "-tmin"  , "min time"   ,    0.d0, "optional" )
-    call List%Add( "-tmax"  , "max time"   ,  200.d0, "optional" )
+    call List%Add( "-t_min"  , "min time"   ,    0.d0, "optional" )
+    call List%Add( "-t_max"  , "max time"   ,  200.d0, "optional" )
     call List%Add( "-field" , "Field File" ,"Field" , "optional" )
     call List%Add( "-w"     , "Becke's Weights File" ,"Weights_File" , "optional" )
     call List%Add( "-v"     , "verbous"   )
     call List%Add( "-sden"  , "Save Charge Density to file (time consuming!)")
     call List%Add( "-iorb"  , "absolute index active orbitals ", "7,8,9,10,11,12,13", "optional" )
-    call List%Add( "-vol"   , "Volume of unit for grid", 1.d-3, "optional" )
+    call List%Add( "-vol"   , "volume of unit for grid", 1.d-3, "optional" )
     call List%Add( "-bath"  , "BATH TEMPERATURE", 327175.d-2, "optional" )
     call List%Add( "-rf"    , "RELAXATION FACTOR", 1.d-3, "optional" )
     call List%Add( "-df"    , "DEPHASING FACTOR", 1.d-3, "optional" )
@@ -80,26 +80,26 @@ contains
     end if
 
     call List%Get( "-o",  strnBuf  )
-    allocate(OutDir,source=trim(adjustl(strnBuf)))
+    allocate(output_directory,source=trim(adjustl(strnBuf)))
     call List%Get( "-i",  strnBuf  )
-    allocate(InpDir,source=trim(adjustl(strnBuf)))
+    allocate(input_directory,source=trim(adjustl(strnBuf)))
     call List%Get( "-xyz",  strnBuf  )
-    allocate(FileGeometry,source=InpDir//"/"//trim(adjustl(strnBuf)))
-    call List%Get( "-nt",  nTimes  )
-    call List%Get( "-tmin", Tmin  )
-    call List%Get( "-tmax", Tmax  )
-    call List%Get( "-vol", Volume  )
-    call List%Get( "-rf", RELAXATION_FACTOR  )
+    allocate(molecular_geometry_file,source=input_directory//"/"//trim(adjustl(strnBuf)))
+    call List%Get( "-nt",  n_times  )
+    call List%Get( "-t_min", t_min  )
+    call List%Get( "-t_max", t_max  )
+    call List%Get( "-vol", volume  )
+    call List%Get( "-rf", relaxation_factor  )
     call List%Get( "-df", dephasing_factor  )
-    call List%Get( "-bath", BATH_TEMPERATURE  )
+    call List%Get( "-bath", bath_temperature  )
     !
     call List%Get( "-s", i_excitation  )
     call List%Get( "-e", i_epsilon  )
     Verbous = List%Present("-v")
 
-    SaveDensity = List%Present("-sden")
+    save_charge_migration_flag = List%Present("-sden")
 
-    Weight_File_flag = List%Present("-w")
+    read_precomputed_weights_flag = List%Present("-w")
     call List%Get( "-w",  strnBuf  )
 
     allocate(Weight_File,source=trim(adjustl(strnBuf)))
@@ -110,17 +110,17 @@ contains
 
     !..Gets String with Orbitals
     pos1=1
-    nOrb=0
+    number_of_orbitals=0
     call List%Get( "-iorb", orbital_string)
-    OrbNumber=1
+    counted_number_of_orbitals=1
     do
        pos1=index(orbital_string,",")
        if(pos1<=0)exit
-       OrbNumber=OrbNumber+1
+       counted_number_of_orbitals=counted_number_of_orbitals+1
        orbital_string(pos1:pos1)=" "
     enddo
-    allocate(ivorb(OrbNumber))
-    read(orbital_string,*) (ivorb(i),i=1,OrbNumber)
+    allocate(ivorb(counted_number_of_orbitals))
+    read(orbital_string,*) (ivorb(i),i=1,counted_number_of_orbitals)
 
     call List%Free()
     !

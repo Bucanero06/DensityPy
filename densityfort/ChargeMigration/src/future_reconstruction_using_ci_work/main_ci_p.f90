@@ -39,27 +39,27 @@ program ChargeMigration
     external zgemm, zgemv, system !Explicit declaration of the EXTERNAL attribute is required.
     !.. Run-time parameters
     !..
-    character(len = :), allocatable :: InpDir
-    character(len = :), allocatable :: OutDir
-    character(len = :), allocatable :: FileGeometry
-    integer :: nTimes
-    real(kind(1d0)) :: Tmin
-    real(kind(1d0)) :: Tmax
+    character(len = :), allocatable :: input_directory
+    character(len = :), allocatable :: output_directory
+    character(len = :), allocatable :: molecular_geometry_file
+    integer :: n_times
+    real(kind(1d0)) :: t_min
+    real(kind(1d0)) :: t_max
     character(len = :), allocatable :: Ext_field_file
     character(len = :), allocatable :: Weight_File
     logical :: Verbous
-    logical :: Weight_File_flag
-    logical :: SaveDensity
+    logical :: read_precomputed_weights_flag
+    logical :: save_charge_migration_flag
     integer, allocatable :: ivorb(:)
-    integer :: OrbNumber
-    real(kind(1d0)) :: Volume
+    integer :: counted_number_of_orbitals
+    real(kind(1d0)) :: volume
     real(kind(1d0)) :: dephasing_factor
-    real(kind(1d0)) :: RELAXATION_FACTOR
-    real(kind(1d0)) :: BATH_TEMPERATURE
+    real(kind(1d0)) :: relaxation_factor
+    real(kind(1d0)) :: bath_temperature
     integer, parameter :: GS_IDX = 1
 
     !.. Local parameters
-    integer :: nStates, nOrb, i
+    integer :: nStates, number_of_orbitals, i
     real(kind(1d0)), allocatable :: Evec(:)
     !.. Dmat(i,j,alpha) = $ \langle \varphi_i | \hat{\mu}_\alpha$ | \varphi_j \rangle $
     real(kind(1d0)), allocatable :: Dmat(:, :, :)
@@ -71,7 +71,7 @@ program ChargeMigration
     integer :: npts, nAtoms, nxpoints
     real(kind(1d0)), allocatable :: gridv(:, :), AtCoord(:, :) ! 3 x npts
     real(kind(1d0)), allocatable :: OrbTab(:, :) ! 3 x npts
-    !    real(kind(1d0)) :: Volume
+    !    real(kind(1d0)) :: volume
 
     !.. Statistical Density Matrix
     complex(kind(1d0)), allocatable :: zStatRho(:, :), zStatRho0(:, :)
@@ -80,7 +80,7 @@ program ChargeMigration
     real   (kind(1d0)), allocatable :: AtomicChargeVec(:), AtomicChargeEvolution(:, :)
 
     character(len = 30) :: istrn
-    character(len = 16), allocatable :: AtomName(:)
+    character(len = 16), allocatable :: atom_names(:)
 
     integer :: iPts, it, iPol, iAtom
     integer :: uid_AtomicCharge, uid_dipole
@@ -104,15 +104,15 @@ program ChargeMigration
 
     !..Test
     real(kind(1d0)), allocatable :: ChargeTotal1(:), ChargeTotal2(:), Becke_new(:, :, :, :), Dipole_new(:, :), Dipole_new_(:), Becke_new1(:, :, :, :), data(:, :, :, :)
-    real(kind(1d0)) :: data1, data2, data3, Orbital_overlap_self, Orbital_overlap_other, Computed_Volume, MASK
+    real(kind(1d0)) :: data1, data2, data3, Orbital_overlap_self, Orbital_overlap_other, Computed_volume, MASK
     real   (kind(1d0)), allocatable :: AtomicChargeVec_new(:, :), AtomicChargeEvolution_new(:, :, :)
-    integer :: iOrb, jOrb, nOrbs, i_excitation, i_epsilon
+    integer :: iOrb, jOrb, number_of_orbitalss, i_excitation, i_epsilon
     real(kind(1d0)), allocatable :: QchargeVec_new    (:, :), R_el(:, :)
     character(len = 64) :: excitation_string
 
-    call GetRunTimeParameters(InpDir, OutDir, FileGeometry, nTimes, Tmin, Tmax, Ext_field_file, Verbous, Weight_File, &
-            Weight_File_flag, SaveDensity, ivorb, OrbNumber, Volume, dephasing_factor, RELAXATION_FACTOR, &
-            BATH_TEMPERATURE, i_excitation, i_epsilon)
+    call GetRunTimeParameters(input_directory, output_directory, molecular_geometry_file, n_times, t_min, t_max, Ext_field_file, Verbous, Weight_File, &
+            read_precomputed_weights_flag, save_charge_migration_flag, ivorb, counted_number_of_orbitals, volume, dephasing_factor, relaxation_factor, &
+            bath_temperature, i_excitation, i_epsilon)
 
     call Set_CD_IO_Verbous(Verbous)
 
@@ -126,72 +126,72 @@ program ChargeMigration
 
     !    !.. Print the pulse
     !    !..
-    dt = (tmax - tmin) / dble(nTimes - 1)
+    dt = (t_max - t_min) / dble(n_times - 1)
     if (i_excitation ==-1 .and. i_epsilon==-1) then
-        call system("mkdir -p " // trim(OutDir))
-        call system("mkdir -p " // OutDir // "/Dipole")
-        call system("mkdir -p " // OutDir // "/AtomicCharge")
-        call system("mkdir -p " // OutDir // "/ChargeDensity")
-        call system("mkdir -p " // OutDir // "/Pulses")
-        call system("cp " // Ext_field_file // " " // OutDir // "/")
+        call system("mkdir -p " // trim(output_directory))
+        call system("mkdir -p " // output_directory // "/Dipole")
+        call system("mkdir -p " // output_directory // "/AtomicCharge")
+        call system("mkdir -p " // output_directory // "/ChargeDensity")
+        call system("mkdir -p " // output_directory // "/Pulses")
+        call system("cp " // Ext_field_file // " " // output_directory // "/")
         do i = 1, N_Simulations
             write(*, *) "Writing pulse " // trim(Simulation_Tagv(i))
-            strn = trim(OUTDir) // "/Pulses/pulse" // trim(Simulation_Tagv(i))
-            call train(i)%Write(strn, Tmin, Tmax, dt)
-            strn = trim(OUTDir) // "/Pulses/FTpulse" // trim(Simulation_Tagv(i))
+            strn = trim(output_directory) // "/Pulses/pulse" // trim(Simulation_Tagv(i))
+            call train(i)%Write(strn, t_min, t_max, dt)
+            strn = trim(output_directory) // "/Pulses/FTpulse" // trim(Simulation_Tagv(i))
             call train(i)%WriteFTA(strn)
         enddo
     end if
 !    stop!stop here to look at pulses
     !
     !
-    call LoadEnergies(InpDir // "/ROOT_ENERGIES", nStates, Evec)
+    call LoadEnergies(input_directory // "/ROOT_ENERGIES", nStates, Evec)
 
     !.. At the moment, we assume that the TDM are defined as
     !   $\rho^{JI}_{nm} = \langle J | a_n^\dagger a_m | I \rangle $
     !..
-    call LoadTDMs    (InpDir // "/DENSITY_MATRIX", InpDir // "/TRANSITION_DENSITY_MATRIX", &
-            nStates, nOrb, TDM)
+    call LoadTDMs    (input_directory // "/DENSITY_MATRIX", input_directory // "/TRANSITION_DENSITY_MATRIX", &
+            nStates, number_of_orbitals, TDM)
 
     !.. Load Dipole matrix elements $\mu_{IJ}$
-    call LoadDipoleME(Dmat, InpDir, nStates)
+    call LoadDipoleME(Dmat, input_directory, nStates)
     allocate(zDmat_t(nStates, nStates, 3))
     do i = 1, 3
         zDmat_t(:, :, i) = Z1 * transpose(Dmat(:, :, i))
     enddo
 
-    if (nOrb .ne. OrbNumber) then
+    if (number_of_orbitals .ne. counted_number_of_orbitals) then
         write(*, *) "Number of orbitals given by '-iOrb' do not match number of orbitals in active the active space"
         stop
     endif
 
-    !.. Load Geometry,Volume, Grid and Orbitals
-    call LoadGeometry(nAtoms, AtCoord, FileGeometry, AtomName)
-    call LoadGrid(InpDir // "/gridcoord", npts, gridv)! $G=\{\vec{r}_i, i=1,\ldots,N_{G}\}$
-    call ComputeVolume(nPts, Computed_Volume, gridv)
-    call LoadOrbitals(InpDir, nOrb, ivOrb, npts, OrbTab)! $\varphi_n(\vec{r}_i)$
+    !.. Load Geometry,volume, Grid and Orbitals
+    call LoadGeometry(nAtoms, AtCoord, molecular_geometry_file, atom_names)
+    call LoadGrid(input_directory // "/gridcoord", npts, gridv)! $G=\{\vec{r}_i, i=1,\ldots,N_{G}\}$
+    call Computevolume(nPts, Computed_volume, gridv)
+    call LoadOrbitals(input_directory, number_of_orbitals, ivOrb, npts, OrbTab)! $\varphi_n(\vec{r}_i)$
     !.. Compute Liouvillian and Diagonalizes it
-    call ComputeLiouvillian01(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, dephasing_factor, RELAXATION_FACTOR)
+    call ComputeLiouvillian01(Evec, Dmat, Liouvillian0, bath_temperature, dephasing_factor, relaxation_factor)
     call DiagonalizeLindblad0(Liouvillian0, L0_Eval, L0_LEvec, L0_REvec)
 
     !..Computes Real and Imaginary Components of the Dipole for each Molecular Excitation and the Ground State with no Excitations
     if (i_excitation ==0 .and. i_epsilon==0) then !Non_Parallel
         Single_Excitation_Loop : do i_excitation = 1, nStates
-            write(excitation_string, '(a,i0.2)') 'mkdir -p ' // OutDir // '/Dipole/Dipole_State_', i_excitation
+            write(excitation_string, '(a,i0.2)') 'mkdir -p ' // output_directory // '/Dipole/Dipole_State_', i_excitation
             call system(excitation_string)
-            write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', i_excitation
-            call EMULATE(excitation_string, N_Simulations, zMuEV, zDmat_t, L0_Eval, L0_LEvec, L0_REvec, GS_IDX, i_excitation, nTimes, tmin, dt, nStates)
+            write(excitation_string, '(a,i0.2)') output_directory // '/Dipole/Dipole_State_', i_excitation
+            call EMULATE(excitation_string, N_Simulations, zMuEV, zDmat_t, L0_Eval, L0_LEvec, L0_REvec, GS_IDX, i_excitation, n_times, t_min, dt, nStates)
         end do Single_Excitation_Loop
     else !Run Parallel
-        write(excitation_string, '(a,i0.2)') 'mkdir -p ' // OutDir // '/Dipole/Dipole_State_', i_excitation
+        write(excitation_string, '(a,i0.2)') 'mkdir -p ' // output_directory // '/Dipole/Dipole_State_', i_excitation
         call system(excitation_string)
-        write(excitation_string, '(a,i0.2)') OutDir // '/Dipole/Dipole_State_', i_excitation
-        call EMULATE_Parallel(excitation_string, N_Simulations, zMuEV, zDmat_t, L0_Eval, L0_LEvec, L0_REvec, GS_IDX, i_excitation, nTimes, tmin, dt, nStates, i_epsilon)
+        write(excitation_string, '(a,i0.2)') output_directory // '/Dipole/Dipole_State_', i_excitation
+        call EMULATE_Parallel(excitation_string, N_Simulations, zMuEV, zDmat_t, L0_Eval, L0_LEvec, L0_REvec, GS_IDX, i_excitation, n_times, t_min, dt, nStates, i_epsilon)
     end if
     stop
     !
-    !    if(.not. SaveDensity)then
-    !        call Write_Summary(OutDir // "/Simulation_Summary", nPts, nAtoms, Volume, Computed_Volume, nTimes, tmin, tmax, AtomName, Radius_BS, nOrb, OrbTab)
+    !    if(.not. save_charge_migration_flag)then
+    !        call Write_Summary(output_directory // "/Simulation_Summary", nPts, nAtoms, volume, Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
     !    end if
 
     stop
@@ -200,12 +200,12 @@ program ChargeMigration
 contains
 
     !###############################>>>>>>>>>>>>>>>>>>>>>>>>>>
-    subroutine EMULATE(FileName, N_Simulations, zMuEV, zDmat_t, L0_Eval, L0_LEvec, L0_REvec, GS_IDX, STATE_TO_EXCITE, nTimes, tmin, dt, nStates)
+    subroutine EMULATE(FileName, N_Simulations, zMuEV, zDmat_t, L0_Eval, L0_LEvec, L0_REvec, GS_IDX, STATE_TO_EXCITE, n_times, t_min, dt, nStates)
         character(len = *), intent(in) :: FileName
-        real   (kind(1d0)), intent(in) :: tmin, dt
+        real   (kind(1d0)), intent(in) :: t_min, dt
         complex(kind(1d0)), intent(in) :: zDmat_t(:, :, :), L0_LEvec(:, :), L0_REvec(:, :), L0_Eval(:)
         !
-        integer, intent(in) :: N_Simulations, GS_IDX, STATE_TO_EXCITE, nTimes, nStates
+        integer, intent(in) :: N_Simulations, GS_IDX, STATE_TO_EXCITE, n_times, nStates
         !
         complex(kind(1d0)), allocatable :: zStatRho(:, :), zMuEV(:, :)
         complex   (kind(1d0)) :: EPSILON
@@ -251,7 +251,7 @@ contains
             if(allocated(zStatRho))deallocate(zStatRho)
             allocate(zStatRho(nStates, nStates))
             if(allocated(zMuEV))deallocate(zMuEV)
-            allocate(zMuEV(3, nTimes))
+            allocate(zMuEV(3, n_times))
             zMuEV = Z0
             !
             write(*, *)
@@ -264,9 +264,9 @@ contains
                 !
                 write(*, *) "Time_Delay = ", iSim, "/", N_Simulations!!!print to screen
                 !.. Time cycle
-                time_loop : do it = 1, nTimes
+                time_loop : do it = 1, n_times
                     !
-                    t = tmin + dt * dble(it - 1)
+                    t = t_min + dt * dble(it - 1)
                     !
                     !..Excites State at t = 0
                     if (t==0.d0) then
@@ -285,7 +285,7 @@ contains
                     !
                     zStatRho(GS_IDX, GS_IDX) = zStatRho(GS_IDX, GS_IDX) + 1.d0
                     !
-                    if(it == nTimes) exit time_loop
+                    if(it == n_times) exit time_loop
                     !
                     call LiouvillianPropagator(L0_Eval, L0_LEvec, L0_REvec, zStatRho)
                     !
@@ -293,7 +293,7 @@ contains
                 !
                 !.. Save Dipole to file
                 excitation_string = trim(FileName) // "/Dipole" // trim(Simulation_tagv(iSim)) // "_" // trim(PART)
-                call Write_Dipole(excitation_string, zMuEV, nTimes, tmin, dt)
+                call Write_Dipole(excitation_string, zMuEV, n_times, t_min, dt)
                 !
             end do Sim_loop
             !
@@ -301,12 +301,12 @@ contains
         !
     end subroutine EMULATE
 
-    subroutine EMULATE_Parallel(FileName, N_Simulations, zMuEV, zDmat_t, L0_Eval, L0_LEvec, L0_REvec, GS_IDX, STATE_TO_EXCITE, nTimes, tmin, dt, nStates, i_epsilon)
+    subroutine EMULATE_Parallel(FileName, N_Simulations, zMuEV, zDmat_t, L0_Eval, L0_LEvec, L0_REvec, GS_IDX, STATE_TO_EXCITE, n_times, t_min, dt, nStates, i_epsilon)
         character(len = *), intent(in) :: FileName
-        real   (kind(1d0)), intent(in) :: tmin, dt
+        real   (kind(1d0)), intent(in) :: t_min, dt
         complex(kind(1d0)), intent(in) :: zDmat_t(:, :, :), L0_LEvec(:, :), L0_REvec(:, :), L0_Eval(:)
         !
-        integer, intent(in) :: N_Simulations, GS_IDX, STATE_TO_EXCITE, nTimes, nStates
+        integer, intent(in) :: N_Simulations, GS_IDX, STATE_TO_EXCITE, n_times, nStates
         !
         complex(kind(1d0)), allocatable :: zStatRho(:, :), zMuEV(:, :)
         complex   (kind(1d0)) :: EPSILON
@@ -329,7 +329,7 @@ contains
         if(allocated(zStatRho))deallocate(zStatRho)
         allocate(zStatRho(nStates, nStates))
         if(allocated(zMuEV))deallocate(zMuEV)
-        allocate(zMuEV(3, nTimes))
+        allocate(zMuEV(3, n_times))
         zMuEV = Z0
         !
         write(*, *)
@@ -342,9 +342,9 @@ contains
             !
             write(*, *) "Time_Delay = ", iSim, "/", N_Simulations!!!print to screen
             !.. Time cycle
-            time_loop : do it = 1, nTimes
+            time_loop : do it = 1, n_times
                 !
-                t = tmin + dt * dble(it - 1)
+                t = t_min + dt * dble(it - 1)
                 !
                 !..Excites State at t = 0
                 if (t==0.d0) then
@@ -363,7 +363,7 @@ contains
                 !
                 zStatRho(GS_IDX, GS_IDX) = zStatRho(GS_IDX, GS_IDX) + 1.d0
                 !
-                if(it == nTimes) exit time_loop
+                if(it == n_times) exit time_loop
                 !
                 call LiouvillianPropagator(L0_Eval, L0_LEvec, L0_REvec, zStatRho)
                 !
@@ -371,7 +371,7 @@ contains
             !
             !.. Save Dipole to file
             excitation_string = trim(FileName) // "/Dipole" // trim(Simulation_tagv(iSim)) // "_" // trim(PART)
-            call Write_Dipole(excitation_string, zMuEV, nTimes, tmin, dt)
+            call Write_Dipole(excitation_string, zMuEV, n_times, t_min, dt)
             !
         end do Sim_loop
         !
@@ -383,10 +383,10 @@ contains
         real(kind(1d0)), allocatable, intent(out) :: R_el(:, :)
 
         real(kind(1d0)) :: sum, m, r, sum1
-        integer :: nAtoms, nPts, nOrbs, iOrb, jOrb, uid
+        integer :: nAtoms, nPts, number_of_orbitalss, iOrb, jOrb, uid
         nAtoms = size(WeightV, 2)
         nPts = size(WeightV, 1)
-        nOrbs = size(OrbTab, 2)
+        number_of_orbitalss = size(OrbTab, 2)
 
         !
         write(*, "(a)") "Computing Barycenters of the Atomic Charges"
@@ -397,8 +397,8 @@ contains
             do iAtom = 1, nAtoms
                 sum = 0.d0
                 sum1 = 0.d0
-                do iOrb = 1, nOrb
-                    do jOrb = 1, nOrb
+                do iOrb = 1, number_of_orbitals
+                    do jOrb = 1, number_of_orbitals
                         do iPts = 1, nPts
                             m = WeightV(iPts, iAtom) * OrbTab(iPts, iOrb) * OrbTab(iPts, iOrb)
                             r = gridv(iPol, iPts)
@@ -429,7 +429,7 @@ contains
         real(kind(1d0)), allocatable, intent(out) :: Becke_new(:, :, :, :)
         real(kind(1d0)), intent(in) :: Bary_center(:, :)
 
-        integer :: nPts, nOrbs, nAtoms
+        integer :: nPts, number_of_orbitalss, nAtoms
         integer :: iPts, iOrb1, iOrb2, iAtom, iPol
         real(kind(1d0)) :: dsum
 
@@ -438,16 +438,16 @@ contains
         !
         nAtoms = size(WeightV, 2)
         nPts = size(WeightV, 1)
-        nOrbs = size(OrbTab, 2)
+        number_of_orbitalss = size(OrbTab, 2)
 
         !        if(allocated(Becke_new))deallocate(Becke_new)
-        allocate(Becke_new(3, nOrbs, nOrbs, nAtoms))
+        allocate(Becke_new(3, number_of_orbitalss, number_of_orbitalss, nAtoms))
 
         Becke_new = 0.d0
         do iPol = 1, 3
             do iAtom = 1, nAtoms
-                do iOrb2 = 1, nOrbs
-                    do iOrb1 = 1, nOrbs
+                do iOrb2 = 1, number_of_orbitalss
+                    do iOrb1 = 1, number_of_orbitalss
                         do iPts = 1, nPts
                             Becke_new(iPol, iOrb1, iOrb2, iAtom) = Becke_new(iPol, iOrb1, iOrb2, iAtom) + &
                                     WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2) * &
@@ -466,7 +466,7 @@ contains
         real(kind(1d0)), allocatable, intent(out) :: Becke_new(:, :, :, :)
         real(kind(1d0)), intent(in) :: gridv(:, :)
 
-        integer :: nPts, nOrbs, nAtoms
+        integer :: nPts, number_of_orbitalss, nAtoms
         integer :: iPts, iOrb1, iOrb2, iAtom, iPol
         real(kind(1d0)) :: dsum
 
@@ -475,16 +475,16 @@ contains
         !
         nAtoms = size(WeightV, 2)
         nPts = size(WeightV, 1)
-        nOrbs = size(OrbTab, 2)
+        number_of_orbitalss = size(OrbTab, 2)
 
         if(allocated(Becke_new))deallocate(Becke_new)
-        allocate(Becke_new(3, nOrbs, nOrbs, nAtoms))
+        allocate(Becke_new(3, number_of_orbitalss, number_of_orbitalss, nAtoms))
 
         Becke_new = 0.d0
         do iPol = 1, 3
             do iAtom = 1, nAtoms
-                do iOrb2 = 1, nOrbs
-                    do iOrb1 = 1, nOrbs
+                do iOrb2 = 1, number_of_orbitalss
+                    do iOrb1 = 1, number_of_orbitalss
                         do iPts = 1, nPts
                             Becke_new(iPol, iOrb1, iOrb2, iAtom) = Becke_new(iPol, iOrb1, iOrb2, iAtom) + &
                                     WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2) * &
@@ -501,22 +501,22 @@ contains
         real(kind(1d0)), intent(in) :: Becke_new(:, :, :, :)
         real(kind(1d0)), allocatable, intent(out) :: QchargeVec_new    (:, :)
 
-        integer :: iAtom, nAtoms, nOrbs, jOrb, iOrb, nPts, iPol
+        integer :: iAtom, nAtoms, number_of_orbitalss, jOrb, iOrb, nPts, iPol
         real(kind(1d0)), external :: DDOT
         real(kind(1d0)) :: dsum
         nPts = size(Becke_new, 1)
-        nOrbs = size(Becke_new, 2)
+        number_of_orbitalss = size(Becke_new, 2)
         nAtoms = size(Becke_new, 4)
         allocate(QchargeVec_new(3, nAtoms))
 
         QchargeVec_new = 0.d0
         do iPol = 1, 3
             do iAtom = 1, nAtoms
-                do jOrb = 1, nOrbs
-                    do iOrb = 1, nOrbs
+                do jOrb = 1, number_of_orbitalss
+                    do iOrb = 1, number_of_orbitalss
                         QchargeVec_new(iPol, iAtom) = QchargeVec_new(iPol, iAtom) + OrbitalDensity(iOrb, jOrb) &
                                 * Becke_new(iPol, iOrb, jOrb, iAtom)
-                        !                QchargeVec_new(iPol, iAtom) = ddot(nOrbs * nOrbs, OrbitalDensity, 1, Becke_new(iPol, 1, 1, iAtom), 1)
+                        !                QchargeVec_new(iPol, iAtom) = ddot(number_of_orbitalss * number_of_orbitalss, OrbitalDensity, 1, Becke_new(iPol, 1, 1, iAtom), 1)
                     end do
                 end do
             enddo
@@ -528,17 +528,17 @@ contains
         complex(kind(1d0)), intent(in) :: zStatRho(:, :)
         real   (kind(1d0)), intent(in) :: TDM(:, :, :, :)
         real   (kind(1d0)), allocatable, intent(out) :: Amat  (:, :)
-        integer :: nOrb, iOrbi, iOrbj, iStatei, iStatej
+        integer :: number_of_orbitals, ii_orb, ij_orb, ii_state, ij_state
 
-        nOrb = size(TDM, 1)
+        number_of_orbitals = size(TDM, 1)
 
         if(allocated(Amat))then
-            if(abs(size(Amat, 1) - nOrb) + abs(size(Amat, 2) - nOrb)>0)then
+            if(abs(size(Amat, 1) - number_of_orbitals) + abs(size(Amat, 2) - number_of_orbitals)>0)then
                 deallocate(Amat)
-                allocate(Amat(nOrb, nOrb))
+                allocate(Amat(number_of_orbitals, number_of_orbitals))
             endif
         else
-            allocate(Amat(nOrb, nOrb))
+            allocate(Amat(number_of_orbitals, number_of_orbitals))
         endif
         !
         !.. Build the expansion Matrix
@@ -547,13 +547,13 @@ contains
         !   Here, we will neglect relaxation and decoherence and hence $P_{IJ}(t) = P_{IJ}(0) e^{-i\omega_{IJ}t}$
         !   where $\omega_{IJ}=E_I-E_J$
         Amat = 0.d0
-        do iOrbi = 1, nOrb
-            do iOrbj = 1, nOrb
+        do ii_orb = 1, number_of_orbitals
+            do ij_orb = 1, number_of_orbitals
                 !
-                do iStatei = 1, nStates
-                    do iStatej = 1, nStates
-                        Amat(iOrbi, iOrbj) = Amat(iOrbi, iOrbj) + &
-                                dble(zStatRho(iStatei, iStatej) * TDM(iOrbi, iOrbj, iStatej, iStatei))
+                do ii_state = 1, nStates
+                    do ij_state = 1, nStates
+                        Amat(ii_orb, ij_orb) = Amat(ii_orb, ij_orb) + &
+                                dble(zStatRho(ii_state, ij_state) * TDM(ii_orb, ij_orb, ij_state, ii_state))
                     enddo
                 enddo
                 !
@@ -568,15 +568,15 @@ contains
         real(kind(1d0)), intent(in) :: OrbTab(:, :)
         real(kind(1d0)), intent(out) :: ChDen(:)
 
-        integer :: nOrb, iOrbi, iOrbj
+        integer :: number_of_orbitals, ii_orb, ij_orb
 
-        nOrb = size(OrbTab, 2)
+        number_of_orbitals = size(OrbTab, 2)
         !.. Tabulate Charge Density
         ChDen = 0.d0
         do iPts = 1, nPts
-            do iOrbi = 1, nOrb
-                do iOrbj = 1, nOrb
-                    ChDen(iPts) = ChDen(iPts) + OrbTab(iPts, iOrbi) * Amat(iOrbi, iOrbj) * OrbTab(iPts, iOrbj)
+            do ii_orb = 1, number_of_orbitals
+                do ij_orb = 1, number_of_orbitals
+                    ChDen(iPts) = ChDen(iPts) + OrbTab(iPts, ii_orb) * Amat(ii_orb, ij_orb) * OrbTab(iPts, ij_orb)
                 enddo
             enddo
         enddo
@@ -587,15 +587,15 @@ contains
         real(kind(1d0)), intent(in) :: OrbTab(:, :)
         real(kind(1d0)), intent(out) :: ChDen(:)
 
-        integer :: nOrb, iOrbi, iOrbj
+        integer :: number_of_orbitals, ii_orb, ij_orb
 
-        nOrb = size(OrbTab, 2)
+        number_of_orbitals = size(OrbTab, 2)
         !.. Tabulate Charge Density
         ChDen = 0.d0
         do iPts = 1, nPts
-            do iOrbi = 1, nOrb
-                do iOrbj = 1, nOrb
-                    ChDen(iPts) = ChDen(iPts) + OrbTab(iPts, iOrbi) * OrbTab(iPts, iOrbj)
+            do ii_orb = 1, number_of_orbitals
+                do ij_orb = 1, number_of_orbitals
+                    ChDen(iPts) = ChDen(iPts) + OrbTab(iPts, ii_orb) * OrbTab(iPts, ij_orb)
                 enddo
             enddo
         enddo
@@ -619,7 +619,7 @@ contains
 
         logical, save :: FIRST_CALL = .TRUE.
         integer :: nLiou
-        integer :: iState, j
+        integer :: i_state, j
         real   (kind(1d0)) :: EFieldX, EFieldY, EFieldZ
         complex(kind(1d0)), allocatable, save :: zmat1(:, :), zmat2(:, :)
         complex(kind(1d0)), allocatable, save :: zPureMat(:, :)
@@ -707,9 +707,9 @@ contains
         !LiouvillianPropagator
         !.. Form the density matrix again
         zStatRho = Z0
-        do iState = 1, nStates
+        do i_state = 1, nStates
             do j = 1, nStates
-                zStatRho(:, j) = zStatRho(:, j) + EPure(iState) * zPureMat(:, iState) * conjg(zPureMat(j, iState))
+                zStatRho(:, j) = zStatRho(:, j) + EPure(i_state) * zPureMat(:, i_state) * conjg(zPureMat(j, i_state))
             enddo
         enddo
         call HilbertToLiouvilleMatrix(zStatRho, RhoVec)
@@ -898,15 +898,15 @@ contains
 
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!>>>>>>>>>>>>>>
-    subroutine ComputeVolume(nPts, Volume, gridv)
+    subroutine Computevolume(nPts, volume, gridv)
         integer, intent(in) :: nPts
-        real(kind(1d0)), intent(out) :: Volume
+        real(kind(1d0)), intent(out) :: volume
         real(kind(1d0)), allocatable, intent(in) :: gridv(:, :)
         real(kind(1d0)) :: coord1, coord2, delta
         real(kind(1d0)), parameter :: threshold = 1d-10
 
         integer :: iPts, iCoord
-        Volume = 1.d0
+        volume = 1.d0
 
         do iCoord = 1, 3
             coord1 = gridv(iCoord, 1)
@@ -917,20 +917,20 @@ contains
                     delta = min(delta, abs(coord1 - coord2))
                 endif
             enddo
-            Volume = Volume * delta
+            volume = volume * delta
         enddo
 
-    end subroutine ComputeVolume
+    end subroutine Computevolume
 
-    subroutine AtomicRadius_Bragg_Slater_Becke(AtomName, nAtom, Radius_BS)
+    subroutine AtomicRadius_Bragg_Slater_Becke(atom_names, nAtom, Radius_BS)
         real(kind(1d0)), allocatable, intent(out) :: Radius_BS(:)
         integer, intent(in) :: nAtom
-        character(len = 16), intent(in) :: AtomName(:)
+        character(len = 16), intent(in) :: atom_names(:)
         integer :: iAtom
         allocate(Radius_BS(nAtom))
 
         do iAtom = 1, nAtom
-            Radius_BS(iAtom) = Radius_Table(AtomName(iAtom))
+            Radius_BS(iAtom) = Radius_Table(atom_names(iAtom))
         end do
     end subroutine AtomicRadius_Bragg_Slater_Becke
 
@@ -960,19 +960,19 @@ contains
         real(kind(1d0)), intent(in) :: OrbitalDensity(:, :)
         real(kind(1d0)), intent(in) :: BeckeMatrix   (:, :, :)
         real(kind(1d0)), allocatable, intent(out) :: QchargeVec    (:)
-        integer :: iAtom, nAtoms, nOrbs, jOrb, iOrb
+        integer :: iAtom, nAtoms, number_of_orbitalss, jOrb, iOrb
         real(kind(1d0)), external :: DDOT
-        nOrbs = size(BeckeMatrix, 1)
+        number_of_orbitalss = size(BeckeMatrix, 1)
         nAtoms = size(BeckeMatrix, 3)
         if(.not.allocated(QchargeVec))allocate(QchargeVec(nAtoms))
         QchargeVec = 0.d0
         do iAtom = 1, nAtoms
-            !            do jOrb = 1, nOrbs
-            !                do iOrb = 1, nOrbs
+            !            do jOrb = 1, number_of_orbitalss
+            !                do iOrb = 1, number_of_orbitalss
             !                    QchargeVec(iAtom) = QchargeVec(iAtom) + OrbitalDensity(iOrb, jOrb) * BeckeMatrix(iOrb, jOrb, iAtom)
             !                end do
             !            end do
-            QchargeVec(iAtom) = ddot(nOrbs * nOrbs, OrbitalDensity, 1, BeckeMatrix(1, 1, iAtom), 1)
+            QchargeVec(iAtom) = ddot(number_of_orbitalss * number_of_orbitalss, OrbitalDensity, 1, BeckeMatrix(1, 1, iAtom), 1)
         enddo
     end subroutine ComputeAtomicCharges
 
@@ -981,21 +981,21 @@ contains
         real(kind(1d0)), allocatable, intent(in) :: OrbTab (:, :)
         real(kind(1d0)), allocatable, intent(out) :: Becke(:, :, :)
 
-        integer :: nPts, nOrbs, nAtoms
+        integer :: nPts, number_of_orbitalss, nAtoms
         integer :: iPts, iOrb1, iOrb2, iAtom
         real(kind(1d0)) :: dsum
 
         nAtoms = size(WeightV, 2)
         nPts = size(WeightV, 1)
-        nOrbs = size(OrbTab, 2)
+        number_of_orbitalss = size(OrbTab, 2)
 
         if(allocated(Becke))deallocate(Becke)
-        allocate(Becke(nOrbs, nOrbs, nAtoms))
+        allocate(Becke(number_of_orbitalss, number_of_orbitalss, nAtoms))
 
         Becke = 0.d0
         do iAtom = 1, nAtoms
-            do iOrb2 = 1, nOrbs
-                do iOrb1 = 1, nOrbs
+            do iOrb2 = 1, number_of_orbitalss
+                do iOrb1 = 1, number_of_orbitalss
                     dsum = 0.d0
                     do iPts = 1, nPts
                         dsum = dsum + WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2)
@@ -1220,10 +1220,10 @@ contains
         complex(kind(1d0)), allocatable, intent(out) :: Liouvillian0(:, :)
 
         real(kind(1d0)), parameter :: WATER_MELTING_POINT = 273.15
-        real(kind(1d0)), parameter :: BATH_TEMPERATURE = WATER_MELTING_POINT + 3000
-        real(kind(1d0)), parameter :: BETA = 1.d0 / (BOLTZMANN_CONSTANT_auK * BATH_TEMPERATURE)
+        real(kind(1d0)), parameter :: bath_temperature = WATER_MELTING_POINT + 3000
+        real(kind(1d0)), parameter :: BETA = 1.d0 / (BOLTZMANN_CONSTANT_auK * bath_temperature)
         real(kind(1d0)), parameter :: dephasing_factor = 1.d-3
-        real(kind(1d0)), parameter :: RELAXATION_FACTOR = 1.d-3
+        real(kind(1d0)), parameter :: relaxation_factor = 1.d-3
 
         integer :: nLiou, nStates, i, j, iLiou, i1, i2, iLiou1, iLiou2
         !.. Dephasing and Relaxation Constants
@@ -1255,7 +1255,7 @@ contains
                 dBuf = dBuf + AverageDipole
                 !
                 !.. Relaxation Factor
-                PairGamma(i, j) = RELAXATION_FACTOR * AverageDipole
+                PairGamma(i, j) = relaxation_factor * AverageDipole
                 if(Evec(i)>Evec(j)) PairGamma(i, j) = PairGamma(i, j) * exp(-BETA * (Evec(i) - Evec(j)))
                 !
             enddo
@@ -1287,14 +1287,14 @@ contains
     end subroutine ComputeLiouvillian0
     !###########################################
 
-    subroutine ComputeLiouvillian01(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, dephasing_factor, RELAXATION_FACTOR)
+    subroutine ComputeLiouvillian01(Evec, Dmat, Liouvillian0, bath_temperature, dephasing_factor, relaxation_factor)
         real   (kind(1d0)), intent(in) :: Evec(:)
         real   (kind(1d0)), intent(in) :: Dmat(:, :, :)
         complex(kind(1d0)), allocatable, intent(out) :: Liouvillian0(:, :)
 
         real(kind(1d0)), intent(in) :: dephasing_factor
-        real(kind(1d0)), intent(in) :: RELAXATION_FACTOR
-        real(kind(1d0)), intent(in) :: BATH_TEMPERATURE
+        real(kind(1d0)), intent(in) :: relaxation_factor
+        real(kind(1d0)), intent(in) :: bath_temperature
 
         integer :: nLiou, nStates, i, j, iLiou, i1, i2, iLiou1, iLiou2
         !.. Dephasing and Relaxation Constants
@@ -1302,7 +1302,7 @@ contains
         real   (kind(1d0)) :: AverageDipole, dBuf
         real(kind(1d0)) :: BETA
 
-        BETA = 1.d0 / (BOLTZMANN_CONSTANT_auK * BATH_TEMPERATURE)
+        BETA = 1.d0 / (BOLTZMANN_CONSTANT_auK * bath_temperature)
 
         nStates = size(Evec, 1)
 
@@ -1329,7 +1329,7 @@ contains
                 dBuf = dBuf + AverageDipole
                 !
                 !.. Relaxation Factor
-                PairGamma(i, j) = RELAXATION_FACTOR * AverageDipole
+                PairGamma(i, j) = relaxation_factor * AverageDipole
                 if(Evec(i)>Evec(j)) PairGamma(i, j) = PairGamma(i, j) * exp(-BETA * (Evec(i) - Evec(j)))
                 !
             enddo
@@ -1393,11 +1393,11 @@ contains
     end subroutine DiagonalizeLindblad0
 
     !>>
-    subroutine Write_Dipole(FileName, Dipole, nTimes, tmin, dt)
+    subroutine Write_Dipole(FileName, Dipole, n_times, t_min, dt)
         character(len = *), intent(in) :: FileName
         complex(kind(1d0)), intent(in) :: Dipole(:, :)
-        real   (kind(1d0)), intent(in) :: tmin, dt
-        integer, intent(in) :: nTimes
+        real   (kind(1d0)), intent(in) :: t_min, dt
+        integer, intent(in) :: n_times
 
         real   (kind(1d0)) :: t
         integer :: uid_dipole, iPol, it
@@ -1407,20 +1407,20 @@ contains
                 form = "formatted", &
                 status = "unknown", &
                 action = "write")
-        do it = 1, nTimes
-            t = tmin + dt * dble(it - 1)
+        do it = 1, n_times
+            t = t_min + dt * dble(it - 1)
             write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((dble(Dipole(iPol, it)), aimag(Dipole(iPol, it))), iPol = 1, 3)
         enddo
         close(uid_dipole)
     end subroutine Write_Dipole
     !
     !
-    subroutine Write_Dipole1(FileName, Dipole, nTimes, tmin, dt)
+    subroutine Write_Dipole1(FileName, Dipole, n_times, t_min, dt)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: Dipole(:, :)
         !        complex(kind(1d0)), intent(in) :: Dipole(:, :)
-        real   (kind(1d0)), intent(in) :: tmin, dt
-        integer, intent(in) :: nTimes
+        real   (kind(1d0)), intent(in) :: t_min, dt
+        integer, intent(in) :: n_times
 
         real   (kind(1d0)) :: t
         integer :: uid_dipole, iPol, it
@@ -1430,19 +1430,19 @@ contains
                 form = "formatted", &
                 status = "unknown", &
                 action = "write")
-        do it = 1, nTimes
-            t = tmin + dt * dble(it - 1)
+        do it = 1, n_times
+            t = t_min + dt * dble(it - 1)
             !            write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((dble(Dipole(iPol, it)), aimag(Dipole(iPol, it))), iPol = 1, 3)
             write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((Dipole(iPol, it), 0.d0), iPol = 1, 3)
         enddo
         close(uid_dipole)
     end subroutine Write_Dipole1
 
-    subroutine Write_Q_Charge(FileName, Charge, nTimes, tmin, dt, nAtoms)
+    subroutine Write_Q_Charge(FileName, Charge, n_times, t_min, dt, nAtoms)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: Charge(:, :)
-        real   (kind(1d0)), intent(in) :: tmin, dt
-        integer, intent(in) :: nTimes, nAtoms
+        real   (kind(1d0)), intent(in) :: t_min, dt
+        integer, intent(in) :: n_times, nAtoms
 
         real   (kind(1d0)) :: t
         integer :: uid_AtomicCharge, iPol, it, iAtom
@@ -1454,15 +1454,15 @@ contains
                 status = "unknown", &
                 action = "write")
         !..Regular
-        do it = 1, nTimes
-            t = tmin + dt * dble(it - 1)
+        do it = 1, n_times
+            t = t_min + dt * dble(it - 1)
             write(uid_AtomicCharge, "(*(x,e24.16))") t, sum(Charge(:, it)), (Charge(iAtom, it), iAtom = 1, nAtoms)
         enddo
         !
         !
         !..New
-        !        do it = 1, nTimes
-        !            t = tmin + dt * dble(it - 1)
+        !        do it = 1, n_times
+        !            t = t_min + dt * dble(it - 1)
         !            write(uid_AtomicCharge, "(*(x,e24.16))") t, sum(Charge(:, :, it)), ((Charge(iPol, iAtom, it), iPol = 1, 3), iAtom = 1, nAtoms)
         !        enddo
         !        !
@@ -1470,11 +1470,11 @@ contains
     end subroutine Write_Q_Charge
     !
     !
-    subroutine Write_Q_Charge1(FileName, Charge, nTimes, tmin, dt, nAtoms)
+    subroutine Write_Q_Charge1(FileName, Charge, n_times, t_min, dt, nAtoms)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: Charge(:, :, :)
-        real   (kind(1d0)), intent(in) :: tmin, dt
-        integer, intent(in) :: nTimes, nAtoms
+        real   (kind(1d0)), intent(in) :: t_min, dt
+        integer, intent(in) :: n_times, nAtoms
 
         real   (kind(1d0)) :: t
         integer :: uid_AtomicCharge, iPol, it, iAtom
@@ -1487,8 +1487,8 @@ contains
                 action = "write")
 
         !..New
-        do it = 1, nTimes
-            t = tmin + dt * dble(it - 1)
+        do it = 1, n_times
+            t = t_min + dt * dble(it - 1)
             write(uid_AtomicCharge, "(*(x,e24.16))") t, sum(Charge(:, :, it)), ((Charge(iPol, iAtom, it), iPol = 1, 3), iAtom = 1, nAtoms)
         enddo
         !
@@ -1511,7 +1511,7 @@ contains
     !        logical, save :: FIRST_CALL = .TRUE.
     !        integer, save :: nliou, nStates, nOmegas
     !        complex(kind(1d0)), allocatable, save :: zmat1(:, :), zmat2(:, :), zvec1(:), zvec2(:), zvec3(:)
-    !        integer :: iPol, iOmega, iLiou, iState
+    !        integer :: iPol, iOmega, iLiou, i_state
     !        real(kind(1d0)) :: w, sigma
     !
     !        if(FIRST_CALL)then
@@ -1551,8 +1551,8 @@ contains
     !                call ZGEMV("N", nLiou, nLiou, Z1, L0_REvec, nLiou, zvec1, 1, Z0, zvec3, 1)
     !                call LiouvilleToHilbertMatrix(zvec3, zmat2)
     !                DipoleFTplus(iPol, iOmega) = 0.d0
-    !                do iState = 1, nStates
-    !                    DipoleFTplus(iPol, iOmega) = DipoleFTplus(iPol, iOmega) + zmat2(iState, iState)
+    !                do i_state = 1, nStates
+    !                    DipoleFTplus(iPol, iOmega) = DipoleFTplus(iPol, iOmega) + zmat2(i_state, i_state)
     !                enddo
     !                DipoleFTplus(iPol, iOmega) = DipoleFTplus(iPol, iOmega) * exp(Zi * w * StepTime) / (2.d0 * PI)
     !
@@ -1569,18 +1569,18 @@ end program ChargeMigration
 
 !*** IDEALLY, SHOULD COMPUTE THE DIPOLE FROM THE AO - AO DIPOLES.
 !!$  !.. Load Dipole matrix element between active MOs
-!!$  call LoadDipoleMO( InpDir, nOrb, ivOrb, MuOrb )
+!!$  call LoadDipoleMO( input_directory, number_of_orbitals, ivOrb, MuOrb )
 !!$
 !!$  !.. Check Dipole Matrix Elements between States
-!!$  do iStatei = 1, nStates
-!!$     do iStatej = 1, nStates
+!!$  do ii_state = 1, nStates
+!!$     do ij_state = 1, nStates
 !!$        TME = 0.d0
-!!$        do i = 1, nOrb
-!!$           do j = 1, nOrb
-!!$              TME = TME + TDM(i,j,iStatei,iStatej) * MuOrb(j,i)
+!!$        do i = 1, number_of_orbitals
+!!$           do j = 1, number_of_orbitals
+!!$              TME = TME + TDM(i,j,ii_state,ij_state) * MuOrb(j,i)
 !!$           enddo
 !!$        enddo
-!!$        write(*,*) iStatei, iStatej, TME
+!!$        write(*,*) ii_state, ij_state, TME
 !!$     enddo
 !!$  enddo
 

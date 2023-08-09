@@ -1,119 +1,12 @@
 #! /usr/bin/env python3.10
+import json
 from os import path
 
 from densitypy.project_utils.logger import setup_logger
-from .def_functions import load_json_file
+from .def_functions import load_json_file, recursively_normalize_dict_keys, validate_and_correct_dictionary
 from ..Default_Settings.default_config import DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_CONTENT
 
 logger = setup_logger(__name__.split('.')[-1])
-
-
-def normalize_key(key: str) -> str:
-    """
-    Normalize a string key by converting all characters to lowercase
-    and removing all spaces and underscores.
-
-    :param key: The string key to be normalized.
-    :type key: str
-    :return: The normalized key.
-    :rtype: str
-
-    Usage::
-
-        normalized_key = normalize_key('Hello_World')
-        print(normalized_key)  # Output: 'helloworld'
-    """
-    translation_table = str.maketrans('', '', ' _')
-    return key.lower().translate(translation_table)
-
-
-def normalize_dict(d: dict) -> dict:
-    """
-    Normalize all keys in a dictionary. If a value is a dictionary,
-    normalize its keys recursively.
-
-    :param d: The dictionary whose keys are to be normalized.
-    :type d: dict
-    :return: A new dictionary with normalized keys.
-    :rtype: dict
-
-    Usage::
-
-        data = {
-            'Hello World': 1,
-            'Good_Day': {
-                'Inner_Key': 2
-            }
-        }
-        normalized_data = normalize_dict(data)
-        print(normalized_data)  # Output: {'helloworld': 1, 'goodday': {'innerkey': 2}}
-    """
-    return {
-        normalize_key(key): normalize_dict(value) if isinstance(value, dict) else value
-        for key, value in d.items()
-    }
-
-
-import json
-
-
-def verify_configuration_keys(json_config: dict, default_config: dict, log: list = []) -> tuple:
-    """
-    Verifies that the given JSON config contains all the required keys as per the default config.
-    If not, adds the missing keys with the default values.
-    Returns a log of warnings and errors in case of missing or unknown keys.
-
-    :param json_config: The JSON configuration to verify.
-    :type json_config: dict
-    :param default_config: The default configuration used for verification.
-    :type default_config: dict
-    :param log: A list of log messages. Default is an empty list.
-    :type log: list, optional
-    :return: A tuple of the verified JSON configuration and the log of warnings/errors.
-    :rtype: tuple
-
-    Usage::
-
-        json_config = {
-            "key1": "value1",
-            "key2": {
-                "subkey1": "subvalue1"
-            }
-        }
-
-        default_config = {
-            "key1": "value1",
-            "key2": {
-                "subkey1": "subvalue1",
-                "subkey2": "subvalue2"
-            },
-            "key3": "value3"
-        }
-
-        verified_config, log = verify_configuration_keys(json_config, default_config)
-        # verified_config will contain all keys from default_config, and log will contain warning/error messages
-    """
-    if not json_config:
-        json_config = {}
-
-    for key, value in default_config.items():
-        if key not in json_config:
-            json_config[key] = value
-            log.append(f'Warning: Missing key "{key}" has been added with default value "{value}"')
-        elif isinstance(value, dict):
-            if isinstance(json_config[key], dict):
-                json_config[key], log = verify_configuration_keys(json_config[key], value, log)
-            else:
-                log.append(f'Error: Key "{key}" should contain a dictionary but found "{type(json_config[key])}"')
-        else:
-            if not isinstance(json_config[key], type(value)):
-                log.append(f'Error: Key "{key}" should be of type "{type(value)}" but found "{type(json_config[key])}"')
-
-    for key in json_config.keys():
-        if key not in default_config:
-            log.append(f'Error: Unknown key "{key}" found in config')
-
-    return json_config, log
 
 
 def parse_configuration_file(config_file_path=None):
@@ -147,10 +40,10 @@ def parse_configuration_file(config_file_path=None):
         write_example_configuration_file(DEFAULT_CONFIG_FILE_PATH)
     #
     config = load_json_file(config_file_path if load_user_configuration else DEFAULT_CONFIG_FILE_PATH)
-    config = normalize_dict(config)
+    config = recursively_normalize_dict_keys(config)
 
-    default_config = normalize_dict(DEFAULT_CONFIG_CONTENT)
-    config, log = verify_configuration_keys(config, default_config)
+    default_config = recursively_normalize_dict_keys(DEFAULT_CONFIG_CONTENT)
+    config, log = validate_and_correct_dictionary(config, default_config)
 
     for message in log:
         logger.warning(message)

@@ -2,12 +2,11 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib as mpl
-import plotly.graph_objects as go
 import csv
 import fnmatch
 import os
 from os import path
-import moviepy.video.io.ImageSequenceClip
+
 import subprocess
 import shutil
 import configparser
@@ -18,6 +17,8 @@ import argparse
 
  
 def run(args):
+    import plotly.graph_objects as go
+    import moviepy.video.io.ImageSequenceClip
     ###Variables
 
     ChDen_timestepsdir = args.input

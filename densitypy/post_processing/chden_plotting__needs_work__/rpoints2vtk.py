@@ -4,11 +4,9 @@ import csv
 from subprocess import Popen, PIPE, CalledProcessError
 import argparse
 import glob
-from natsort import realsorted
 import pandas as pd
 
 import time
-import progressbar
 
 
 def Execute(command):
@@ -94,6 +92,9 @@ def Find_Max_and_Min(coords):
 ########################################################################################################################
 
 def run(args):
+    from natsort import realsorted
+    import progressbar
+
     # Gets Run_Time_Parameters
     inputdirectory = args.inputdirectory
 

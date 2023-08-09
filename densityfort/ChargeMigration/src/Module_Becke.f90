@@ -9,8 +9,17 @@ Module Module_Becke
     logical :: Verbous
 
     public :: &
-            ComputeAtomicWeights
-
+        EuclDist, &
+        EllipticalCoord, &
+        Radius_Table, &
+        get_param_a, &
+        new_mu_transformation, &
+        fkfun, &
+        skfun, &
+        skfunab, &
+        Pkfuna, &
+        PkFunTot, &
+        wkfun
 
 contains
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

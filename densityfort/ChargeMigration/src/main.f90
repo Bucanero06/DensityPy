@@ -33,33 +33,34 @@ program ChargeMigration
     !.. Local modules
     use ModuleRTP
     use Module_CD_IO
+    use Module_Becke
 
     implicit none
 
     external zgemm, zgemv, system !Explicit declaration of the EXTERNAL attribute is required.
     !.. Run-time parameters
     !..
-    character(len = :), allocatable :: InpDir
-    character(len = :), allocatable :: OutDir
-    character(len = :), allocatable :: FileGeometry
-    integer :: nTimes
-    real(kind(1d0)) :: Tmin
-    real(kind(1d0)) :: Tmax
+    character(len = :), allocatable :: input_directory
+    character(len = :), allocatable :: output_directory
+    character(len = :), allocatable :: molecular_geometry_file
+    integer :: n_times
+    real(kind(1d0)) :: t_min
+    real(kind(1d0)) :: t_max
     character(len = :), allocatable :: Ext_field_file
     character(len = :), allocatable :: Weight_File
     logical :: Verbous
-    logical :: Weight_File_flag
-    logical :: SaveDensity
+    logical :: read_precomputed_weights_flag
+    logical :: save_charge_migration_flag
     integer, allocatable :: ivorb(:)
-    integer :: OrbNumber
-    real(kind(1d0)) :: Volume
+    integer :: counted_number_of_orbitals
+    real(kind(1d0)) :: volume
     real(kind(1d0)) :: dephasing_factor
-    real(kind(1d0)) :: RELAXATION_FACTOR
-    real(kind(1d0)) :: BATH_TEMPERATURE
+    real(kind(1d0)) :: relaxation_factor
+    real(kind(1d0)) :: bath_temperature
     integer, parameter :: GS_IDX = 1
 
     !.. Local parameters
-    integer :: nStates, nOrb, i
+    integer :: nStates, number_of_orbitals, i
     real(kind(1d0)), allocatable :: Evec(:)
     !.. Dmat(i,j,alpha) = $ \langle \varphi_i | \hat{\mu}_\alpha$ | \varphi_j \rangle $
     real(kind(1d0)), allocatable :: Dmat(:, :, :)
@@ -71,7 +72,7 @@ program ChargeMigration
     integer :: npts, nAtoms, nxpoints
     real(kind(1d0)), allocatable :: gridv(:, :), AtCoord(:, :) ! 3 x npts
     real(kind(1d0)), allocatable :: OrbTab(:, :) ! 3 x npts
-    !    real(kind(1d0)) :: Volume
+    !    real(kind(1d0)) :: volume
 
     !.. Statistical Density Matrix
     complex(kind(1d0)), allocatable :: zStatRho(:, :), zStatRho0(:, :)
@@ -80,7 +81,7 @@ program ChargeMigration
     real   (kind(1d0)), allocatable :: AtomicChargeVec(:), AtomicChargeEvolution(:, :)
 
     character(len = 30) :: istrn
-    character(len = 16), allocatable :: AtomName(:)
+    character(len = 16), allocatable :: atom_names(:)
 
     integer :: iPts, it, iPol, iAtom
     integer :: uid_AtomicCharge, uid_dipole
@@ -103,20 +104,20 @@ program ChargeMigration
 
     !..Test
     real(kind(1d0)), allocatable :: ChargeTotal1(:), ChargeTotal2(:), Becke_new(:, :, :, :), Dipole_new(:, :), Dipole_new_(:), Becke_new1(:, :, :, :), data(:, :, :, :)
-    real(kind(1d0)) :: data1, data2, data3, Orbital_overlap_self, Orbital_overlap_other, Computed_Volume
+    real(kind(1d0)) :: data1, data2, data3, Orbital_overlap_self, Orbital_overlap_other, Computed_volume
     real   (kind(1d0)), allocatable :: AtomicChargeVec_new(:, :), AtomicChargeEvolution_new(:, :, :)
-    integer :: iOrb, jOrb, nOrbs
+    integer :: iOrb, jOrb, number_of_orbitalss
     real(kind(1d0)), allocatable :: QchargeVec_new    (:, :), R_el(:, :)
 
-    call GetRunTimeParameters(InpDir, OutDir, FileGeometry, &
-            nTimes, Tmin, Tmax, Ext_field_file, Verbous, Weight_File, Weight_File_flag, &
-            SaveDensity, ivorb, OrbNumber, Volume, dephasing_factor, RELAXATION_FACTOR, BATH_TEMPERATURE)
+    call GetRunTimeParameters(input_directory, output_directory, molecular_geometry_file, &
+            n_times, t_min, t_max, Ext_field_file, Verbous, Weight_File, read_precomputed_weights_flag, &
+            save_charge_migration_flag, ivorb, counted_number_of_orbitals, volume, dephasing_factor, relaxation_factor, bath_temperature)
 
-    call system("mkdir -p " // trim(OutDir))
-    call system("mkdir -p " // OutDir // "/Dipole")
-    call system("mkdir -p " // OutDir // "/AtomicCharge")
-    call system("mkdir -p " // OutDir // "/ChargeDensity")
-    call system("mkdir -p " // OutDir // "/Pulses")
+    call system("mkdir -p " // trim(output_directory))
+    call system("mkdir -p " // output_directory // "/Dipole")
+    call system("mkdir -p " // output_directory // "/AtomicCharge")
+    call system("mkdir -p " // output_directory // "/ChargeDensity")
+    call system("mkdir -p " // output_directory // "/Pulses")
     call Set_CD_IO_Verbous(Verbous)
 
     open(newunit = uid, &
@@ -129,70 +130,76 @@ program ChargeMigration
 
     !    !.. Print the pulse
     !    !..
-    dt = (tmax - tmin) / dble(nTimes - 1)
+    dt = (t_max - t_min) / dble(n_times - 1)
     do i = 1, N_Simulations
         write(*, *) "Writing pulse " // trim(Simulation_Tagv(i))
-        strn = trim(OUTDir) // "/Pulses/pulse" // trim(Simulation_Tagv(i))
-        call train(i)%Write(strn, Tmin, Tmax, dt)  !>>pulse_trainWrite
-        strn = trim(OUTDir) // "/Pulses/FTpulse" // trim(Simulation_Tagv(i))
+        strn = trim(output_directory) // "/Pulses/pulse" // trim(Simulation_Tagv(i))
+        call train(i)%Write(strn, t_min, t_max, dt)  !>>pulse_trainWrite
+        strn = trim(output_directory) // "/Pulses/FTpulse" // trim(Simulation_Tagv(i))
         call train(i)%WriteFTA(strn) !>>pulse_trainWriteFTA
     enddo
     !    stop!stop here to look at pulses
     !
     !
-    call LoadEnergies(InpDir // "/ROOT_ENERGIES", nStates, Evec)
+    call LoadEnergies(input_directory // "/ROOT_ENERGIES", nStates, Evec)
 
     !.. At the moment, we assume that the TDM are defined as
     !   $\rho^{JI}_{nm} = \langle J | a_n^\dagger a_m | I \rangle $
-    call LoadTDMs    (InpDir // "/DENSITY_MATRIX", InpDir // "/TRANSITION_DENSITY_MATRIX", nStates, nOrb, TDM)
+    call LoadTDMs    (input_directory // "/DENSITY_MATRIX", input_directory // "/TRANSITION_DENSITY_MATRIX", nStates, number_of_orbitals, TDM)
 
     !.. Load Dipole matrix elements $\mu_{IJ}$
-    call LoadDipoleME(Dmat, InpDir, nStates)
+    call LoadDipoleME(Dmat, input_directory, nStates)
+
     allocate(zDmat_t(nStates, nStates, 3))
     do i = 1, 3
         zDmat_t(:, :, i) = Z1 * transpose(Dmat(:, :, i))
     enddo
 
-    if (nOrb .ne. OrbNumber) then
+    if (number_of_orbitals .ne. counted_number_of_orbitals) then
+        ! TODO change to assert method of ASTRA
         write(*, *) "Number of orbitals given by '-iOrb' do not match number of orbitals in active the active space"
         stop
     endif
 
-    !.. Load Geometry,Volume, Grid and Orbitals
-    call LoadGeometry(nAtoms, AtCoord, FileGeometry, AtomName)
-    call LoadGrid(InpDir // "/gridcoord", npts, gridv)! $G=\{\vec{r}_i, i=1,\ldots,N_{G}\}$
+    !.. Load Geometry,volume, Grid and Orbitals
+    call LoadGeometry(nAtoms, AtCoord, molecular_geometry_file, atom_names)
+    call LoadGrid(input_directory // "/gridcoord.csv", npts, gridv)! $G=\{\vec{r}_i, i=1,\ldots,N_{G}\}$
     !        nxpoints = int(exp(log(nPts + 0.1d0) / 3.d0))
-    call ComputeVolume(nPts, Computed_Volume, gridv) ! Should probably check that this computed volume is the same as the one given in the input file
+    call Computevolume(nPts, Computed_volume, gridv) ! Should probably check that this computed volume is the same as the one given in the input file
 
     !.. Load Orbitals
-    call LoadOrbitals(InpDir, nOrb, ivOrb, npts, OrbTab)! $\varphi_n(\vec{r}_i)$
+    call LoadOrbitals(input_directory, number_of_orbitals, npts, OrbTab)! $\varphi_n(\vec{r}_i)$
+
+
+    !!fixme save_charge_migration_flag is being misused trhough out the code. should only be used to yes or not do CM
+    !!      for plotting
 
     !.. Compute and Write | or Read Becke's Weights
-    if(.not. SaveDensity)then
+    if(.not. save_charge_migration_flag)then
         !
-        call AtomicRadius_Bragg_Slater_Becke(AtomName, nAtoms, Radius_BS)
-        if (Weight_File_flag == .True.) then
+        call AtomicRadius_Bragg_Slater_Becke(atom_names, nAtoms, Radius_BS)
+        if (read_precomputed_weights_flag == .True.) then
             call Read_Weights(Weight_File, WEIGHTV, nAtoms, nPts)
         else
             call ComputeAtomicWeights(nPts, gridv, nAtoms, AtCoord, WeightV, Radius_BS)
-            call Write_Weights(OUTDir // "/" // Weight_File // "_" // OUTDir, WEIGHTV, gridv, nAtoms, nPts)
+            call Write_Weights(output_directory // "/" // Weight_File // "_" // output_directory // ".csv", WEIGHTV, gridv, nAtoms, nPts)
         endif
         !.. Compute Berycenter of Atmoic Charges
         call Compute_R_el(gridv, WeightV, OrbTab, R_el)
-        call Write_R_el_bc(OutDir, nAtoms, R_el)
+        call Write_R_el_bc(output_directory, atom_names, nAtoms, R_el)
 
         !.. Compute Becke's Matrix
         call ComputeNewBeckeMatrix(WeightV, OrbTab, Becke_new, R_el) !!using electronic barycenter or AtCoord for the nuclear barycenter
-        !    BeckeMatrix = BeckeMatrix * Computed_Volume
+        !    BeckeMatrix = BeckeMatrix * Computed_volume
     end if
 
     allocate(AtomicChargeVec(nAtoms))
-    allocate(AtomicChargeEvolution(nAtoms, nTimes))
-    allocate(AtomicChargeEvolution_new(3, nAtoms, nTimes))
+    allocate(AtomicChargeEvolution(nAtoms, n_times))
+    allocate(AtomicChargeEvolution_new(3, nAtoms, n_times))
 
 
     !.. Compute Liouvillian and Diagonalizes it
-    call ComputeLiouvillian_0(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, dephasing_factor, RELAXATION_FACTOR)
+    call ComputeLiouvillian_0(Evec, Dmat, Liouvillian0, bath_temperature, dephasing_factor, relaxation_factor)
     call DiagonalizeLindblad_0(Liouvillian0, L0_Eval, L0_LEvec, L0_REvec)
 
     allocate(zStatRho (nStates, nStates))
@@ -200,10 +207,10 @@ program ChargeMigration
 
     allocate(ChDen(nPts))
 
-    allocate(zMuEV(3, nTimes))
+    allocate(zMuEV(3, n_times))
     zMuEV = Z0
 
-    allocate(Dipole_new(3, nTimes))
+    allocate(Dipole_new(3, n_times))
 
     write(*, *) "Starting Sim Loop"
     Sim_loop : do iSim = 1, N_Simulations
@@ -214,15 +221,15 @@ program ChargeMigration
         write(*, '(A, F0.2, A, I0, A)') "Simulation progress: ", 100.d0 * iSim / (N_Simulations)
 
         !.. Time cycle
-        time_loop : do it = 1, nTimes
+        time_loop : do it = 1, n_times
             !
-            t = tmin + dt * dble(it - 1)
+            t = t_min + dt * dble(it - 1)
             !.. Computes the excitation density wrt ground state
             zStatRho(GS_IDX, GS_IDX) = zStatRho(GS_IDX, GS_IDX) - 1.d0
 
             !.. Evaluates the expectation value of the dipole as a function of time
             !            write(*, *) it, iSim
-            if(.not. SaveDensity)then
+            if(.not. save_charge_migration_flag)then
                 do iPol = 1, 3
                     zMuEV(iPol, it) = zdotu(nStates * nStates, zStatRho, 1, zDmat_t(1, 1, iPol), 1)
                 enddo
@@ -230,47 +237,47 @@ program ChargeMigration
             !
             call ComputeOrbitalDensity(zStatRho, TDM, OrbitalDensity)
 
-            if(.not. SaveDensity)then
+            if(.not. save_charge_migration_flag)then
                 !
                 call ComputeNewAtomicCharges(OrbitalDensity, Becke_new, AtomicChargeVec_new)
-                AtomicChargeVec_new = AtomicChargeVec_new * Computed_Volume
+                AtomicChargeVec_new = AtomicChargeVec_new * Computed_volume
                 AtomicChargeEvolution_new(:, :, it) = AtomicChargeVec_new
             end if
 
             !
-            if(SaveDensity)then
+            if(save_charge_migration_flag)then
                 call TabulateChargeDensity(OrbitalDensity, OrbTab, ChDen)
                 write(istrn, "(f12.4)")t
                 !..Makes new directory inside of ChargeDensity directory for each simulation
-                call system("mkdir -p " // OutDir // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)))
-                call Write_Charge_Density(OutDir // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)) // "/ChDen" // trim(adjustl(istrn)), &
+                call system("mkdir -p " // output_directory // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)))
+                call Write_Charge_Density(output_directory // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)) // "/ChDen" // trim(adjustl(istrn)) // ".csv", &
                         nPts, gridv, ChDen, Weightv, nAtoms)
             endif
             !
             zStatRho(GS_IDX, GS_IDX) = zStatRho(GS_IDX, GS_IDX) + 1.d0
             !
-            if(it == nTimes) exit time_loop
+            if(it == n_times) exit time_loop
             !
             call LiouvillianPropagator(L0_Eval, L0_LEvec, L0_REvec, zStatRho)
             !
         enddo time_loop
         !.. Save Dipole to filerc
-        call Write_Dipole(OutDir // "/Dipole/Dipole" // trim(Simulation_tagv(iSim)), zMuEV, nTimes, tmin, dt)
-        !        call Write_Dipole1(OutDir // "/Dipole/Dipole" // trim(Simulation_tagv(iSim)), Dipole_new, nTimes, tmin, dt)
+        call Write_Dipole(output_directory // "/Dipole/Dipole" // trim(Simulation_tagv(iSim)) // ".csv", zMuEV, n_times, t_min, dt)
 
         !.. Save Q_Charge
-        !        call Write_Q_Charge(OutDir // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)), AtomicChargeEvolution, nTimes, tmin, dt, nAtoms)
-        call Write_Q_Charge1(OutDir // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)), AtomicChargeEvolution_new, nTimes, tmin, dt, nAtoms)
+        !        call Write_Q_Charge(output_directory // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)), AtomicChargeEvolution, n_times, t_min, dt, nAtoms)
+        call Write_Q_Charge(output_directory // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)) // ".csv", AtomicChargeEvolution_new, n_times, t_min, dt, nAtoms)
 
     end do Sim_loop
     !
-    if(.not. SaveDensity)then
-        call Write_Summary(OutDir // "/Simulation_Summary", nPts, nAtoms, Volume, Computed_Volume, nTimes, tmin, tmax, AtomName, Radius_BS, nOrb, OrbTab)
+    if(.not. save_charge_migration_flag)then
+        call Write_Summary(output_directory // "/Simulation_Summary", nPts, nAtoms, volume, Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
     end if
     stop
 
 
 contains
+
 
     ! ################################################
     !... Lindblad Equation - LiouvillianPropagator
@@ -329,7 +336,7 @@ contains
 
         logical, save :: FIRST_CALL = .TRUE.
         integer :: nLiou
-        integer :: iState, j
+        integer :: i_state, j
         real   (kind(1d0)) :: EFieldX, EFieldY, EFieldZ
         complex(kind(1d0)), allocatable, save :: zmat1(:, :), zmat2(:, :)
         complex(kind(1d0)), allocatable, save :: zPureMat(:, :)
@@ -417,9 +424,9 @@ contains
         !LiouvillianPropagator
         !.. Form the density matrix again
         zStatRho = Z0
-        do iState = 1, nStates
+        do i_state = 1, nStates
             do j = 1, nStates
-                zStatRho(:, j) = zStatRho(:, j) + EPure(iState) * zPureMat(:, iState) * conjg(zPureMat(j, iState))
+                zStatRho(:, j) = zStatRho(:, j) + EPure(i_state) * zPureMat(:, i_state) * conjg(zPureMat(j, i_state))
             enddo
         enddo
         call HilbertToLiouvilleMatrix(zStatRho, RhoVec)
@@ -438,9 +445,9 @@ contains
     ! Evec (input, real array): The array of energy eigenvalues of the system's Hamiltonian.
     ! Dmat (input, real array): The dipole moment matrix of the system.
     ! Liouvillian0 (output, complex array): The computed Liouvillian superoperator. It's an output parameter that's updated in the subroutine.
-    ! BATH_TEMPERATURE (input, real): The temperature of the bath or environment interacting with the quantum system.
+    ! bath_temperature (input, real): The temperature of the bath or environment interacting with the quantum system.
     ! dephasing_factor (input, real): The factor representing dephasing effects in the system.
-    ! RELAXATION_FACTOR (input, real): The factor representing relaxation effects in the system.
+    ! relaxation_factor (input, real): The factor representing relaxation effects in the system.
     ! Important Variables:
     ! nLiou and nStates: The size of the Liouvillian and the number of quantum states in the system, respectively.
     ! PairGamma, TotalGamma: The arrays containing the pair relaxation rates and the total relaxation rates, respectively.
@@ -452,14 +459,14 @@ contains
     ! The total relaxation rate for each state is computed as the sum of the pair relaxation rates involving the state.
     ! Finally, the dissipative part of the Liouvillian, capturing the effects of the interaction of the system with its environment, is computed based on these relaxation rates.
     ! Please note that this subroutine computes the Lindblad superoperator for a specific case where the relaxation and dephasing rates are assumed to be constants and the Lindblad operators are assumed to be proportional to the dipole moment operator. In more complex or specific cases, modifications would be required.
-    subroutine ComputeLiouvillian_0(Evec, Dmat, Liouvillian0, BATH_TEMPERATURE, dephasing_factor, RELAXATION_FACTOR)
+    subroutine ComputeLiouvillian_0(Evec, Dmat, Liouvillian0, bath_temperature, dephasing_factor, relaxation_factor)
         real   (kind(1d0)), intent(in) :: Evec(:)
         real   (kind(1d0)), intent(in) :: Dmat(:, :, :)
         complex(kind(1d0)), allocatable, intent(out) :: Liouvillian0(:, :)
 
         real(kind(1d0)), intent(in) :: dephasing_factor
-        real(kind(1d0)), intent(in) :: RELAXATION_FACTOR
-        real(kind(1d0)), intent(in) :: BATH_TEMPERATURE
+        real(kind(1d0)), intent(in) :: relaxation_factor
+        real(kind(1d0)), intent(in) :: bath_temperature
 
         integer :: nLiou, nStates, i, j, iLiou, i1, i2, iLiou1, iLiou2
         !.. Dephasing and Relaxation Constants
@@ -467,7 +474,7 @@ contains
         real   (kind(1d0)) :: AverageDipole, dBuf
         real(kind(1d0)) :: BETA
 
-        BETA = 1.d0 / (BOLTZMANN_CONSTANT_auK * BATH_TEMPERATURE)
+        BETA = 1.d0 / (BOLTZMANN_CONSTANT_auK * bath_temperature)
 
         nStates = size(Evec, 1)
 
@@ -494,7 +501,7 @@ contains
                 dBuf = dBuf + AverageDipole
                 !
                 !.. Relaxation Factor
-                PairGamma(i, j) = RELAXATION_FACTOR * AverageDipole
+                PairGamma(i, j) = relaxation_factor * AverageDipole
                 if(Evec(i)>Evec(j)) PairGamma(i, j) = PairGamma(i, j) * exp(-BETA * (Evec(i) - Evec(j)))
                 !
             enddo
@@ -524,12 +531,6 @@ contains
         enddo
 
     end subroutine ComputeLiouvillian_0
-    !
-    !<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-    ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    ! Hilbert and Liouville space transformations subroutines
-    ! ----------------------------------------------------
     !
     !*************************************************************************************************
     !.. DiagonalizeLindblad_0: This subroutine performs the diagonalization of the time-independent
@@ -577,6 +578,12 @@ contains
         enddo
         write(*, *)"|U_R U_L^+ -1|_1 = ", sum(abs(zmat))
     end subroutine DiagonalizeLindblad_0
+    !
+    !<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    ! Hilbert and Liouville space transformations subroutines
+    ! ----------------------------------------------------
     !
     !*************************************************************************************************
     !..  HilbertToLiouvilleMatrix: This subroutine transforms a matrix from Hilbert space into a vector
@@ -701,7 +708,7 @@ contains
     !<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    ! Called ... rn not going to organize these yet
+    ! Called ... rn not going to organize these yet ... figure out what module they go to
     ! ----------------------------------------------------
     subroutine DiagonalizeDipole(Dmat, EVEC_DX, zUMAT_DX, EVEC_DY, zUMAT_DY, EVEC_DZ, zUMAT_DZ)
         real   (kind(1d0)), intent(in) :: Dmat(:, :, :)
@@ -744,15 +751,15 @@ contains
         deallocate(rmat)
 
     end subroutine DiagonalizeDipole
-    subroutine ComputeVolume(nPts, Volume, gridv)
+    subroutine Computevolume(nPts, volume, gridv)
         integer, intent(in) :: nPts
-        real(kind(1d0)), intent(out) :: Volume
+        real(kind(1d0)), intent(out) :: volume
         real(kind(1d0)), allocatable, intent(in) :: gridv(:, :)
         real(kind(1d0)) :: coord1, coord2, delta
         real(kind(1d0)), parameter :: threshold = 1d-10
 
         integer :: iPts, iCoord
-        Volume = 1.d0
+        volume = 1.d0
 
         do iCoord = 1, 3
             coord1 = gridv(iCoord, 1)
@@ -763,19 +770,19 @@ contains
                     delta = min(delta, abs(coord1 - coord2))
                 endif
             enddo
-            Volume = Volume * delta
+            volume = volume * delta
         enddo
 
-    end subroutine ComputeVolume
+    end subroutine Computevolume
     subroutine Compute_R_el(gridv, WeightV, OrbTab, R_el) !!!***** refactor writing to Module RTP, hard coded... *****
         real(kind(1d0)), allocatable, intent(in) :: OrbTab (:, :), gridv(:, :), WeightV(:, :)
         real(kind(1d0)), allocatable, intent(out) :: R_el(:, :)
 
         real(kind(1d0)) :: sum, m, r, sum1
-        integer :: nAtoms, nPts, nOrbs, iOrb, jOrb, uid
+        integer :: nAtoms, nPts, number_of_orbitalss, iOrb, jOrb, uid
         nAtoms = size(WeightV, 2)
         nPts = size(WeightV, 1)
-        nOrbs = size(OrbTab, 2)
+        number_of_orbitalss = size(OrbTab, 2)
 
         !
         write(*, "(a)") "Computing Barycenters of the Atomic Charges"
@@ -786,8 +793,8 @@ contains
             do iAtom = 1, nAtoms
                 sum = 0.d0
                 sum1 = 0.d0
-                do iOrb = 1, nOrb
-                    do jOrb = 1, nOrb
+                do iOrb = 1, number_of_orbitals
+                    do jOrb = 1, number_of_orbitals
                         do iPts = 1, nPts
                             m = WeightV(iPts, iAtom) * OrbTab(iPts, iOrb) * OrbTab(iPts, iOrb)
                             r = gridv(iPol, iPts)
@@ -811,15 +818,15 @@ contains
         !        end do
         !        close(uid)
     end subroutine Compute_R_el
-    subroutine AtomicRadius_Bragg_Slater_Becke(AtomName, nAtom, Radius_BS)
+    subroutine AtomicRadius_Bragg_Slater_Becke(atom_names, nAtom, Radius_BS)
         real(kind(1d0)), allocatable, intent(out) :: Radius_BS(:)
         integer, intent(in) :: nAtom
-        character(len = 16), intent(in) :: AtomName(:)
+        character(len = 16), intent(in) :: atom_names(:)
         integer :: iAtom
         allocate(Radius_BS(nAtom))
 
         do iAtom = 1, nAtom
-            Radius_BS(iAtom) = Radius_Table(AtomName(iAtom))
+            Radius_BS(iAtom) = Radius_Table(atom_names(iAtom))
         end do
     end subroutine AtomicRadius_Bragg_Slater_Becke
     subroutine ComputeNewAtomicCharges(OrbitalDensity, Becke_new, QchargeVec_new)
@@ -827,22 +834,22 @@ contains
         real(kind(1d0)), intent(in) :: Becke_new(:, :, :, :)
         real(kind(1d0)), allocatable, intent(out) :: QchargeVec_new    (:, :)
 
-        integer :: iAtom, nAtoms, nOrbs, jOrb, iOrb, nPts, iPol
+        integer :: iAtom, nAtoms, number_of_orbitalss, jOrb, iOrb, nPts, iPol
         real(kind(1d0)), external :: DDOT
         real(kind(1d0)) :: dsum
         nPts = size(Becke_new, 1)
-        nOrbs = size(Becke_new, 2)
+        number_of_orbitalss = size(Becke_new, 2)
         nAtoms = size(Becke_new, 4)
         allocate(QchargeVec_new(3, nAtoms))
 
         QchargeVec_new = 0.d0
         do iPol = 1, 3
             do iAtom = 1, nAtoms
-                do jOrb = 1, nOrbs
-                    do iOrb = 1, nOrbs
+                do jOrb = 1, number_of_orbitalss
+                    do iOrb = 1, number_of_orbitalss
                         QchargeVec_new(iPol, iAtom) = QchargeVec_new(iPol, iAtom) + OrbitalDensity(iOrb, jOrb) &
                                 * Becke_new(iPol, iOrb, jOrb, iAtom)
-                        !                QchargeVec_new(iPol, iAtom) = ddot(nOrbs * nOrbs, OrbitalDensity, 1, Becke_new(iPol, 1, 1, iAtom), 1)
+                        !                QchargeVec_new(iPol, iAtom) = ddot(number_of_orbitalss * number_of_orbitalss, OrbitalDensity, 1, Becke_new(iPol, 1, 1, iAtom), 1)
                     end do
                 end do
             enddo
@@ -852,17 +859,17 @@ contains
         complex(kind(1d0)), intent(in) :: zStatRho(:, :)
         real   (kind(1d0)), intent(in) :: TDM(:, :, :, :)
         real   (kind(1d0)), allocatable, intent(out) :: Amat  (:, :)
-        integer :: nOrb, iOrbi, iOrbj, iStatei, iStatej
+        integer :: number_of_orbitals, ii_orb, ij_orb, ii_state, ij_state
 
-        nOrb = size(TDM, 1)
+        number_of_orbitals = size(TDM, 1)
 
         if(allocated(Amat))then
-            if(abs(size(Amat, 1) - nOrb) + abs(size(Amat, 2) - nOrb)>0)then
+            if(abs(size(Amat, 1) - number_of_orbitals) + abs(size(Amat, 2) - number_of_orbitals)>0)then
                 deallocate(Amat)
-                allocate(Amat(nOrb, nOrb))
+                allocate(Amat(number_of_orbitals, number_of_orbitals))
             endif
         else
-            allocate(Amat(nOrb, nOrb))
+            allocate(Amat(number_of_orbitals, number_of_orbitals))
         endif
         !
         !.. Build the expansion Matrix
@@ -871,13 +878,13 @@ contains
         !   Here, we will neglect relaxation and decoherence and hence $P_{IJ}(t) = P_{IJ}(0) e^{-i\omega_{IJ}t}$
         !   where $\omega_{IJ}=E_I-E_J$
         Amat = 0.d0
-        do iOrbi = 1, nOrb
-            do iOrbj = 1, nOrb
+        do ii_orb = 1, number_of_orbitals
+            do ij_orb = 1, number_of_orbitals
                 !
-                do iStatei = 1, nStates
-                    do iStatej = 1, nStates
-                        Amat(iOrbi, iOrbj) = Amat(iOrbi, iOrbj) + &
-                                dble(zStatRho(iStatei, iStatej) * TDM(iOrbi, iOrbj, iStatej, iStatei))
+                do ii_state = 1, nStates
+                    do ij_state = 1, nStates
+                        Amat(ii_orb, ij_orb) = Amat(ii_orb, ij_orb) + &
+                                dble(zStatRho(ii_state, ij_state) * TDM(ii_orb, ij_orb, ij_state, ii_state))
                     enddo
                 enddo
                 !
@@ -909,15 +916,15 @@ contains
         real(kind(1d0)), intent(in) :: OrbTab(:, :)
         real(kind(1d0)), intent(out) :: ChDen(:)
 
-        integer :: nOrb, iOrbi, iOrbj
+        integer :: number_of_orbitals, ii_orb, ij_orb
 
-        nOrb = size(OrbTab, 2)
+        number_of_orbitals = size(OrbTab, 2)
         !.. Tabulate Charge Density
         ChDen = 0.d0
         do iPts = 1, nPts
-            do iOrbi = 1, nOrb
-                do iOrbj = 1, nOrb
-                    ChDen(iPts) = ChDen(iPts) + OrbTab(iPts, iOrbi) * Amat(iOrbi, iOrbj) * OrbTab(iPts, iOrbj)
+            do ii_orb = 1, number_of_orbitals
+                do ij_orb = 1, number_of_orbitals
+                    ChDen(iPts) = ChDen(iPts) + OrbTab(iPts, ii_orb) * Amat(ii_orb, ij_orb) * OrbTab(iPts, ij_orb)
                 enddo
             enddo
         enddo
@@ -928,7 +935,7 @@ contains
         real(kind(1d0)), allocatable, intent(out) :: Becke_new(:, :, :, :)
         real(kind(1d0)), intent(in) :: Bary_center(:, :)
 
-        integer :: nPts, nOrbs, nAtoms
+        integer :: nPts, number_of_orbitalss, nAtoms
         integer :: iPts, iOrb1, iOrb2, iAtom, iPol
         real(kind(1d0)) :: dsum
 
@@ -937,16 +944,16 @@ contains
         !
         nAtoms = size(WeightV, 2)
         nPts = size(WeightV, 1)
-        nOrbs = size(OrbTab, 2)
+        number_of_orbitalss = size(OrbTab, 2)
 
         !        if(allocated(Becke_new))deallocate(Becke_new)
-        allocate(Becke_new(3, nOrbs, nOrbs, nAtoms))
+        allocate(Becke_new(3, number_of_orbitalss, number_of_orbitalss, nAtoms))
 
         Becke_new = 0.d0
         do iPol = 1, 3
             do iAtom = 1, nAtoms
-                do iOrb2 = 1, nOrbs
-                    do iOrb1 = 1, nOrbs
+                do iOrb2 = 1, number_of_orbitalss
+                    do iOrb1 = 1, number_of_orbitalss
                         do iPts = 1, nPts
                             Becke_new(iPol, iOrb1, iOrb2, iAtom) = Becke_new(iPol, iOrb1, iOrb2, iAtom) + &
                                     WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2) * &
@@ -968,19 +975,19 @@ contains
         real(kind(1d0)), intent(in) :: OrbitalDensity(:, :)
         real(kind(1d0)), intent(in) :: BeckeMatrix   (:, :, :)
         real(kind(1d0)), allocatable, intent(out) :: QchargeVec    (:)
-        integer :: iAtom, nAtoms, nOrbs, jOrb, iOrb
+        integer :: iAtom, nAtoms, number_of_orbitalss, jOrb, iOrb
         real(kind(1d0)), external :: DDOT
-        nOrbs = size(BeckeMatrix, 1)
+        number_of_orbitalss = size(BeckeMatrix, 1)
         nAtoms = size(BeckeMatrix, 3)
         if(.not.allocated(QchargeVec))allocate(QchargeVec(nAtoms))
         QchargeVec = 0.d0
         do iAtom = 1, nAtoms
-            !            do jOrb = 1, nOrbs
-            !                do iOrb = 1, nOrbs
+            !            do jOrb = 1, number_of_orbitalss
+            !                do iOrb = 1, number_of_orbitalss
             !                    QchargeVec(iAtom) = QchargeVec(iAtom) + OrbitalDensity(iOrb, jOrb) * BeckeMatrix(iOrb, jOrb, iAtom)
             !                end do
             !            end do
-            QchargeVec(iAtom) = ddot(nOrbs * nOrbs, OrbitalDensity, 1, BeckeMatrix(1, 1, iAtom), 1)
+            QchargeVec(iAtom) = ddot(number_of_orbitalss * number_of_orbitalss, OrbitalDensity, 1, BeckeMatrix(1, 1, iAtom), 1)
         enddo
     end subroutine ComputeAtomicCharges
     subroutine ComputeDipole_new(Amat, OrbTab, Dipole_new_, gridv)
@@ -988,17 +995,17 @@ contains
         real(kind(1d0)), intent(in) :: OrbTab (:, :)
         real(kind(1d0)), intent(in) :: gridv(:, :)
         real(kind(1d0)), allocatable, intent(out) :: Dipole_new_(:)
-        integer :: nPts, nOrbs
+        integer :: nPts, number_of_orbitalss
         integer :: iPts, iOrb, jOr
 
         nPts = size(OrbTab, 1)
-        nOrbs = size(OrbTab, 2)
+        number_of_orbitalss = size(OrbTab, 2)
 
         if (.not.allocated(Dipole_new_))allocate(Dipole_new_(3))
         Dipole_new_ = 1
         do iPol = 1, 3
-            do iOrb = 1, nOrb
-                do jOrb = 1, nOrb
+            do iOrb = 1, number_of_orbitals
+                do jOrb = 1, number_of_orbitals
                     do iPts = 1, nPts
                         Dipole_new_(iPol) = Dipole_new_(iPol) + OrbTab(iPts, iOrb) * OrbTab(iPts, jOrb) * Amat(iOrb, jOrb) * gridv(iPol, iPts)
                     enddo
@@ -1016,8 +1023,6 @@ contains
         enddo
     end function zTraceFunction
     ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-
 
 
 end program ChargeMigration

@@ -4,8 +4,7 @@ import click
 @click.command()
 @click.argument("json_config_path")
 @click.argument("study_directory")
-@click.option("--molcas_input", help="Path to the Molcas input file")
-@click.option("--run_molcas", is_flag=True, help="Enable Molcas execution")
+@click.option("--molcas_input", help="Path to the Molcas input file, this enables molcas execution")
 @click.option("--run_charge_migration", is_flag=True, help="Enable charge migration")
 @click.option("--run_charge_migration_ft", is_flag=True, help="Enable charge migration FT")
 @click.option("--run_spectrum_reconstruction", is_flag=True, help="Enable spectrum reconstruction")
@@ -23,22 +22,24 @@ import click
 @click.option("--old_main", is_flag=True, help="Enable old main")
 @click.option("--parallel", is_flag=True, help="Enable parallel execution")
 @click.option("--save_previous", is_flag=True, help="Enable saving previous results")
-@click.option("--make", is_flag=True, help="Enable Fortran compilation")
-@click.option("--make_directory", help="Path to the Fortran compilation directory")
-@click.option("--make_flags", help="Path to the Fortran compilation make flags")
-def cli_run(json_config_path, study_directory, molcas_input, run_molcas, run_charge_migration,
+@click.option("--make", is_flag=True, help="Enable Fortran compilation", default=False)
+@click.option("--make_directory", help="Path to the Fortran compilation directory", required=False, default="")
+@click.option("--make_flags", help="Path to the Fortran compilation make flags", required=False, default="")
+@click.option("--plot", is_flag=True, help="Enable plotting", default=False)
+def cli_run(json_config_path, study_directory, molcas_input, run_charge_migration,
             run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, lus, gridflag,
             write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file, givenfieldfile,
             old_main, parallel, save_previous,
-            make, make_directory, make_flags):
+            make, make_directory, make_flags, plot):
     # Modify the run function to include your desired functionality
     from densitypy.main import run_densitypy
-    run_densitypy(json_config_path, study_directory, molcas_input, run_molcas, run_charge_migration,
+    run_densitypy(json_config_path, study_directory, molcas_input, run_charge_migration,
                   run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, lus,
                   gridflag, write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file,
                   givenfieldfile, old_main, parallel, save_previous,
                   make_fortran=make,
-                  make_fortran_config=dict(directory=make_directory, make_flags=make_flags)
+                  make_fortran_config=dict(directory=make_directory, make_flags=make_flags),
+                  plot=plot
 
                   )
 

@@ -2,21 +2,27 @@
 # >import molcasscripts as rmolcs
 # TODO: use other available solutions to these problems when refactoring, preferably from the standard OpenMolcas
 #  library
-import os
-import sys
-from os import path
+import csv
+import re
 
 import numpy as np
 import pandas as pd
-import seaborn as sns
-from matplotlib import pyplot as plt
 
 from densitypy.project_utils.def_functions import find, \
-    get_dipole_values_as_array, file_len, execute_command, print_molcas_log_errors, copy_file_to, \
-    delete_files_or_directories
+    execute_command, print_molcas_log_errors, change_directory, \
+    extract_datasets_from_h5_to_csv
 from densitypy.project_utils.logger import setup_logger
 
 logger = setup_logger(__name__.split('.')[-1])
+MOLECULAR_ORBITAL_DATA = {  # todo not used yet
+    'meta_info': {
+        # Orbital sym=',i2,' index=',i5,' Energ=',F12.4,' occ=',F4.2,' type=',a1
+        'sys': None,
+        'energy': None,
+        'occ': None,
+        'type': None},
+    'density': []
+}
 
 
 # Creates Helpful input file for Molcas with comments to help user begin (0)
@@ -50,57 +56,21 @@ def create_help_input_file():
         logger.info("molcas_input_help.input created")
 
 
-
 # >Makes points to be used for pymolcas input (0)
 def make_grid_coordinates(molcas_directory, Nx, Ny, Nz, xmin, xmax, ymin, ymax, zmin, zmax):
     # >Makes points to be used for pymolcas input
     n_points = Nx * Ny * Nz
     logger.info("Number of Points = " + str(n_points))
-    with open(molcas_directory + '/gridcoord', 'w') as fout:
+    with open(molcas_directory + '/gridcoord.csv', 'w') as fout:
+        fout.write("{},{},{}\n".format("X", "Y", "Z"))
         for i in range(0, Nx):
             x = xmin + (xmax - xmin) / (Nx - 1) * i
             for j in range(0, Ny):
                 y = ymin + (ymax - ymin) / (Ny - 1) * j
                 for k in range(0, Ny):
                     z = zmin + (zmax - zmin) / (Nz - 1) * k
-                    fout.write("{} {} {}\n".format(x, y, z))
-
-
-##################################################################################
-def read_xyz(xyz_file):
-    atoms = []
-    x = []
-    y = []
-    z = []
-    atomic_coordinates = [] * 3
-    with open(xyz_file, 'r') as fin:
-        n_atoms = int(fin.readline())
-        title = fin.readline()
-        stop = 0
-        for line in fin:
-            stop = stop + 1
-            atom_, x_, y_, z_ = line.split()
-            atoms.append(atom_)
-            x.append([float(x_)])
-            y.append([float(y_)])
-            z.append([float(z_)])
-            if (stop == n_atoms):
-                break
-
-    for i in range(0, len(atoms)):
-        atomic_coordinates.append((x[i], y[i], z[i]))
-
-    logger.info("filename:         %s" % xyz_file)
-    logger.info("title:            %s" % title)
-    logger.info("number of atoms:  %d" % n_atoms)
-
-    return atomic_coordinates
-
-
-def distance(avec, bvec):
-    c = np.square(np.subtract(avec, bvec))
-    cvec = np.sqrt(np.sum(c))
-    return cvec
+                    fout.write("{},{},{}\n".format(x, y, z))
+    return n_points
 
 
 def make_new_grid(atomic_coordinates, step_size, boundary, limitedgrid, np=None):
@@ -151,6 +121,91 @@ def make_new_grid(atomic_coordinates, step_size, boundary, limitedgrid, np=None)
     return gridcoord, initial_Npoints
 
 
+def make_better_grid(molcas_directory, geometry, step_size, Boundary, limitedgrid, ):
+    logger.info("Making Grid")
+    atomic_coordinates = read_xyz(geometry)
+    # > Make_Grid(maxi, mini, Npoints)
+    gridcoord, initial_Npoints = make_new_grid(atomic_coordinates, step_size, Boundary, limitedgrid)
+    n_points = len(gridcoord)
+    logger.info("Number of Points = " + str(n_points))
+    # > Writes to file
+    logger.info("Writing Grid to File")
+    with open(molcas_directory + '/gridcoord.csv', 'w') as fout:
+        fout.write("{},{},{}\n".format("X", "Y", "Z"))
+        for i in range(0, n_points):
+            fout.write(
+                "{},{},{}\n".format(round(gridcoord[i][0], 2), round(gridcoord[i][1], 2), round(gridcoord[i][2], 2)))
+    return n_points
+
+
+def add_grid_it_to_manual_input_file(pymolcas_input, project_name, molcas_directory, orbital_list, n_points):
+    Lowest_orbital = min(orbital_list)
+    Highest_orbital = max(orbital_list)
+
+    # Construct the output file path
+    output_file_path = f'{molcas_directory}/{project_name}.input'
+
+    with open(molcas_directory + '/gridcoord.csv', 'r') as fin, open(output_file_path, 'a') as fout:
+        # Using csv.reader to read the CSV file
+        csv_reader = csv.reader(fin)
+
+        # Skip the first row (header)
+        next(csv_reader)
+
+        # Log the information
+        logger.info(f'Adding Grid_it to {project_name}.input')
+
+        # Writing the initial part of the output
+        fout.write('\n&GRIDIT '
+                   '\n select '
+                   f'\n 1:{Lowest_orbital}-{Highest_orbital}'
+                   '\n NOLUSCUS '
+                   '\n GRID'
+                   '\n ')
+        fout.write(str(n_points))
+        fout.write('\n')
+
+        # Writing each row of the CSV to the output file
+        for row in csv_reader:
+            fout.write(','.join(row) + '\n')
+
+
+def read_xyz(xyz_file):
+    atoms = []
+    x = []
+    y = []
+    z = []
+    atomic_coordinates = [] * 3
+    with open(xyz_file, 'r') as fin:
+        n_atoms = int(fin.readline())
+        title = fin.readline()
+        stop = 0
+        for line in fin:
+            stop = stop + 1
+            atom_, x_, y_, z_ = line.split()
+            atoms.append(atom_)
+            x.append([float(x_)])
+            y.append([float(y_)])
+            z.append([float(z_)])
+            if (stop == n_atoms):
+                break
+
+    for i in range(0, len(atoms)):
+        atomic_coordinates.append((x[i], y[i], z[i]))
+
+    logger.info("filename:         %s" % xyz_file)
+    logger.info("title:            %s" % title)
+    logger.info("number of atoms:  %d" % n_atoms)
+
+    return atomic_coordinates
+
+
+def distance(avec, bvec):
+    c = np.square(np.subtract(avec, bvec))
+    cvec = np.sqrt(np.sum(c))
+    return cvec
+
+
 def find_max_and_min(coords):
     maxi = []
     mini = []
@@ -170,262 +225,252 @@ def find_max_and_min(coords):
     return maxi, mini
 
 
-def make_better_grid(molcas_directory, geometry, step_size, Boundary, limitedgrid, ):
-    logger.info("Making Grid")
-    atomic_coordinates = read_xyz(geometry)
-    # > Make_Grid(maxi, mini, Npoints)
-    gridcoord, initial_Npoints = make_new_grid(atomic_coordinates, step_size, Boundary, limitedgrid)
-    n_points = len(gridcoord)
-    logger.info("Number of Points = " + str(n_points))
-    # > Writes to file
-    logger.info("Writing Grid to File")
-    with open(molcas_directory + '/gridcoord', 'w') as fout:
-        for i in range(0, n_points):
-            fout.write(
-                "{} {} {}\n".format(round(gridcoord[i][0], 2), round(gridcoord[i][1], 2), round(gridcoord[i][2], 2)))
-    return n_points
-
-
 #################################################################################################
 # Creates input from users own input file for pymolcas(0)
-def copy_input_file_to_edit(pymolcas_input, project_name, molcas_directory):
-    # Creates input from users own input file for pymolcas
-    string_list = ['RASSCF', 'RASSI', 'TDM']
-    true_values = []
+def copy_and_parse_molcas_input_file_to_edit(pymolcas_input, project_name, molcas_directory):
+    """
+    Uses the user's input file to create a molcas input file by copying the user's input file and then
+    utilizing it to add other necessary sections to the input file.
+    """
 
-    with open(pymolcas_input, 'r') as fin:
-        #
-        with open(molcas_directory + '/' + project_name + '.input', 'w') as fout:
-            logger.info('Creating ' + molcas_directory + '/' + project_name + '.input from ' + pymolcas_input)
-            for line in fin:
-                if line.startswith('//') is False:
-                    fout.write(line)
-                    for string in string_list:
-                        if string.upper() in line.upper():
-                            true_values.append(string.upper())
-    #
-    return true_values
+    KEYWORDS_NEEDED = {
+        "TDM": 'Transition Density Matrix',
+        "RASSCF": 'Density Matrix',
+        "RASSI": 'Density Matrix'
+    }
+    keywords_needed_found = []
 
+    # Create input from user's own input file for pymolcas
+    with open(pymolcas_input, 'r') as fin, open(f'{molcas_directory}/{project_name}.input', 'w') as fout:
+        logger.info(f'Creating {molcas_directory}/{project_name}.input from {pymolcas_input}')
 
-# Adds GRID_IT section to copied input file
-def add_grid_it_to_manual_input_file(pymolcas_input, project_name, molcas_directory, orbital_list, n_points):
-    # Creates input from users own input file for pymolcas
-    Lowest_orbital = min(orbital_list)
-    Highest_orbital = max(orbital_list)
-    with open(molcas_directory + '/gridcoord', 'r') as fin:
-        # with open(project_name + '.input', 'a') as fout:
-        with open(f'{molcas_directory}/{project_name}.input', 'a') as fout:
-            logger.info('Adding Grid_it to ' + project_name + '.input')
-            fout.write('\n&GRIDIT '
-                       '\n select '
-                       '\n 1:' + str(Lowest_orbital) + '-' + str(Highest_orbital) +
-                       '\n NOLUSCUS '
-                       '\n GRID'
-                       '\n ')
-            fout.write(str(n_points))
-            fout.write("\n" + fin.read())
+        for line in fin:
+            if not line.startswith('//'):
+                fout.write(line)
+                for string in KEYWORDS_NEEDED.keys():
+                    if string.upper() in line.upper():
+                        keywords_needed_found.append(string.upper())
+
+    # Validate input file
+    # TODO: Implement the validation logic
+    for keyword, matrix in KEYWORDS_NEEDED.items():
+        if keyword not in keywords_needed_found:
+            logger.warning(
+                f'{keyword} keyword was not found in Molcas input file. As a result, no {matrix} will be created and '
+                f'ChargeMigration modules will not be able to run.'
+            )
+    return keywords_needed_found
 
 
 # >Calls pymolcas and writes to scrach folder and log file(1)
 def call_open_molcas(project_name, molcas_directory):
-    # >Calls pymolcas and writes to scrach folder and log file
+    # >Calls pymolcas and writes to scratch folder and log file
     logger.info("Running OpenMolcas")
-    #
-    current_directory = os.getcwd()
-    os.chdir(molcas_directory)
 
-    # rfunc.ExecutePymolcasWithErrorPrint("pymolcas " + project_name + ".input -f", project_name)
-    # execute_pymolcas_with_error_print("pymolcas " + project_name + ".input -f", project_name)
-    # execute_pymolcas_with_error_print(f'pymolcas {project_name}.input -f', project_name)
-    try:
-        execute_command(f'pymolcas {project_name}.input -f', _logger=logger)
-    except Exception as e:
-        logger.error('Error in call_open_molcas')
-        print_molcas_log_errors(project_name + ".log", "Timing")
-        raise e
+    # Use the context manager to temporarily change the working directory
+    with change_directory(molcas_directory):
+        try:
+            execute_command(f'pymolcas {project_name}.input -f', _logger=logger)
+        except Exception as e:
+            logger.error('Error in call_open_molcas')
+            print_molcas_log_errors(project_name + ".log", "Timing")
+            raise e
 
     logger.info("Done Running OpenMolcas")
-    os.chdir(current_directory)
 
 
 # >Extract Density Matrix, Transition Density Matrix, ENERGIES, AO_Dipoles, MO_energies, MO_vectors(1,1,2)
-def fetch_fromh5_file(project_name, molcas_directory, pathtofile, filename):
-    # >Extracts Information from H5FILEs
-    execute_command("h5dump -o " + molcas_directory + "/" + filename +
-                    " -y -w 0 -d " + filename + " " + pathtofile + "/" + project_name + ".rasscf.h5", _logger=logger)
-    logger.info("Extracted " + filename)
 
 
-def fetch_fromh5_filewidth1(project_name, molcas_directory, pathtofile, filename):
-    # >Extracts Information from H5FILEs
-    execute_command("h5dump -o " + molcas_directory + "/" + filename +
-                    " -y -w 1 -d " + filename + " " + pathtofile + "/" + project_name + ".rasscf.h5", _logger=logger)
-    logger.info("Extracted " + filename)
-
-
-def load_fromh5_file(project_name, molcas_directory, workingdirectory, true_values, density_matrix,
-                     transition_density_matrix,
-                     root_energies, ao_multiple_x, ao_multiple_y, ao_multiple_z,
-                     mo_energies, mo_vectors, justh5):
-    # >Find <ProjectName>.rasscf.h5
-    rasscf_h5_filepath = find(project_name + ".rasscf.h5", ".", workingdirectory)
-
+# >Extract Density Matrix, Transition Density Matrix, ENERGIES, AO_Dipoles, MO_energies, MO_vectors(1,1,2)
+def load_project_rasscf_h5_file(project_name, molcas_output_directory, workingdirectory):
     # >Extract Density Matrix, Transition Density Matrix, ENERGIES, AO_Dipoles, MO_energies, MO_vectors
-    fetch_fromh5_file(project_name, molcas_directory, rasscf_h5_filepath, density_matrix)
-    if "TDM" in true_values or justh5:
-        fetch_fromh5_file(project_name, molcas_directory, rasscf_h5_filepath, transition_density_matrix)
-    else:
-        logger.info(f'Found {project_name}".rasscf.h5" but TDM keyword was not found in Molcas input file, '
-                    f'thus no Transition Density Matrix printed')
-    fetch_fromh5_filewidth1(project_name, molcas_directory, rasscf_h5_filepath, root_energies)
-    fetch_fromh5_file(project_name, molcas_directory, rasscf_h5_filepath, ao_multiple_x)
-    fetch_fromh5_file(project_name, molcas_directory, rasscf_h5_filepath, ao_multiple_y)
-    fetch_fromh5_file(project_name, molcas_directory, rasscf_h5_filepath, ao_multiple_z)
-    fetch_fromh5_filewidth1(project_name, molcas_directory, rasscf_h5_filepath, mo_energies)
-    fetch_fromh5_filewidth1(project_name, molcas_directory, rasscf_h5_filepath, mo_vectors)
+    DATASETS_TO_EXTRACT = ["DENSITY_MATRIX",
+                           "TRANSITION_DENSITY_MATRIX", "ROOT_ENERGIES", "AO_MLTPL_X", "AO_MLTPL_Y",
+                           "AO_MLTPL_Z", "MO_ENERGIES", "MO_VECTORS"]
+
+    # The keys are the names of the datasets to extract and the values are used for the output files
+    dataset_mappings = {dataset: f'{molcas_output_directory}/{dataset}' for dataset in DATASETS_TO_EXTRACT}
+
+    # >Find <ProjectName>.rasscf.h5
+    rasscf_h5_dirpath = find(f'{project_name}.rasscf.h5', ".", workingdirectory)
+    extract_datasets_from_h5_to_csv(
+        h5_filepath=f'{rasscf_h5_dirpath}/{project_name}.rasscf.h5',
+        # >Define the dataset mappings using DATASETS_TO_EXTRACT as keys and molcas_output_directory/dataset names as
+        # values
+        dataset_mapping=dataset_mappings
+    )
 
 
 # >Extracts Density for the grids of each Orbital found oin <Project>.grid (0)
-def extract_grid_density(orbital_list, output_filename, directorypath, molcas_directory):
-    Highest_orbital = max(orbital_list)
-    stringend = "Title=    0 "
-    reset_lines = []
-    reset_lines.append(0)
+def parse_project_grid_file(output_filename, directorypath):
     gridfilepath = find(output_filename + '.grid', ".", directorypath)
-    with open(gridfilepath + "/" + output_filename + '.grid', 'r') as fin:
-        for num, line in enumerate(fin, 1):
-            if stringend in line:
-                reset_lines.append(num)
 
-    for iorb in range(len(orbital_list)):
-        orbital = orbital_list[iorb]
-        string = ["Title=", str(orbital)]
+    # Open the file
+    with open(gridfilepath + "/" + output_filename + '.grid', 'r') as file:
+        lines = file.readlines()
 
-        if (orbital == Highest_orbital):
-            pass
-        else:
-            next_orbital = orbital_list[iorb + 1]
-            stringstop = ["Title=", str(next_orbital)]
+    data = {
+        'Natom': None,
+        'atoms': [],
+        'meta_info': {
+            'version': None,
+            'N_of_MO': None,
+            'N_of_Grids': None,
+            'N_of_Points': None,
+            'Block_Size': None,
+            'N_Blocks': None,
+            'Is_cutoff': None,
+            'CutOff': None,
+            'N_P': None,
+            'N_INDEX': None,
+        },
+        'molecular_orbitals': {}
+    }
 
-        # >This commented section is here in case the fix above does not work
-        # for orbital in orbital_list:
-        #     string = ["Title=", str(orbital)]
-        #     stringstop = ["Title=", str(orbital + 1)]
-        #     # This means that active space must be continuous, orbital 1,2,3 not 1,3,4.
-        #     # Should be okay if using no symmetry
+    atom_flag = False
+    store_the_index_of_the_line = None
+    for line_index, line in enumerate(lines):  # from line 0 to line N_lines
 
-        # Deletes Previous Orbital Density Grids
-        orbital_grid = molcas_directory + '/grid' + str(orbital)
-        if path.exists(orbital_grid):
-            delete_files_or_directories()
+        if line.startswith('Natom='):
+            data['Natom'] = int(line.split('=')[-1].strip())
+            atom_flag = True
+            continue
 
-        # Reads and Writes Densities Orbital by Orbital
-        with open(gridfilepath + "/" + output_filename + '.grid', 'r') as fin:
-            with open(molcas_directory + '/grid' + str(orbital), 'a') as fout:
-                for j in reset_lines:
-                    copy = False
-                    for num, line in enumerate(fin):
-                        if num > j:
-                            if orbital < Highest_orbital:
-                                if all(match in line for match in string):
-                                    copy = True
-                                elif all(match in line for match in stringstop):
-                                    copy = False
-                                elif copy:
-                                    fout.write(line)
-                            elif orbital == Highest_orbital:
-                                if all(match in line for match in string):
-                                    copy = True
-                                elif all(match in line for match in stringend):
-                                    copy = False
-                                elif copy:
-                                    fout.write(line)
-        # logger.info("grid" + str(orbital))
-        logger.info(f'Extracted Density Grid for Orbital {orbital}')
-    logger.info("Successfully Extracted Density Grid")  # todo perhaps... add a check to see if all grids were extracted
+        if atom_flag and len(data['atoms']) < data['Natom']:
+            parts = line.split()
+            atom_info = {
+                'element': parts[0][:-1],
+                'index': int(parts[0][-1]),
+                'x': float(parts[1]),
+                'y': float(parts[2]),
+                'z': float(parts[3])
+            }
+            data['atoms'].append(atom_info)
+            continue
+
+        if line.startswith('VERSION='):
+            data['meta_info']['version'] = line.split('=')[-1].strip()
+            continue
+
+        if line.startswith('N_of_MO='):
+            data['meta_info']['N_of_MO'] = int(line.split('=')[-1].strip())
+            continue
+
+        if line.startswith('N_of_Grids='):
+            data['meta_info']['N_of_Grids'] = int(line.split('=')[-1].strip())
+            continue
+
+        if line.startswith('N_of_Points='):
+            data['meta_info']['N_of_Points'] = int(line.split('=')[-1].strip())
+            continue
+
+        if line.startswith('Block_Size='):
+            data['meta_info']['Block_Size'] = int(line.split('=')[-1].strip())
+            continue
+
+        if line.startswith('N_Blocks='):
+            data['meta_info']['N_Blocks'] = int(line.split('=')[-1].strip())
+            continue
+
+        if line.startswith('Is_cutoff='):
+            data['meta_info']['Is_cutoff'] = int(line.split('=')[-1].strip())
+            continue
+
+        if line.startswith('CutOff='):
+            data['meta_info']['CutOff'] = float(line.split('=')[-1].strip())
+            continue
+
+        if line.startswith('N_P='):
+            data['meta_info']['N_P'] = int(line.split('=')[-1].strip())
+            continue
+
+        if line.startswith('N_INDEX='):
+            data['meta_info']['N_INDEX'] = [int(i) for i in line.split('=')[-1].strip().split()]
+            continue
+
+        if line.startswith('GridName='):
+            pattern = r"GridName=\s*(\d+)\s*(\d+)\s*([\-\d\.]+)\s*\(([\d\.]+)\)\s*(\d)"
+            match = re.search(pattern, line)
+            if match:
+                # Orbital sym=',i2,' index=',i5,' Energ=',F12.4,' occ=',F4.2,' type=',a1
+                orbital_index = int(match.group(2))
+                orbital_info = {
+                    'sym': int(match.group(1)),
+                    'energy': float(match.group(3)),
+                    'occ': float(match.group(4)),
+                    'type': int(match.group(5))
+                }
+                data['molecular_orbitals'][orbital_index] = {
+                    'meta_info': orbital_info,
+                    'density': []
+                }
+                continue
+
+        if line.startswith('Title='):  # break and continue lines from here
+            store_the_index_of_the_line = line_index
+            break
+
+    assert store_the_index_of_the_line is not None, "Could not find Title=<MOj> in the grid file"
+    density_containing_lines = lines[store_the_index_of_the_line:]
+    actual_n_chunks = data['meta_info']['N_Blocks']
+    orbitals_to_extract = list(data['molecular_orbitals'].keys()) * actual_n_chunks
+    orbital_index = None
+
+    # FIXME DEBUGGING
+    # lets check the already outputed file f'{molcas_output_directory}/grid_density.csv' and compare each columun/orbital density
+    # with the one extracted here
+    # Read the file
+    df = pd.read_csv(f'{directorypath}/grid_density.csv')
+
+    print(df.head())
+    for line_index, line in enumerate(density_containing_lines):  # use re for matching
+
+        # e.g. Title=   18  or Title= 1 or Title=    194 etc...
+        pattern = r'Title=\s*(\d+)'
+        match = re.search(pattern, line)
+
+        if match:
+
+            orbital_index = int(match.group(1))
 
 
-# Gets Dipoles found inside of <Project>.log "RASSI" (2,0)
-def copy_xyz_dipoles(filein, fileout, linestart, linestop, numberofstates):
-    linestop2 = "PROPERTY: MLTPL  2"
-    with open(filein, 'r') as fin:
-        with open(fileout, 'w') as fout:
-            copy = False
-            for line in fin:
-                if linestart in line:
-                    copy = True
-                    next(fin)
-                    next(fin)
-                    next(fin)
-                elif "STATE" in line:
-                    next(fin)
-                elif linestop in line:
-                    copy = False
-                elif linestop2 in line:
-                    copy = False
-                elif copy:
-                    fout.write(line)
-    range_states = range(0, numberofstates, 1)
-    with open(fileout + "temp", 'w') as fout:
-        fout.write("\n")
-        for states in range_states:
-            states += 1
-            string = " " + str(states) + " "
-            value = get_dipole_values_as_array(fileout, string, "      ")
-            fout.write(' '.join([str(f) for f in value]) + "\n")
+            if orbital_index not in orbitals_to_extract:
+                assert orbital_index == 0
+                if not orbitals_to_extract:
+                    break
+                continue
+            # data['molecular_orbitals'][orbital_index]['density'].append(float(0))  # fixme appending is expensive
 
-    # execute_command("cp " + fileout + "temp " + fileout)
-    # execute_command("rm " + fileout + "temp")
+            assert (orbital_index in orbitals_to_extract), f"Orbital {orbital_index} not found in orbitals_to_extract"
+            # pop the orbital from the list
+            orbitals_to_extract.pop(orbitals_to_extract.index(orbital_index))
+            continue
 
-    copy_file_to(f'{fileout}temp', fileout)
-    delete_files_or_directories(f'{fileout}temp')
+        if not orbital_index == 0:
+            data['molecular_orbitals'][orbital_index]['density'].append(float(line))  # fixme appending is expensive
+
+    # print(json.dumps(data, indent=4))
+    logger.info(
+        "Successfully Extracted Density Grids for each of the orbitals")  # todo perhaps... add a check to see if all grids were extracted
+
+    return data
 
 
-def get_dipoles_from_log_file(project_name, output_dir, number_of_states, working_directory):
-    componentlist = list("123")
+def write_grid_density_file(grid_file_data_dict, molcas_output_directory):  # todo pythonic data model
+    # A Dataframe [N_Orbitals x N_Points]
+    grids_meta_info = grid_file_data_dict['meta_info']
+    molecular_orbitals_data = grid_file_data_dict['molecular_orbitals']
 
-    logdirectory = find(project_name + ".log", ".", working_directory)
+    # Prepare dataframe
+    df = pd.DataFrame(columns=molecular_orbitals_data.keys(),
+                      # index=range(grids_meta_info['N_of_Points'])
+                      )
+    for orbital_index, orbital_data in molecular_orbitals_data.items():
+        df[orbital_index] = orbital_data['density']
 
-    for component in componentlist:
-        component1 = str(int(float(component) + 1))
-        if component == "1":
-            dipolename = "X_DIPOLE"
-        elif component == "2":
-            dipolename = "Y_DIPOLE"
-        elif component == "3":
-            dipolename = "Z_DIPOLE"
-        copy_xyz_dipoles(logdirectory + "/" + project_name + ".log", output_dir + "/" + dipolename,
-                         "PROPERTY: MLTPL  1   COMPONENT:   " + component,
-                         "PROPERTY: MLTPL  1   COMPONENT:   " + component1, number_of_states)
-        logger.info("Extracted " + dipolename)
+    # Make sure total number of indexes is the same as the number of points
+    # assert len(df) == grids_meta_info['N_of_Points']
 
-
-# >Makes a color matrix refering to Dipole between each state(1)
-def make_mu_heat_map(directory):
-    rows = file_len(directory + "/X_DIPOLE")
-    cols = rows
-    direction_list = list("XYZ")
-    for direction in direction_list:
-        with open(directory + "/" + direction + '_DIPOLE', 'r') as fin:
-            data = []
-            next(fin)
-            for i in range(1, rows):
-                data.append(list(map(float, fin.readline().split()[:cols])))
-        df = pd.DataFrame(data)
-        # mask = np.zeros_like(data)
-        # mask[np.triu_indices_from(mask)] = True # cuts out upper triangular side of the matrix
-        f, ax = plt.subplots(figsize=(11, 9))
-        cmap = sns.color_palette("coolwarm", as_cmap=True)
-        sns.heatmap(
-            df,  # The data to plot
-            # mask=mask,  # Mask some cells
-            cmap=cmap,  # What colors to plot the heatmap as
-            annot=True,  # Should the values be plotted in the cells?
-            vmax=1,  # The maximum value of the legend. All higher vals will be same color
-            vmin=-1,  # The minimum value of the legend. All lower vals will be same color
-            center=0,  # The center value of the legend. With divergent cmap, where white is
-            square=True,  # Force cells to be square
-            linewidths=.5,  # Width of lines that divide cells
-            cbar_kws={"shrink": .5}  # Extra kwargs for the legend; in this case, shrink by 50%
-        )
-        f.savefig(directory + "/" + direction + '_DIPOLE_heatmap')
+    # Write to file
+    df.to_csv(f'{molcas_output_directory}/grid_density.csv', index=False)

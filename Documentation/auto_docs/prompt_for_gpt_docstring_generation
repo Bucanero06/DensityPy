@@ -1,1 +1,22 @@
-Refactor/Generate reStructuredText docstrings for the following functions. Provide usages where possible and well recommended or other actually useful autodoc material :). Do for ALL functions provided:
+Given the following Fortran subroutine or function code, please generate the appropriate FORD documentation. Make sure to include details such as the description, arguments, usage, and any notes or warnings. Follow the guidelines as specified in the FORD documentation system, with appropriate markdown syntax and special comments using double exclamation marks (``!!``) for inline documentation, and ``!>`` for preceding documentation.
+
+[Insert the code snippet for the subroutine or function here]
+
+For example, if the code is:
+
+```fortran
+subroutine feed_pets(cats, dogs, food, angry)
+   integer, intent(in)  :: cats
+   integer, intent(in)  :: dogs
+   real, intent(inout)  :: food
+   integer, intent(out) :: angry
+   return
+end subroutine feed_pets
+```
+
+Please provide the FORD documentation for the provided code snippet.
+
+The section "[Insert the code snippet for the subroutine or function here]" should be replaced with the actual code snippet that you wish to document, and GPT-4 should respond with the correct FORD documentation based on the given information.
+
+
+

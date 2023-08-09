@@ -21,11 +21,13 @@ ModuleDiagonalize
 
 #.. Local files
 #..
-loc_ff90=main ModuleRTP Module_CD_IO
+#loc_ff90=main_old_trying_to_reconcile ModuleRTP Module_CD_IO Module_Becke #Module_Liouvillian_Propagator
+loc_ff90=main ModuleRTP Module_CD_IO Module_Becke #Module_Liouvillian_Propagator
 loc_fc  =
 
 #.. Local dependencies
 #..
+#$(OBJ)/main_old_trying_to_reconcile.o: \
 $(OBJ)/main.o: \
                     $(SHARE)/$(OBJ)/ModuleErrorHandling.o \
                     $(SHARE)/$(OBJ)/ModuleSystemUtils.o \
@@ -37,17 +39,18 @@ $(OBJ)/main.o: \
                     $(SHARE)/$(OBJ)/ModulePulses_3D.o \
                     $(SHARE)/$(OBJ)/ModuleDiagonalize.o \
                     $(OBJ)/ModuleRTP.o \
-                    $(OBJ)/Module_CD_IO.o
+                    $(OBJ)/Module_CD_IO.o \
+                    $(OBJ)/Module_Becke.o
+                    #$(OBJ)/Module_Liouvillian_Propagator.o
 
-$(OBJ)/ModuleRTP.o: \
-                    $(SHARE)/$(OBJ)/ModuleErrorHandling.o \
-                    $(SHARE)/$(OBJ)/ModuleString.o \
-                    $(SHARE)/$(OBJ)/ModuleCommandLineParameterList.o
+$(OBJ)/ModuleRTP.o:
 
-$(OBJ)/Module_CD_IO.o: \
-                    $(SHARE)/$(OBJ)/ModuleErrorHandling.o \
-                    $(SHARE)/$(OBJ)/ModuleString.o
- 
+$(OBJ)/Module_CD_IO.o:
+
+$(OBJ)/Module_Becke.o:
+
+#$(OBJ)/Module_Liouvillian_Propagator.o:
+
 
 #.. Commands with common syntax
 #..

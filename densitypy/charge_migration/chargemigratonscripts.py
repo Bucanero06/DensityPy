@@ -36,6 +36,24 @@ def Write_FieldHelp():
     exit()
 
 
+def generate_time_delays(number_of_pp, time_delay_start, time_delay_stop):
+    if number_of_pp == 0:
+        raise ValueError("Number of points must be greater than 0.")
+
+    if number_of_pp == 1:
+        time_delay_range = [0.0]
+    elif number_of_pp % 2 == 0:  # even case
+        change_in_delay = (time_delay_stop - time_delay_start) / (number_of_pp // 2)
+        half_point = number_of_pp // 2
+        time_delay_range = list(range(-half_point, half_point))
+        time_delay_range = [x * change_in_delay for x in time_delay_range]
+    else:  # odd case
+        change_in_delay = (time_delay_stop - time_delay_start) / ((number_of_pp - 1) // 2)
+        half_point = (number_of_pp - 1) // 2
+        time_delay_range = list(range(-half_point, half_point + 1))
+        time_delay_range = [x * change_in_delay for x in time_delay_range]
+
+    return time_delay_range
 # >Writes pulses to Field File ,Pump Probe Experiment (0)
 def Write_Pulses(field_file, type_of_pulse_pump, start_time, pump_central_frequency,
                  pump_periods, pump_phase, pump_intensity, pump_polarization,
@@ -126,7 +144,7 @@ def Call_Charge_Migration(Bin_Directory, input_directory, experiment_directory, 
         f"{debug_mode_decoy}ChargeMigration -i {input_directory} -o {experiment_directory} -nt {str(number_of_times)} "
         f"-tmin {str(min_time)} -tmax {str(max_time)} -field {field_file} -vol {str(Volume)} -stept {str(stept)} "
         f"-stepw {str(stepw)} -xyz {str(geometry)} {weights_file_decoy} {write_charge_migrationflag_decoy} -iorb "
-        f"{','.join(map(repr, orbital_list))} -rf {str(relaxation_factor)} -bath {str(bath_temp)} -df "
+        f"{','.join(map(str, orbital_list))} -rf {str(relaxation_factor)} -bath {str(bath_temp)} -df "
         f"{str(dephasing_factor)} -s {i_excitation} -e {i_epsilon}"
     , _logger=logger)
 

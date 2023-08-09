@@ -5,12 +5,21 @@ from datetime import datetime
 
 
 # DEFAULT LOGGING VALUES
-# CRITICAL: 50
-# ERROR: 40
-# WARNING: 30
-# INFO: 20
-# DEBUG: 10
-# NOTSET: 0
+DEFAULT_LOGGIN_VALUES = dict(
+    RESET=0,
+    DEBUG=10,
+    INFO=20,
+    REMARKS=25,
+    WARNING=30,
+    UNKNOWN=35,
+    ERROR=40,
+    CRITICAL=50
+)
+
+REMARKS = DEFAULT_LOGGIN_VALUES["REMARKS"]
+UNKNOWN = DEFAULT_LOGGIN_VALUES["UNKNOWN"]
+
+
 def remarks(self, message, *args, **kws):
     if self.isEnabledFor(REMARKS):
         self._log(REMARKS, message, args, **kws)
@@ -22,11 +31,10 @@ def unknown(self, message, *args, **kws):
 
 
 # Add the custom levels and methods to the Logger class
-REMARKS = 25
+
 logging.addLevelName(REMARKS, "REMARKS")
 logging.Logger.remarks = remarks
 
-UNKNOWN = 35
 logging.addLevelName(UNKNOWN, "UNKNOWN")
 logging.Logger.unknown = unknown
 

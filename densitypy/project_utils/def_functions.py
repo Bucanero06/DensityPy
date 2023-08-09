@@ -5,94 +5,220 @@ import os
 import re
 import shutil
 import sys
+from contextlib import contextmanager
 from os import path
 from subprocess import Popen, PIPE, CalledProcessError
-from typing import Any
+
+import h5py as h5py
+import numpy as np
 
 from densitypy.project_utils.logger import setup_logger
 
 logger = setup_logger(__name__.split('.')[-1])
 
 
-def execute_command(command: str, write_stream=True, _logger=None) -> None:
+# todo i want to be able to pass a re output handler for user defined parsing
+def execute_command(command: str, write_stream=True, _logger=None) -> (int, list, list):
     """
-    Executes a command line instruction and streams the output to a logger.
+    Execute a shell command and capture the standard output and standard error streams.
 
-    :param command: The command to be executed.
-    :param write_stream: A boolean flag indicating if the output should be streamed.
+    :param command: The shell command to execute.
     :type command: str
+    :param write_stream: Flag indicating whether to write the output streams to the log, defaults to True.
     :type write_stream: bool, optional
-    :raises CalledProcessError: If the subprocess exits with a non-zero status.
-
-    Usage::
-
-    >>> execute_command("ls -l")
+    :param _logger: A logger instance to use for logging, defaults to None, in which case the global `logger` is used.
+    :type _logger: logging.Logger, optional
+    :return: The return code of the command, and the standard output and standard error captured as lists.
+    :rtype: tuple(int, list, list)
+    :raises CalledProcessError: If the command returns a non-zero exit status.
     """
     if _logger is None:
         _logger = logger
 
     _logger.info(f"Executing command: {command}")
-    with Popen(command, stdout=PIPE, stderr=PIPE, bufsize=1, universal_newlines=True, shell=True) as p:
-        if write_stream:
-            for line in p.stdout:
-                _logger.info(f' ---> {line.strip()}')
-            for line in p.stderr:
-                _logger.error(f' ---> {line.strip()}')
-
-    if p.returncode != 0:
-        error_msg = f"Command '{command}' returned non-zero exit status {p.returncode}"
-        _logger.error(error_msg)
-        raise CalledProcessError(p.returncode, p.args, output=p.stdout, stderr=p.stderr)
-
-
-def execute_command_with_capture(command: str, write_stream=True, _logger=None):
-    """
-    Executes a command line instruction and streams the output to a logger.
-
-    :param command: The command to be executed.
-    :param write_stream: A boolean flag indicating if the output should be streamed.
-    :type command: str
-    :type write_stream: bool, optional
-    :type command: str
-    :type write_stream: bool, optional
-    :return: Tuple of return code, stdout and stderr of the command.
-    :raises CalledProcessError: If the subprocess exits with a non-zero status.
-
-
-    Usage::
-
-    >>> execute_command("ls -l")
-    """
-    if _logger is None:
-        _logger = logger
-
-    _logger.info(f"Executing command: {command}")
-    stdout_output = []
-    stderr_output = []
+    stdout_output_list = []
+    stderr_output_list = []
     try:
         with Popen(command, stdout=PIPE, stderr=PIPE, bufsize=1, universal_newlines=True, shell=True) as p:
             for line in p.stdout:
                 line = line.strip()
-                stdout_output.append(line)
+                stdout_output_list.append(line)
                 if write_stream:
                     _logger.info(f' ---> {line}')
             for line in p.stderr:
                 line = line.strip()
-                stderr_output.append(line)
+                stderr_output_list.append(line)
                 if write_stream:
                     _logger.error(f' ---> {line}')
         return_code = p.returncode
 
+        stdout_output_list, stderr_output_list = json.dumps(stdout_output_list), json.dumps(stderr_output_list)
         if return_code != 0:
-            error_msg = f"Command '{command}' returned non-zero exit status {return_code}"
-            _logger.error(error_msg)
-            raise CalledProcessError(return_code, p.args, output="\COMMA".join(stdout_output),
-                                     stderr="\COMMA".join(stderr_output))
+            raise CalledProcessError(return_code, p.args, output=stdout_output_list,
+                                     stderr=stderr_output_list)
 
-        return return_code, stdout_output, stderr_output
+        return return_code, json.loads(stdout_output_list), json.loads(stderr_output_list)
 
     except Exception as e:
-        raise
+        raise e
+
+
+@contextmanager
+def change_directory(new_directory):
+    """Context manager to change the working directory temporarily."""
+    current_directory = os.getcwd()
+    os.chdir(new_directory)
+    try:
+        yield
+    finally:
+        os.chdir(current_directory)
+
+
+def extract_datasets_from_h5_to_csv(h5_filepath, dataset_mapping):
+    """
+    Extract specific datasets from an HDF5 file and save them to CSV files.
+
+    Parameters:
+    - h5_filepath: Path to the input HDF5 file.
+    - dataset_mapping: Dictionary where keys are dataset names in the HDF5 file
+                       and values are the output filenames for CSV files.
+
+    Note:
+        - it will flatten the data in the dataset to a 2D array if the dataset is a 3D array
+            - 3D arrays of shape (x, y, z) → 2D arrays of shape (x*y, z)
+            - 4D arrays of shape (w, x, y, z) → 2D arrays of shape (wxy, z)
+            - ... and so on.
+    """
+    with h5py.File(h5_filepath, 'r') as h5_file:
+        for dataset_name, output_file in dataset_mapping.items():
+            try:
+                if dataset_name in h5_file:
+                    logger.debug(f"Extracting dataset {dataset_name} from {h5_filepath} to {output_file}")
+                    data = flatten_ND_to_2D(h5_file[dataset_name][:]) # Flatten the data to 2D
+                    # Save the data as a CSV file
+                    np.savetxt(output_file, data, delimiter=',')
+                else:
+                    logger.warning(f"Dataset {dataset_name} not found in {h5_filepath}")
+            except Exception as e:
+                logger.error(f"Error extracting dataset {dataset_name}: {e}")
+
+
+def flatten_ND_to_2D(array):
+    """Flatten a multi-dimensional array keeping the last dimension and format its values."""
+    if array.ndim > 1:
+        flat = array.reshape(-1, array.shape[-1])  # Flatten all dimensions except the last one
+    else:
+        flat = array  # If already 1D, no reshaping needed
+    return flat
+
+
+def remove_spaces_and_to_lowercase(key: str) -> str:
+    """
+    Normalize a string key by converting all characters to lowercase
+    and removing all spaces and underscores.
+
+    :param key: The string key to be normalized.
+    :type key: str
+    :return: The normalized key.
+    :rtype: str
+
+    Usage::
+
+        normalized_key = normalize_key('Hello_World')
+        print(normalized_key)  # Output: 'helloworld'
+    """
+    translation_table = str.maketrans('', '', ' _')
+    return key.lower().translate(translation_table)
+
+
+def recursively_normalize_dict_keys(d: dict) -> dict:
+    """
+    Normalize all keys in a dictionary. If a value is a dictionary,
+    normalize its keys recursively.
+
+    :param d: The dictionary whose keys are to be normalized.
+    :type d: dict
+    :return: A new dictionary with normalized keys.
+    :rtype: dict
+
+    Usage::
+
+        data = {
+            'Hello World': 1,
+            'Good_Day': {
+                'Inner_Key': 2
+            }
+        }
+        normalized_data = normalize_dict(data)
+        print(normalized_data)  # Output: {'helloworld': 1, 'goodday': {'innerkey': 2}}
+    """
+    return {
+        remove_spaces_and_to_lowercase(key): recursively_normalize_dict_keys(value) if isinstance(value,
+                                                                                                  dict) else value
+        for key, value in d.items()
+    }
+
+
+def validate_and_correct_dictionary(dict_to_verify: dict, default_config: dict, log=None) -> tuple:
+    """
+    Verifies that the given JSON config contains all the required keys as per the default config.
+    If not, adds the missing keys with the default values.
+    Returns a log of warnings and errors in case of missing or unknown keys.
+
+    :param dict_to_verify: The JSON configuration to verify.
+    :type dict_to_verify: dict
+    :param default_config: The default configuration used for verification.
+    :type default_config: dict
+    :param log: A list of log messages. Default is an empty list.
+    :type log: list, optional
+    :return: A tuple of the verified JSON configuration and the log of warnings/errors.
+    :rtype: tuple
+
+    Usage::
+
+        json_config = {
+            "key1": "value1",
+            "key2": {
+                "subkey1": "subvalue1"
+            }
+        }
+
+        default_config = {
+            "key1": "value1",
+            "key2": {
+                "subkey1": "subvalue1",
+                "subkey2": "subvalue2"
+            },
+            "key3": "value3"
+        }
+
+        verified_config, log = verify_configuration_keys(json_config, default_config)
+        # verified_config will contain all keys from default_config, and log will contain warning/error messages
+    """
+    if log is None:
+        log = []
+    if not dict_to_verify:
+        dict_to_verify = {}
+
+    for key, value in default_config.items():
+        if key not in dict_to_verify:
+            dict_to_verify[key] = value
+            log.append(f'Warning: Missing key "{key}" has been added with default value "{value}"')
+        elif isinstance(value, dict):
+            if isinstance(dict_to_verify[key], dict):
+                dict_to_verify[key], log = validate_and_correct_dictionary(dict_to_verify[key], value, log)
+            else:
+                log.append(f'Error: Key "{key}" should contain a dictionary but found "{type(dict_to_verify[key])}"')
+        else:
+            if not isinstance(dict_to_verify[key], type(value)):
+                log.append(
+                    f'Error: Key "{key}" should be of type "{type(value)}" but found "{type(dict_to_verify[key])}"')
+
+    for key in dict_to_verify.keys():
+        if key not in default_config:
+            log.append(f'Error: Unknown key "{key}" found in config')
+
+    return dict_to_verify, log
 
 
 def execute_pymolcas_with_error_print(command, nameofproject):
@@ -438,3 +564,15 @@ def make_directory(output_dir: str, delete_if_exists: bool = False):
     """
     if delete_if_exists and os.path.exists(output_dir):  delete_files_or_directories(output_dir)
     os.makedirs(output_dir, exist_ok=True)  # Create the directory
+
+
+class change_directory_manager:
+    def __init__(self, new_dir):
+        self.new_dir = new_dir
+        self.original_dir = os.getcwd()
+
+    def __enter__(self):
+        os.chdir(self.new_dir)
+
+    def __exit__(self, type, value, traceback):
+        os.chdir(self.original_dir)
