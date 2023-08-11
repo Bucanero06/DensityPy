@@ -48,8 +48,8 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                 # sort by error type
                 compiler_output_df = compiler_output_df.sort_values(by='Type',
                                                                     key=lambda x: x.map(DEFAULT_LOGGIN_VALUES))
-                logger.error(f'\n'
-                             f'{compiler_output_df}')
+                # logger.error(f'\n'
+                #              f'{compiler_output_df}')
             exit(return_code)
 
     # TODO too explicit, does not allow for new args to be added easily
@@ -149,7 +149,6 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
 
         time_delay_range = generate_time_delays(number_of_pp, time_delay_start, time_delay_stop)
 
-        print("time_delay_range = ", time_delay_range)
         print("number_of_pp = ", number_of_pp)
         print("time_delay_start = ", time_delay_start)
 
@@ -168,7 +167,6 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
             fig = project.get_mu_heatmaps()
             fig.savefig(f'{molcas_output_directory}/dipole-heatmap.png')
             exit()
-
 
         if field_file_help:
             Write_FieldHelp()
@@ -230,8 +228,6 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
 
             if "RASSCF" in keywords_needed_found:
                 load_project_rasscf_h5_file(project_name, molcas_output_directory, molcas_output_directory)
-
-
 
         # >ChargeMigration
         if run_charge_migration:
@@ -381,21 +377,22 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                                          pump_polarization, probe_polarization, number_of_omegas, min_tau_omega,
                                          max_tau_omega)
             #
-            Call_Spectrum_Reconstruction_n_Difference(DEFAULT_BIN_FILE_PATH, molcas_output_directory,
-                                                      experiment_directory,
-                                                      f"{molcas_output_directory}/{xyz_geometry}", number_of_omegas,
-                                                      min_omegas, max_omegas,
-                                                      number_of_tau_omegas, min_tau_omega, max_tau_omega, debug_mode)
+            # Call_Spectrum_Reconstruction_n_Difference(DEFAULT_BIN_FILE_PATH, molcas_output_directory,
+            #                                           experiment_directory,
+            #                                           f"{molcas_output_directory}/{xyz_geometry}", number_of_omegas,
+            #                                           min_omegas, max_omegas,
+            #                                           number_of_tau_omegas, min_tau_omega, max_tau_omega, debug_mode)
 
             # logger.info("Creating difference_" + experiment_directory + " to compare the Dipole and Charge Spectra")
             # Dipole_Charge_Comparison(experiment_directory + '/Dipole/DipoleFT_ww', experiment_directory +
             #                          '/Dipole/DipoleFT_ww_reconstructed', 'difference_' + experiment_directory)
 
         if plot:
-            from densitypy.post_processing.plotting import PlotSimulation
+            from densitypy.post_processing.plotting import PlotDipolesSimulation
 
-            plotter = PlotSimulation(study_directory=study_directory, experiment_directory=experiment_directory)
-            plotter.plot_all_dipoles()
+            plotter = PlotDipolesSimulation(study_directory=study_directory, experiment_directory=experiment_directory)
+
+            plotter.plot_ftpp_all()
 
 
 if __name__ == "__main__":
@@ -416,7 +413,7 @@ if __name__ == "__main__":
 
                   make_fortran=False, make_fortran_config=make_fortran_config
                   )
-
+#
 # fixme most of the data is gotten from RASSCF H5 file only but some from only i beleive we are looking for the integrals
 # Todo:
 #     refactor the code to avoid using os.chdir entirely, since it changes the state of the Python process and can potentially lead to confusing bugs. This can be achieved by using absolute paths in the shell commands instead of changing the working directory. However, the feasibility of this refactoring depends on the specific codebase and build system.

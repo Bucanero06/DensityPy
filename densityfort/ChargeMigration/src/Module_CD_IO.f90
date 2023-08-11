@@ -772,7 +772,7 @@ contains
                 status = "unknown", &
                 action = "write")
 
-        write(uid_dipole, '(a)') '"Index","Time","DipoleX_Re","DipoleX_Im","DipoleY_Re","DipoleY_Im","DipoleZ_Re","DipoleZ_Im"'
+        write(uid_dipole, '(a)') '"itime","Time","DipoleX_Re","DipoleX_Im","DipoleY_Re","DipoleY_Im","DipoleZ_Re","DipoleZ_Im"'
 
         do it = 1, n_times
             t = t_min + dt * dble(it - 1)
@@ -784,12 +784,12 @@ contains
         enddo
         close(uid_dipole)
     end subroutine Write_Dipole
-
-    subroutine Write_Q_Charge(FileName, Charge, n_times, t_min, dt, nAtoms)
+    subroutine Write_Q_Charge(FileName, Charge, n_times, t_min, dt, nAtoms, atom_names)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: Charge(:, :, :)
         real   (kind(1d0)), intent(in) :: t_min, dt
         integer, intent(in) :: n_times, nAtoms
+        character(len = 16), intent(in) :: atom_names(:)
 
         real   (kind(1d0)) :: t
         integer :: uid_AtomicCharge, iPol, it, iAtom
@@ -800,10 +800,35 @@ contains
                 status = "unknown", &
                 action = "write")
 
+        write(uid_AtomicCharge, '(a)', advance = "no") '"itime","Time","TotalCharge",'
+        do iAtom = 1, nAtoms - 1
+            write(uid_AtomicCharge, "(a)", advance = "no") "" &
+                    // '"Atom_' // trim(atom_names(iAtom)) // '_ChargeX",' &
+                    // '"Atom_' // trim(atom_names(iAtom)) // '_ChargeY",' &
+                    // '"Atom_' // trim(atom_names(iAtom)) // '_ChargeZ",'
+
+        end do
+        write(uid_AtomicCharge, '(a)') '' &
+                // '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeX",' &
+                // '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeY",' &
+                // '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeZ",'
+
         do it = 1, n_times
             t = t_min + dt * dble(it - 1)
-            write(uid_AtomicCharge, "(*(x,e24.16,','))") t, sum(Charge(:, :, it)), ((Charge(iPol, iAtom, it), iPol = 1, 3), iAtom = 1, nAtoms)
+            write(uid_AtomicCharge, "(i4,',',E24.16,',')", advance = 'no') it, t
+            write(uid_AtomicCharge, "(*(x,e24.16,','))", advance = 'no')  sum(Charge(:, :, it))
+            do iAtom = 1, nAtoms - 1
+                write(uid_AtomicCharge, "(*(x,e24.16,','))", advance = "no") &
+                        Charge(1, iAtom, it), &
+                        Charge(2, iAtom, it), &
+                        Charge(3, iAtom, it)
+            end do
+            write(uid_AtomicCharge, "(*(x,e24.16,','))") &
+                    Charge(1, nAtoms, it), &
+                    Charge(2, nAtoms, it), &
+                    Charge(3, nAtoms, it)
         enddo
+
         close(uid_AtomicCharge)
     end subroutine Write_Q_Charge
 

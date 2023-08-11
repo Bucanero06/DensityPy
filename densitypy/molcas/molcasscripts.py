@@ -270,6 +270,7 @@ def call_open_molcas(project_name, molcas_directory):
     # Use the context manager to temporarily change the working directory
     with change_directory(molcas_directory):
         try:
+            _logger = setup_logger('open_molcas')
             execute_command(f'pymolcas {project_name}.input -f', _logger=logger)
         except Exception as e:
             logger.error('Error in call_open_molcas')
@@ -417,13 +418,6 @@ def parse_project_grid_file(output_filename, directorypath):
     orbitals_to_extract = list(data['molecular_orbitals'].keys()) * actual_n_chunks
     orbital_index = None
 
-    # FIXME DEBUGGING
-    # lets check the already outputed file f'{molcas_output_directory}/grid_density.csv' and compare each columun/orbital density
-    # with the one extracted here
-    # Read the file
-    df = pd.read_csv(f'{directorypath}/grid_density.csv')
-
-    print(df.head())
     for line_index, line in enumerate(density_containing_lines):  # use re for matching
 
         # e.g. Title=   18  or Title= 1 or Title=    194 etc...

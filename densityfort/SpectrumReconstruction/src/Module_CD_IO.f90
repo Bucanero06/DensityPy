@@ -14,13 +14,13 @@ Module Module_CD_IO
             Set_CD_IO_Verbous, &
             LoadGeometry, &
             LoadEnergies, &
-            SaveDipoleFTFile, &
-            SaveAtomicChargeFT, &
+            WriteDipoleFTFile, &
+            WriteAtomicChargeFT, &
             WriteAllDipoleFTtoSingleFile, &
             WriteAllAtomicChargeFTtoSingleFile, &
             LoadDipoles, &
-            ReadAtomicCharges, &
-            SaveRegularizedDipole, &
+            LoadAtomicCharges, &
+            WriteRegularizedDipole, &
             LoadFTDipole_asfuncitonof_TimeDelay, &
             Load_XUVDipole, &
             SaveBidimentioal_Dipole_Spectrum, &
@@ -195,7 +195,7 @@ contains
     end subroutine LoadDipoles
 
 
-    subroutine ReadAtomicCharges(FileName, AtomicChargeEvolution, nTimes, nAtoms, iSim, tmin, dt, uid_AtomicChargeALL)
+    subroutine LoadAtomicCharges(FileName, AtomicChargeEvolution, nTimes, nAtoms, iSim, tmin, dt, uid_AtomicChargeALL)
         real(kind(1d0)), intent(in) :: tmin, dt
         character(len = *), intent(in) :: FileName
         integer, intent(in) :: nTimes, iSim, nAtoms, uid_AtomicChargeALL
@@ -218,10 +218,10 @@ contains
         enddo
         write(uid_AtomicChargeALL, *)
         close(uid_AtomicCharge)
-    end subroutine ReadAtomicCharges
+    end subroutine LoadAtomicCharges
 
 
-    subroutine SaveRegularizedDipole(FileName, zMuEV, nTimes, tmin, dt)
+    subroutine WriteRegularizedDipole(FileName, zMuEV, nTimes, tmin, dt)
         complex(kind(1d0)), intent(in) :: zMuEV(:, :)
         real(kind(1d0)), intent(in) :: tmin, dt
         character(len = *), intent(in) :: FileName
@@ -240,10 +240,10 @@ contains
             write(uid_dipole, "(i4,*(x,E24.16))") it, t, ((dble(zMuEV(iPol, it)), aimag(zMuEV(iPol, it))), iPol = 1, 3)
         enddo
         close(uid_dipole)
-    end subroutine SaveRegularizedDipole
+    end subroutine WriteRegularizedDipole
 
 
-    subroutine SaveDipoleFTFile (FileName, DipoleFTtotal, OmegaVec, nOmegas)
+    subroutine WriteDipoleFTFile (FileName, DipoleFTtotal, OmegaVec, nOmegas)
         complex(kind(1d0)), intent(in) :: DipoleFTtotal(:, :)
         character(len = *), intent(in) :: FileName
         integer, intent(in) :: nOmegas
@@ -263,7 +263,7 @@ contains
                     ((dble(DipoleFTtotal(iPol, iOmega)), aimag(DipoleFTtotal(iPol, iOmega))), iPol = 1, 3)
         end do
         close(uid_dipoleFT)
-    end subroutine SaveDipoleFTFile
+    end subroutine WriteDipoleFTFile
 
 
     subroutine WriteAllDipoleFTtoSingleFile (FileName, DipoleFTtotal, OmegaVec, nOmegas, iSim, train)
@@ -293,7 +293,7 @@ contains
     end subroutine WriteAllDipoleFTtoSingleFile
 
 
-    subroutine SaveAtomicChargeFT (FileName, AtomicChargeFT, OmegaVec, nOmegas, nAtoms)
+    subroutine WriteAtomicChargeFT (FileName, AtomicChargeFT, OmegaVec, nOmegas, nAtoms)
         complex(kind(1d0)), intent(in) :: AtomicChargeFT(:, :)
         character(len = *), intent(in) :: FileName
         integer, intent(in) :: nOmegas, nAtoms
@@ -315,7 +315,7 @@ contains
             iAtom = 1, nAtoms)
         end do
         close(uid_AtomicChargeFT)
-    end subroutine SaveAtomicChargeFT
+    end subroutine WriteAtomicChargeFT
 
 
     subroutine WriteAllAtomicChargeFTtoSingleFile(FileName, AtomicChargeFT, OmegaVec, nOmegas, nAtoms, iSim, train)

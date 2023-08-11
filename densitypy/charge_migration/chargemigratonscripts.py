@@ -137,6 +137,7 @@ def Call_Charge_Migration(Bin_Directory, input_directory, experiment_directory, 
 
     logger.info(screen_print)
     # >Runs Charge Migration (Fortran Code)
+    _logger = setup_logger('Charge_Migration')
     execute_command(
         # FIXME : This is a temporary fix for the issue with the MKL library and my pycharm env
         f"export LD_LIBRARY_PATH='/opt/intel/oneapi/mkl/2023.2.0/lib/intel64:/opt/intel/oneapi/compiler/2023.2.0/linux/compiler/lib/intel64_lin:$LD_LIBRARY_PATH' &&"
@@ -146,7 +147,7 @@ def Call_Charge_Migration(Bin_Directory, input_directory, experiment_directory, 
         f"-stepw {str(stepw)} -xyz {str(geometry)} {weights_file_decoy} {write_charge_migrationflag_decoy} -iorb "
         f"{','.join(map(str, orbital_list))} -rf {str(relaxation_factor)} -bath {str(bath_temp)} -df "
         f"{str(dephasing_factor)} -s {i_excitation} -e {i_epsilon}"
-    , _logger=logger)
+    , _logger=_logger)
 
     logger.info("Finished Executing ChargeMigration")
 
@@ -162,6 +163,8 @@ def Call_Charge_MigrationFT(Bin_Directory, input_directory, experiment_directory
 
     logger.info(screen_print)
     # >Runs Charge Migration FT (Fortran Code)
+    _logger = setup_logger('Charge_Migration_FT')
+
     execute_command(
         # FIXME : This is a temporary fix for the issue with the MKL library and pycharm
         f"export LD_LIBRARY_PATH='/opt/intel/oneapi/mkl/2023.2.0/lib/intel64:/opt/intel/oneapi/compiler/2023.2.0/linux/compiler/lib/intel64_lin:$LD_LIBRARY_PATH' &&"
@@ -170,7 +173,7 @@ def Call_Charge_MigrationFT(Bin_Directory, input_directory, experiment_directory
         f'{str(geometry)} -stept {str(ft_time_step)} -stepw {str(ft_width_step)} -field {str(field_file)} -nw '
         f'{str(Number_of_Omegas)} -wmax {str(min_omegas)} -wmin {str(max_omegas)} -ntw {str(number_of_tau_omega)} '
         f'-twmax {str(min_tau_omega)} -twmin {str(max_tau_omega)} -s {i_excitation} -e {i_epsilon}'
-    , _logger=logger)
+    , _logger=_logger)
 
     logger.info("Finished Executing ChargeMigrationFT")
 

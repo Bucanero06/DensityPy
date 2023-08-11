@@ -780,7 +780,7 @@ contains
     !#########################
 
 
-    subroutine Read_Q_Charge1(FileName, Charge, nTimes, tmin, dt, nAtoms, iSim, uid_AtomicChargeALL)
+    subroutine Load_Q_Charge_and_Write2FTALL1(FileName, Charge, nTimes, tmin, dt, nAtoms, iSim, uid_AtomicChargeALL)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), allocatable, intent(out) :: Charge(:, :, :)
         real   (kind(1d0)), intent(in) :: tmin, dt
@@ -807,7 +807,7 @@ contains
         !
         write(uid_AtomicChargeALL, *)
         close(uid_AtomicCharge)
-    end subroutine Read_Q_Charge1
+    end subroutine Load_Q_Charge_and_Write2FTALL1
 
     subroutine WriteAllAtomicChargeFTtoSingleFile1(FileName, AtomicChargeFT_new, OmegaVec, nOmegas, nAtoms, iSim, train)
         complex(kind(1d0)) :: AtomicChargeFT_new(:, :, :)

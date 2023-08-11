@@ -128,7 +128,7 @@ program ChargeMigration
         DipoleFTplus = Z0
         DipoleFTtotal = (DipoleFTminus + DipoleFTplus) !- XUVDipoleFT
         !.. Save FT of Dipoles
-!        call SaveDipoleFTFile (OutDir // "/Dipole/DipoleFT" // trim(Simulation_tagv(iSim)), &
+!        call WriteDipoleFTFile (OutDir // "/Dipole/DipoleFT" // trim(Simulation_tagv(iSim)), &
 !                DipoleFTtotal, OmegaVec, nOmegas)
 
         !        !.. Write the FT of Dipoles to a single file

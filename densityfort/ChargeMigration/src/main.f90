@@ -265,8 +265,8 @@ program ChargeMigration
         call Write_Dipole(output_directory // "/Dipole/Dipole" // trim(Simulation_tagv(iSim)) // ".csv", zMuEV, n_times, t_min, dt)
 
         !.. Save Q_Charge
-        !        call Write_Q_Charge(output_directory // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)), AtomicChargeEvolution, n_times, t_min, dt, nAtoms)
-        call Write_Q_Charge(output_directory // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)) // ".csv", AtomicChargeEvolution_new, n_times, t_min, dt, nAtoms)
+        call Write_Q_Charge(output_directory // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)) // ".csv", &
+        AtomicChargeEvolution_new, n_times, t_min, dt, nAtoms,atom_names)
 
     end do Sim_loop
     !
