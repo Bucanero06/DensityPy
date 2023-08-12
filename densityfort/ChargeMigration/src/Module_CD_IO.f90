@@ -832,7 +832,7 @@ contains
         close(uid_AtomicCharge)
     end subroutine Write_Q_Charge
 
-    subroutine Write_Charge_Density(FileName, npts, gridv, ChDen, Weightv, nAtoms)
+    subroutine Write_Charge_Density(FileName, npts, gridv, ChDen, Weightv, nAtoms, atom_names)
         use ModuleErrorHandling
         use ModuleString
 
@@ -843,6 +843,8 @@ contains
         real(kind(1d0)), allocatable, intent(in) :: gridv(:, :)
         real(kind(1d0)), allocatable, intent(in) :: ChDen(:)
         real(kind(1d0)), allocatable, intent(in) :: Weightv(:, :)
+        character(len = 16), intent(in) :: atom_names(:)
+
         integer :: uid, iostat
         character(len = 1000) :: iomsg
         integer :: iPts, iAtom, j
@@ -860,8 +862,15 @@ contains
             stop
         endif
 
+        write(uid, "(a)", advance = "no") '"x","y","z","ChargeDensity",'
+        do iAtom = 1, nAtoms - 1
+            write(uid, "(a)", advance = "no") '"Atom_' // trim(atom_names(iAtom)) // '_ChargeDensity",'
+
+        end do
+        write(uid, '(a)') '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeDensity"'
         do iPts = 1, nPts
-            write(uid, "(*(x,e24.14e3,','))") (gridv(j, iPts), j = 1, 3), ChDen(iPts)!, (ChDen(iPts) * Weightv(iPts, iAtom), iAtom=1, nAtoms),(Weightv(iPts, iAtom), iAtom=1, nAtoms)
+            write(uid, "(*(x,e24.14e3,','))") (gridv(j, iPts), j = 1, 3), ChDen(iPts), &
+                    (ChDen(iPts) * Weightv(iPts, iAtom), iAtom=1, nAtoms)
         enddo
 
         close(uid)

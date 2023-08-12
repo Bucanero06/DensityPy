@@ -12,7 +12,7 @@ import click
 @click.option("--molcas_input_help", is_flag=True, help="Enable Molcas input help")
 @click.option("--lus", is_flag=True, help="Enable LUS")
 @click.option("--gridflag", is_flag=True, help="Enable grid flag")
-@click.option("--write_charge_migration", help="Write charge migration")
+@click.option("--write_charge_migration", is_flag=True, help="Write charge migration")
 @click.option("--debug_mode", is_flag=True, help="Enable debug mode")
 @click.option("--justh5", is_flag=True, help="Enable just h5")
 @click.option("--justgetdipoles", is_flag=True, help="Enable just get dipoles")

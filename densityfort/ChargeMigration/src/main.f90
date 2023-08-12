@@ -170,28 +170,22 @@ program ChargeMigration
     !.. Load Orbitals
     call LoadOrbitals(input_directory, number_of_orbitals, npts, OrbTab)! $\varphi_n(\vec{r}_i)$
 
-
-    !!fixme save_charge_migration_flag is being misused trhough out the code. should only be used to yes or not do CM
-    !!      for plotting
-
     !.. Compute and Write | or Read Becke's Weights
-    if(.not. save_charge_migration_flag)then
-        !
-        call AtomicRadius_Bragg_Slater_Becke(atom_names, nAtoms, Radius_BS)
-        if (read_precomputed_weights_flag == .True.) then
-            call Read_Weights(Weight_File, WEIGHTV, nAtoms, nPts)
-        else
-            call ComputeAtomicWeights(nPts, gridv, nAtoms, AtCoord, WeightV, Radius_BS)
-            call Write_Weights(output_directory // "/" // Weight_File // "_" // output_directory // ".csv", WEIGHTV, gridv, nAtoms, nPts)
-        endif
-        !.. Compute Berycenter of Atmoic Charges
-        call Compute_R_el(gridv, WeightV, OrbTab, R_el)
-        call Write_R_el_bc(output_directory, atom_names, nAtoms, R_el)
+    !
+    call AtomicRadius_Bragg_Slater_Becke(atom_names, nAtoms, Radius_BS)
+    if (read_precomputed_weights_flag == .True.) then
+        call Read_Weights(Weight_File, WEIGHTV, nAtoms, nPts)
+    else
+        call ComputeAtomicWeights(nPts, gridv, nAtoms, AtCoord, WeightV, Radius_BS)
+        call Write_Weights(output_directory // "/" // Weight_File // "_" // output_directory // ".csv", WEIGHTV, gridv, nAtoms, nPts)
+    endif
+    !.. Compute Berycenter of Atmoic Charges
+    call Compute_R_el(gridv, WeightV, OrbTab, R_el)
+    call Write_R_el_bc(output_directory, atom_names, nAtoms, R_el)
 
-        !.. Compute Becke's Matrix
-        call ComputeNewBeckeMatrix(WeightV, OrbTab, Becke_new, R_el) !!using electronic barycenter or AtCoord for the nuclear barycenter
-        !    BeckeMatrix = BeckeMatrix * Computed_volume
-    end if
+    !.. Compute Becke's Matrix
+    call ComputeNewBeckeMatrix(WeightV, OrbTab, Becke_new, R_el) !!using electronic barycenter or AtCoord for the nuclear barycenter
+    !    BeckeMatrix = BeckeMatrix * Computed_volume
 
     allocate(AtomicChargeVec(nAtoms))
     allocate(AtomicChargeEvolution(nAtoms, n_times))
@@ -214,11 +208,15 @@ program ChargeMigration
 
     write(*, *) "Starting Sim Loop"
     Sim_loop : do iSim = 1, N_Simulations
-
-        zStatRho = Z0
-        zStatRho(GS_IDX, GS_IDX) = 1.d0
         ! Lets keep a percentage write of the simulation only 2 digits after the decimal point
         write(*, '(A, F0.2, A, I0, A)') "Simulation progress: ", 100.d0 * iSim / (N_Simulations)
+        if(save_charge_migration_flag)then
+            write(*, *) "Computing Charge Migration for simulation ", iSim, trim(Simulation_tagv(iSim))
+        end if
+
+        !.. Load Initial State
+        zStatRho = Z0
+        zStatRho(GS_IDX, GS_IDX) = 1.d0
 
         !.. Time cycle
         time_loop : do it = 1, n_times
@@ -229,29 +227,27 @@ program ChargeMigration
 
             !.. Evaluates the expectation value of the dipole as a function of time
             !            write(*, *) it, iSim
-            if(.not. save_charge_migration_flag)then
-                do iPol = 1, 3
-                    zMuEV(iPol, it) = zdotu(nStates * nStates, zStatRho, 1, zDmat_t(1, 1, iPol), 1)
-                enddo
-            end if
+            do iPol = 1, 3
+                zMuEV(iPol, it) = zdotu(nStates * nStates, zStatRho, 1, zDmat_t(1, 1, iPol), 1)
+            enddo
             !
             call ComputeOrbitalDensity(zStatRho, TDM, OrbitalDensity)
 
-            if(.not. save_charge_migration_flag)then
-                !
-                call ComputeNewAtomicCharges(OrbitalDensity, Becke_new, AtomicChargeVec_new)
-                AtomicChargeVec_new = AtomicChargeVec_new * Computed_volume
-                AtomicChargeEvolution_new(:, :, it) = AtomicChargeVec_new
-            end if
-
             !
+            call ComputeNewAtomicCharges(OrbitalDensity, Becke_new, AtomicChargeVec_new)
+            AtomicChargeVec_new = AtomicChargeVec_new * Computed_volume
+            AtomicChargeEvolution_new(:, :, it) = AtomicChargeVec_new
+
+            !$> this needs to be be moved outside of this module or loop since is costly and can be computed when needed
             if(save_charge_migration_flag)then
                 call TabulateChargeDensity(OrbitalDensity, OrbTab, ChDen)
                 write(istrn, "(f12.4)")t
                 !..Makes new directory inside of ChargeDensity directory for each simulation
                 call system("mkdir -p " // output_directory // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)))
-                call Write_Charge_Density(output_directory // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)) // "/ChDen" // trim(adjustl(istrn)) // ".csv", &
-                        nPts, gridv, ChDen, Weightv, nAtoms)
+                call Write_Charge_Density(&
+                        output_directory // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)) &
+                                // "/ChDen" // trim(adjustl(istrn)) // ".csv", &
+                        nPts, gridv, ChDen, Weightv, nAtoms, atom_names)
             endif
             !
             zStatRho(GS_IDX, GS_IDX) = zStatRho(GS_IDX, GS_IDX) + 1.d0
@@ -266,13 +262,11 @@ program ChargeMigration
 
         !.. Save Q_Charge
         call Write_Q_Charge(output_directory // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)) // ".csv", &
-        AtomicChargeEvolution_new, n_times, t_min, dt, nAtoms,atom_names)
+                AtomicChargeEvolution_new, n_times, t_min, dt, nAtoms, atom_names)
 
     end do Sim_loop
     !
-    if(.not. save_charge_migration_flag)then
-        call Write_Summary(output_directory // "/Simulation_Summary", nPts, nAtoms, volume, Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
-    end if
+    call Write_Summary(output_directory // "/Simulation_Summary", nPts, nAtoms, volume, Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
     stop
 
 
