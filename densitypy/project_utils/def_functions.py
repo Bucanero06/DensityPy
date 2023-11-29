@@ -44,12 +44,12 @@ def execute_command(command: str, write_stream=True, _logger=None) -> (int, list
                 line = line.strip()
                 stdout_output_list.append(line)
                 if write_stream:
-                    _logger.info(f' ---> {line}')
+                    _logger.info(line)
             for line in p.stderr:
                 line = line.strip()
                 stderr_output_list.append(line)
                 if write_stream:
-                    _logger.error(f' ---> {line}')
+                    _logger.error(line)
         return_code = p.returncode
 
         stdout_output_list, stderr_output_list = json.dumps(stdout_output_list), json.dumps(stderr_output_list)

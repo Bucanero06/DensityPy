@@ -221,7 +221,7 @@ contains
                 form = "formatted", &
                 status = "unknown")
 
-        write(uid, "(a)") "# w, FT(Ax), FT(Ay), FT(Az), Re(FT(A^-1(w))), Im(FT(A^-1(w))), Re(FT(A^0(w))), ..."
+!        write(uid, "(a)") "# w, FT(Ax), FT(Ay), FT(Az), Re(FT(A^-1(w))), Im(FT(A^-1(w))), Re(FT(A^0(w))), ..."
         !
         do iFreq = 1, size(Freq)
             do mu = -1, 1

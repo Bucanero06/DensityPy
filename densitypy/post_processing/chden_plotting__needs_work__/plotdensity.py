@@ -1,5 +1,5 @@
-#! /usr/bin/env python3.7
 import matplotlib.pyplot as plt
+import pandas as pd
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib as mpl
 import csv
@@ -16,25 +16,18 @@ import sys
 import argparse
 
  
-def run(args):
+def run(
+        # args
+):
     import plotly.graph_objects as go
     import moviepy.video.io.ImageSequenceClip
     ###Variables
 
-    ChDen_timestepsdir = args.input
+    # ChDen_timestepsdir = args.input
+    ChDen_timestepsdir = "/home/ruben/PycharmProjects/DensityPy/Studies/cluttertest/sim/ChargeDensity/ChDenSimPP500.0"
     images_folder = ChDen_timestepsdir + '/images_folder'
-    tempfiles = ChDen_timestepsdir + '/tempfiles'
     ###End of Variables
 
-    ##Creates directories to store temporary information
-    if path.exists(tempfiles):
-        path_to_dir = tempfiles
-        files_in_dir = os.listdir(path_to_dir)  # get list of files in the directory
-        for file in files_in_dir:  # loop to delete each file in folder
-            os.remove(f'{path_to_dir}/{file}')
-    else:
-        os.mkdir(tempfiles)
-    #
     if path.exists(images_folder):
         path_to_dir = images_folder
         files_in_dir = os.listdir(path_to_dir)  # get list of files in the directory
@@ -58,34 +51,27 @@ def run(args):
     for file_name in sorted(file_list, key=last_8chars):
         if fnmatch.fnmatch(file_name, 'ChDen*'):
 
-            ###Changes formating of columns from space to ',' and D to E to avoid bugs
-            with open(ChDen_timestepsdir + '/' + file_name, 'r') as fin:
-                with open(tempfiles + '/temp' + file_name, 'w') as fout:
-                    for i in fin:
-                        fout.write(i.replace('  ', ','))
-
-            fin = open(tempfiles + '/temp' + file_name, "rt")
-            data = fin.read()
-            data = data.replace('D', 'E')
-            fin.close()
-            fin = open(tempfiles + '/temp' + file_name, "wt")
-            fin.write(data)
-            fin.close()
+            df = pd.read_csv(ChDen_timestepsdir + '/' + file_name, sep=',').replace('D', 'E')
 
             print('Plotting: ' + file_name)
-            x = []
-            y = []
-            z = []
-            d = []
+            # x = []
+            # y = []
+            # z = []
+            # d = []
+            x = df['x'].tolist()
+            y = df['y'].tolist()
+            z = df['z'].tolist()
+            d = df['ChargeDensity'].tolist()
 
-            ###Appends rows in time files
-            with open(tempfiles + '/temp' + file_name, 'r') as fin:
-                xyz = csv.reader(fin, delimiter=',')
-                for row in xyz:
-                    x.append(row[1])
-                    y.append(row[2])
-                    z.append(row[3])
-                    d.append(row[4])
+
+            # ###Appends rows in time files
+            # with open(tempfiles + '/temp' + file_name, 'r') as fin:
+            #     xyz = csv.reader(fin, delimiter=',')
+            #     for row in xyz:
+            #         x.append(row[1])
+            #         y.append(row[2])
+            #         z.append(row[3])
+            #         d.append(row[4])
 
             ###########VolumePlot
             # ###Plots time files
@@ -137,7 +123,7 @@ def run(args):
             np.set_printoptions(threshold=sys.maxsize)
             D = D.astype(float)
 
-            threshold = 0.005  # sets threshold for Point Value
+            threshold = 0.0000000005  # sets threshold for Point Value
             X = np.where(abs(D) < threshold, np.nan, X)
             Y = np.where(abs(D) < threshold, np.nan, Y)
             Z = np.where(abs(D) < threshold, np.nan, Z)
@@ -162,9 +148,11 @@ def run(args):
             norm = MidpointNormalize(vmin=vmin, vmax=vmax, midpoint=0)
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
-            ax.scatter(X, Y, Z, c=['blue' if i < 0 else 'red' for i in D], marker='o', norm=norm, alpha=1)
-            ax.view_init(91.94805194805241, -88.344155844155416)
- 
+            ax.scatter(X, Y, Z, c=D.ravel(), cmap='RdBu_r',
+                       marker='o',
+                       # norm=norm,
+                       alpha=0.2)
+
             ax.set_xlabel('X Label')
             ax.set_ylabel('Y Label')
             ax.set_zlabel('Z Label')
@@ -173,13 +161,10 @@ def run(args):
             plt.savefig(images_folder + '/' + file_name + ".png")
             plt.clf()
 
+            plt.close()
+
         #####End of Scatter Plot
 
-        ###Resseting variables
-        x = []
-        y = []
-        z = []
-        d = []
 
     ###End of plot
 
@@ -204,7 +189,7 @@ def run(args):
 
     fps = 2
     clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(images_folder, fps=fps)
-    clip.write_gif('ChargeMigration_NMA.GIF')
+    clip.write_gif(f'{ChDen_timestepsdir}/ChargeMigration_NMA.GIF')
     ##
 
 
@@ -221,8 +206,9 @@ def main():
     args.func(args)
 
 if __name__ == "__main__":
-    main()
+    # main()
 
+    run()
 
 
 

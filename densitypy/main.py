@@ -403,18 +403,21 @@ if __name__ == "__main__":
 
     run_densitypy(json_config_path="configuration_help.json",
                   study_directory="/home/ruben/PycharmProjects/DensityPy/Studies/cluttertest/",
-                  molcas_input='molcas_input_help.input', run_charge_migration=True,
-                  run_charge_migration_ft=False, run_spectrum_reconstruction=False, field_file_help=False,
-                  molcas_input_help=False, lus=False, gridflag=True, write_charge_migration=None, debug_mode=True,
+                  molcas_input=False ,#'molcas_input_help.input',
+                  # molcas_input='molcas_input_help.input',
+                  run_charge_migration=False,
+                  run_charge_migration_ft=True,
+                  run_spectrum_reconstruction=False,
+                  plot=False,
+                  #
+                  field_file_help=False,molcas_input_help=False,
+                  lus=False, gridflag=True, write_charge_migration=None, debug_mode=True,
                   justh5=False, justgetdipoles=False, justgetdensity=False, weights_file=None, givenfieldfile=None,
                   old_main=True, parallel=False, save_previous=False,
-
-                  plot=True,
-
                   make_fortran=False, make_fortran_config=make_fortran_config
                   )
 #
-# fixme most of the data is gotten from RASSCF H5 file only but some from only i beleive we are looking for the integrals
+# fixme most of the data is gotten from RASSCF H5 file only but some from only i beleive we are looking for the integrals, RASSI?
 # Todo:
 #     refactor the code to avoid using os.chdir entirely, since it changes the state of the Python process and can potentially lead to confusing bugs. This can be achieved by using absolute paths in the shell commands instead of changing the working directory. However, the feasibility of this refactoring depends on the specific codebase and build system.
 # todo

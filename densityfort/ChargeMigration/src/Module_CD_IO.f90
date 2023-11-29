@@ -262,7 +262,6 @@ contains
         enddo
         close(uid)
     end subroutine LoadGrid
-
     !
     !> Loads the Orbitals found inside the input_directory
     !> Loads the Orbitals from the grid_density.csv file inside the input_directory
@@ -325,47 +324,6 @@ contains
         end do
         !
     end subroutine LoadOrbitals
-
-    !    subroutine LoadOrbitals(Dir, number_of_orbitals, ivOrb, npts, OrbTab)
-    !        !
-    !        use ModuleErrorHandling
-    !        use ModuleString
-    !        !
-    !        implicit none
-    !        !
-    !        character(len = *), intent(in) :: Dir
-    !        integer, intent(in) :: number_of_orbitals, npts, ivOrb(:)
-    !        real(kind(1d0)), allocatable, intent(out) :: OrbTab(:, :)
-    !
-    !        integer :: uid, iostat, i, iOrb
-    !        character(len = 1000) :: iomsg
-    !        character(len = 6) :: istrn
-    !        !
-    !        write(*, "(a)") "Loading Orbitals"
-    !        !
-    !        allocate(OrbTab(npts, number_of_orbitals))
-    !        do iOrb = 1, number_of_orbitals
-    !            write(istrn, "(i0)") ivOrb(iOrb)
-    !            istrn = adjustl(istrn)
-    !            open(&
-    !                    newunit = uid, &
-    !                    file = Dir // "/grid" // trim(istrn), &
-    !                    form = "formatted", &
-    !                    status = "old", &
-    !                    action = "read", &
-    !                    iostat = iostat, &
-    !                    iomsg = iomsg)
-    !            if(iostat /= 0) then
-    !                call Assert(trim(iomsg), Assertion%LEVEL_SEVERE)
-    !                call StopExecution()
-    !            endif
-    !            do i = 1, npts
-    !                read(uid, *) OrbTab(i, iOrb)
-    !            enddo
-    !            close(uid)
-    !            !
-    !        enddo
-    !    end subroutine LoadOrbitals
     !
     !> Loads all the Dipoles found inside the input_directory
     subroutine LoadDipoleME(Dmat, input_directory, nStates)
@@ -394,8 +352,7 @@ contains
         call LoadDipoles (input_directory // "/Z_DIPOLE.csv", nStates, dBufM)
         Dmat(:, :, 3) = dBufM
     end subroutine LoadDipoleME
-
-
+    !
     !> Loads the Dipoles found inside the input_directory
     subroutine LoadDipoles(FileName, nStates, Dmat)
         use ModuleErrorHandling
@@ -452,7 +409,6 @@ contains
 
         close(uid)
     end subroutine LoadDipoles
-
     !
     !> Loads the TDM found inside the input_directory
     !---------------------------------------------------------------------
@@ -747,7 +703,7 @@ contains
 
         ! Loop over atoms and write their positions to the file
         do iAtom = 1, nAtoms
-            write(uid, "(i5,',',A20,',',3(f20.14,','))") iAtom, trim(atom_names(iAtom)), (R_el(iPol, iAtom), iPol = 1, 3)
+            write(uid, "(i5,',',A20,2(',',f20.14),',',f20.14)") iAtom, trim(atom_names(iAtom)), (R_el(iPol, iAtom), iPol = 1, 3)
         end do
 
 
@@ -771,16 +727,16 @@ contains
                 form = "formatted", &
                 status = "unknown", &
                 action = "write")
-
+        ! Write Headers
         write(uid_dipole, '(a)') '"itime","Time","DipoleX_Re","DipoleX_Im","DipoleY_Re","DipoleY_Im","DipoleZ_Re","DipoleZ_Im"'
-
+        ! Write Data
         do it = 1, n_times
             t = t_min + dt * dble(it - 1)
-            write(uid_dipole, "(i4,',',E24.16,',')", advance = 'no') it, t
-            do iPol = 1, 2
-                write(uid_dipole, "(E24.16,',',E24.16,',')", advance = 'no')  dble(Dipole(iPol, it)), aimag(Dipole(iPol, it))
-            enddo
-            write(uid_dipole, "(E24.16,',',E24.16)") dble(Dipole(3, it)), aimag(Dipole(3, it))
+            write(uid_dipole, "(i4,6(',',E24.16),',',E24.16)") &
+                    it, t, &
+                    dble(Dipole(1, it)), aimag(Dipole(1, it)), &
+                    dble(Dipole(2, it)), aimag(Dipole(2, it)), &
+                    dble(Dipole(3, it)), aimag(Dipole(3, it))
         enddo
         close(uid_dipole)
     end subroutine Write_Dipole
@@ -790,6 +746,7 @@ contains
         real   (kind(1d0)), intent(in) :: t_min, dt
         integer, intent(in) :: n_times, nAtoms
         character(len = 16), intent(in) :: atom_names(:)
+        CHARACTER(LEN = 1000) :: formatString
 
         real   (kind(1d0)) :: t
         integer :: uid_AtomicCharge, iPol, it, iAtom
@@ -800,35 +757,39 @@ contains
                 status = "unknown", &
                 action = "write")
 
+        ! Start of the header
         write(uid_AtomicCharge, '(a)', advance = "no") '"itime","Time","TotalCharge",'
+        ! Headers for the individual atomic charges
         do iAtom = 1, nAtoms - 1
             write(uid_AtomicCharge, "(a)", advance = "no") "" &
                     // '"Atom_' // trim(atom_names(iAtom)) // '_ChargeX",' &
                     // '"Atom_' // trim(atom_names(iAtom)) // '_ChargeY",' &
                     // '"Atom_' // trim(atom_names(iAtom)) // '_ChargeZ",'
-
         end do
+        ! Last atomic charge header
         write(uid_AtomicCharge, '(a)') '' &
                 // '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeX",' &
                 // '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeY",' &
-                // '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeZ",'
+                // '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeZ"'
 
+        ! Write Data
         do it = 1, n_times
             t = t_min + dt * dble(it - 1)
-            write(uid_AtomicCharge, "(i4,',',E24.16,',')", advance = 'no') it, t
-            write(uid_AtomicCharge, "(*(x,e24.16,','))", advance = 'no')  sum(Charge(:, :, it))
-            do iAtom = 1, nAtoms - 1
-                write(uid_AtomicCharge, "(*(x,e24.16,','))", advance = "no") &
-                        Charge(1, iAtom, it), &
-                        Charge(2, iAtom, it), &
-                        Charge(3, iAtom, it)
+            ! Write initial data: iteration number, time, and the sum of charges at that time step.
+            write(uid_AtomicCharge, "(i4,2(',',E24.16))", advance = 'no') it, t, sum(Charge(:, :, it))
+            ! For the first atom in each time step, skip the comma.
+            write(uid_AtomicCharge, "(',', E24.16, ',', E24.16, ',', E24.16)", advance = "no") &
+                    Charge(1, 1, it), Charge(2, 1, it), Charge(3, 1, it)
+            ! For all other atoms except the iAtom=nAtoms, prefix the charges with a comma
+            do iAtom = 2, nAtoms - 1
+                ! For all other atoms, prefix the charges with a comma and do not advance to the next line
+                write(uid_AtomicCharge, "(',', E24.16, ',', E24.16, ',', E24.16)", advance = "no") &
+                        Charge(1, iAtom, it), Charge(2, iAtom, it), Charge(3, iAtom, it)
             end do
-            write(uid_AtomicCharge, "(*(x,e24.16,','))") &
-                    Charge(1, nAtoms, it), &
-                    Charge(2, nAtoms, it), &
-                    Charge(3, nAtoms, it)
+            ! For the last atom, suffix the charges with a newline
+            write(uid_AtomicCharge, "(',', E24.16, ',', E24.16, ',', E24.16)") &
+                    Charge(1, nAtoms, it), Charge(2, nAtoms, it), Charge(3, nAtoms, it)
         enddo
-
         close(uid_AtomicCharge)
     end subroutine Write_Q_Charge
 
@@ -862,36 +823,65 @@ contains
             stop
         endif
 
+        ! Start of the header
         write(uid, "(a)", advance = "no") '"x","y","z","ChargeDensity",'
+        ! Headers for the individual atomic charges
         do iAtom = 1, nAtoms - 1
             write(uid, "(a)", advance = "no") '"Atom_' // trim(atom_names(iAtom)) // '_ChargeDensity",'
-
         end do
+        ! Header for the last atom
         write(uid, '(a)') '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeDensity"'
-        do iPts = 1, nPts
-            write(uid, "(*(x,e24.14e3,','))") (gridv(j, iPts), j = 1, 3), ChDen(iPts), &
-                    (ChDen(iPts) * Weightv(iPts, iAtom), iAtom=1, nAtoms)
-        enddo
 
+        ! Write the data
+        do iPts = 1, nPts
+            ! Writing the first set of values without a comma at the beginning
+            write(uid, "(E24.14E3, ',', E24.14E3, ',', E24.14E3, ',', E24.14E3)", advance = "no") (gridv(j, iPts), j = 1, 3), ChDen(iPts)
+            ! Writing the next sets of values with a comma at the beginning
+            do iAtom = 1, nAtoms - 1
+                write(uid, "(',', E24.14E3)", advance = "no") ChDen(iPts) * Weightv(iPts, iAtom)
+            end do
+            ! For the last value, write without appending another comma
+            write(uid, "(',', E24.14E3)") ChDen(iPts) * Weightv(iPts, nAtoms)
+        enddo
         close(uid)
     end subroutine Write_Charge_Density
 
     !> Write Weights Subroutine
-    subroutine Write_Weights(FileName, WEIGHTV, gridv, nAtoms, nPts)
+    subroutine Write_Weights(FileName, WEIGHTV, gridv, nAtoms, nPts, atom_names)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)), intent(in) :: gridv(:, :)
         integer, intent(in) :: nPts, nAtoms
         real   (kind(1d0)), intent(in) :: WEIGHTV(:, :)
+        character(len = 16), intent(in) :: atom_names(:)
         integer :: uid, iPts, iAtom, i
+
         !
         write(*, "(a)") "Writing Weights to File"
 
-        !
         !..Write Weights to File
         open(newunit = uid, file = FileName, form = "formatted", status = "unknown", action = "write")
-        do iPts = 1, nPts
-            write(uid, "(*(e24.14e3,:,','))") (gridv(i, iPts), i = 1, 3), (WEIGHTV(iPts, iAtom), iAtom = 1, nAtoms)
+
+        ! Start of the header
+        write(uid, "(a)", advance = "no") '"x","y","z",'
+        ! Headers for the individual atomic charges
+        do iAtom = 1, nAtoms - 1
+            write(uid, "(a)", advance = "no") '"Atom_' // trim(atom_names(iAtom)) // '_ChargeDensity",'
         end do
+        ! Header for the last atom
+        write(uid, '(a)') '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeDensity"'
+
+        ! Write the data
+        do iPts = 1, nPts
+            ! Writing the first set of values without a comma at the beginning
+            write(uid, "(E24.14E3, ',', E24.14E3, ',', E24.14E3)", advance = "no") (gridv(i, iPts), i = 1, 3)
+            ! Writing the next sets of values with a comma at the beginning
+            do iAtom = 1, nAtoms - 1
+                write(uid, "(',', E24.14E3)", advance = "no") WEIGHTV(iPts, iAtom)
+            end do
+            ! For the last value, write without appending another comma
+            write(uid, "(',', E24.14E3)") WEIGHTV(iPts, nAtoms)
+        end do
+
         close(uid)
     end subroutine Write_Weights
 
@@ -902,40 +892,29 @@ contains
         real   (kind(1d0)), allocatable, intent(out) :: WEIGHTV(:, :)
         real   (kind(1d0)) :: dBuf(3)
         integer :: uid, iPts, iAtom, i
+        character(len = 100) :: headerLine
         allocate(WEIGHTV(nPts, nAtoms))
         !
         write(*, "(a)") "Reading Weights from File"
         !
         !..Read Weights from File
         open(newunit = uid, file = FileName, form = "formatted", status = "old", action = "read")
+
+        ! Skip the header
+        read(uid, "(a)") headerLine
+
+        ! Read the data
         do iPts = 1, nPts
-            read(uid, "(*(e24.14e3,:,','))") (dBuf(i), i = 1, 3), (WEIGHTV(iPts, iAtom), iAtom = 1, nAtoms)
+            read(uid, "(E24.14E3, ',', E24.14E3, ',', E24.14E3)", advance = "no") (dBuf(i), i = 1, 3)
+            do iAtom = 1, nAtoms - 1
+                read(uid, "(',', E24.14E3)", advance = "no") WEIGHTV(iPts, iAtom)
+            end do
+            read(uid, "(',', E24.14E3)") WEIGHTV(iPts, nAtoms)
         end do
+
+        ! Close the file
         close(uid)
     end subroutine Read_Weights
-
-
-    !    subroutine Read_Weights(FileName, WEIGHTV, nAtoms, nPts)
-    !        character(len = *), intent(in) :: FileName
-    !        integer, intent(in) :: nPts, nAtoms
-    !        real   (kind(1d0)), allocatable, intent(out) :: WEIGHTV(:, :)
-    !        real   (kind(1d0)) :: dBuf(3)
-    !        integer :: uid, iPts, iAtom, i
-    !        allocate(WEIGHTV(nPts, nAtoms))
-    !        !
-    !        write(*, "(a)") "Reading Weights from File"
-    !        !
-    !        !..Read Weights from File
-    !        open(newunit = uid, &
-    !                file = FileName, &
-    !                form = "formatted", &
-    !                status = "old", &
-    !                action = "read")
-    !        do iPts = 1, nPts
-    !            read(uid, "(*(x,e24.14e3))") (dBuf(i), i = 1, 3), (WEIGHTV(iPts, iAtom), iAtom = 1, nAtoms)
-    !        end do
-    !        close(uid)
-    !    end subroutine Read_Weights
 
 
 end Module Module_CD_IO

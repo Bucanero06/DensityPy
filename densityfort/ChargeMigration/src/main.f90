@@ -2,14 +2,36 @@
 
 !> \mainpage Program <ProgramName> <Insert here what the program does>
 !!
-!! Synopsis:
+!! Synopsis: <Program Name> <mandatory run-time parameters (RTP)> [<optional RTP>]
 !! ---------
 !!
-!!     <Program Name> <mandatory run-time parameters (RTP)> [<optional RTP>]
+!! ChargeMigration simulates charge migration in molecular systems under external fields.
 !!
 !! ___
 !! Description:
 !! ------------
+!!
+!!
+!!
+!! Key Subroutines:
+!!
+!! LiouvillianPropagator: This central routine simulates the dynamics of a quantum system subject to an external field. It updates the state density matrix zStatRho using the eigenvalues L0_Eval and eigenvectors L0_LEvec, L0_REvec of the Liouvillian operator.
+!!
+!! ComputeLiouvillian_0: Calculates the time-independent Lindblad superoperator (Liouvillian), crucial in describing the time evolution of the density matrix in an open quantum system. It uses system energy eigenvalues Evec, dipole moment matrix Dmat, and parameters like bath_temperature, dephasing_factor, and relaxation_factor.
+!!
+!! DiagonalizeLindblad_0: Performs diagonalization of the Lindblad superoperator Liouvillian0, determining its eigenvalues L0_Eval and eigenvectors L0_LEvec and L0_REvec.
+!!
+!! HilbertToLiouvilleMatrix and LiouvilleToHilbertMatrix: These subroutines transform between Hilbert space matrices and Liouville space vectors. They are crucial for applying the Liouville operator in the simulations.
+!!
+!! ComputeOrbitalDensity: Builds the orbital density matrix Amat from the state density matrix zStatRho and transition density matrices TDM.
+!!
+!! ComputeNewAtomicCharges: Calculates new atomic charges QchargeVec_new from the orbital density OrbitalDensity and Becke matrix Becke_new.
+!!
+!! TabulateChargeDensity: Generates charge density ChDen from the orbital density matrix Amat and orbital table OrbTab.
+!!
+!! ComputeNewBeckeMatrix: Constructs the Becke matrix Becke_new using weights WeightV, orbital table OrbTab, and barycenter coordinates Bary_center.
+!!
+!! ComputeAtomicWeights: Calculates atomic weights WeightV for a given set of points gridv, atomic coordinates AtCoord, and radii Radius_BS.
 !!
 !! Input parameters:      {#Input_Parameters}
 !! =================
@@ -69,7 +91,7 @@ program ChargeMigration
     !.. Expectation Value of the Dipole Moment (Mu)
     complex(kind(1d0)), allocatable :: zMuEV(:, :), zDmat_t(:, :, :)
 
-    integer :: npts, nAtoms, nxpoints
+    integer :: npts, nAtoms
     real(kind(1d0)), allocatable :: gridv(:, :), AtCoord(:, :) ! 3 x npts
     real(kind(1d0)), allocatable :: OrbTab(:, :) ! 3 x npts
     !    real(kind(1d0)) :: volume
@@ -94,9 +116,7 @@ program ChargeMigration
     character(len = 1000) :: strn
     type(pulse_train), pointer :: train(:)
     !..
-    !    B_{ij}^{\alpha} = \int d^3r \phi_i(\vec{r})\phi_j(\vec{r}) w_\alpha(\vec{r})
-    !                    = BeckeMatrix(i,j,alpha)
-    !..
+    !    B_{ij}^{\alpha} = \int d^3r \phi_i(\vec{r})\phi_j(\vec{r}) w_\alpha(\vec{r}) = BeckeMatrix(i,j,alpha)
     real(kind(1d0)), allocatable :: BeckeMatrix   (:, :, :)
     real(kind(1d0)), allocatable :: OrbitalDensity(:, :)
     real(kind(1d0)), allocatable :: Radius_BS(:)
@@ -128,8 +148,8 @@ program ChargeMigration
     close(uid)
     write(*, *) "N_Simulations=", N_Simulations
 
-    !    !.. Print the pulse
-    !    !..
+    !.. Write and Print the pulse
+    !..
     dt = (t_max - t_min) / dble(n_times - 1)
     do i = 1, N_Simulations
         write(*, *) "Writing pulse " // trim(Simulation_Tagv(i))
@@ -138,8 +158,6 @@ program ChargeMigration
         strn = trim(output_directory) // "/Pulses/FTpulse" // trim(Simulation_Tagv(i))
         call train(i)%WriteFTA(strn) !>>pulse_trainWriteFTA
     enddo
-    !    stop!stop here to look at pulses
-    !
     !
     call LoadEnergies(input_directory // "/ROOT_ENERGIES", nStates, Evec)
 
@@ -164,7 +182,6 @@ program ChargeMigration
     !.. Load Geometry,volume, Grid and Orbitals
     call LoadGeometry(nAtoms, AtCoord, molecular_geometry_file, atom_names)
     call LoadGrid(input_directory // "/gridcoord.csv", npts, gridv)! $G=\{\vec{r}_i, i=1,\ldots,N_{G}\}$
-    !        nxpoints = int(exp(log(nPts + 0.1d0) / 3.d0))
     call Computevolume(nPts, Computed_volume, gridv) ! Should probably check that this computed volume is the same as the one given in the input file
 
     !.. Load Orbitals
@@ -177,7 +194,8 @@ program ChargeMigration
         call Read_Weights(Weight_File, WEIGHTV, nAtoms, nPts)
     else
         call ComputeAtomicWeights(nPts, gridv, nAtoms, AtCoord, WeightV, Radius_BS)
-        call Write_Weights(output_directory // "/" // Weight_File // "_" // output_directory // ".csv", WEIGHTV, gridv, nAtoms, nPts)
+        call Write_Weights(output_directory // "/" // Weight_File // "_" // output_directory // ".csv", &
+                WEIGHTV, gridv, nAtoms, nPts, atom_names)
     endif
     !.. Compute Berycenter of Atmoic Charges
     call Compute_R_el(gridv, WeightV, OrbTab, R_el)
@@ -324,6 +342,7 @@ contains
     ! The FIRST_CALL logical variable is used to execute certain lines of code only during the first invocation of the subroutine, primarily for the allocation and initialization of arrays.
     !
     !This subroutine effectively encapsulates a single iteration or time step of the simulation. For a complete simulation over a given time period, this subroutine would typically be called repeatedly in a loop.
+    !*************************************************************************************************
     subroutine LiouvillianPropagator(L0_Eval, L0_LEvec, L0_REvec, zStatRho)
         complex(kind(1d0)), intent(in) :: L0_LEvec(:, :), L0_REvec(:, :), L0_Eval(:)
         complex(kind(1d0)), intent(inout) :: zStatRho(:, :)
@@ -431,6 +450,8 @@ contains
         call ZGEMV("N", nLiou, nLiou, Z1, L0_REvec, nLiou, RhoVec2, 1, Z0, RhoVec, 1)
         call LiouvilleToHilbertMatrix(RhoVec, zStatRho)
     end subroutine LiouvillianPropagator
+    !
+    !*************************************************************************************************
     !.. ComputeLiouvillian_0:  Calculates the time-independent Lindblad superoperator (Liouvillian), a crucial element in the Lindblad master equation, used for describing the time evolution of the density matrix of a quantum system in an open quantum system framework.
     !
     ! Here's a breakdown of the subroutine:
@@ -453,6 +474,7 @@ contains
     ! The total relaxation rate for each state is computed as the sum of the pair relaxation rates involving the state.
     ! Finally, the dissipative part of the Liouvillian, capturing the effects of the interaction of the system with its environment, is computed based on these relaxation rates.
     ! Please note that this subroutine computes the Lindblad superoperator for a specific case where the relaxation and dephasing rates are assumed to be constants and the Lindblad operators are assumed to be proportional to the dipole moment operator. In more complex or specific cases, modifications would be required.
+    !*************************************************************************************************
     subroutine ComputeLiouvillian_0(Evec, Dmat, Liouvillian0, bath_temperature, dephasing_factor, relaxation_factor)
         real   (kind(1d0)), intent(in) :: Evec(:)
         real   (kind(1d0)), intent(in) :: Dmat(:, :, :)
@@ -704,6 +726,19 @@ contains
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     ! Called ... rn not going to organize these yet ... figure out what module they go to
     ! ----------------------------------------------------
+    !
+    !*************************************************************************************************
+    ! DiagonalizeDipole: Purpose: Diagonalizes the dipole matrices in the X, Y, and Z directions.
+    !
+    ! Inputs:
+    ! Dmat(:, :, :): Real 3D array representing the dipole moment matrix.
+    !
+    ! Outputs:
+    ! zUMAT_DX(:, :), zUMAT_DY(:, :), zUMAT_DZ(:, :): Complex 2D arrays for the diagonalized matrices in X, Y, and Z directions, respectively.
+    ! EVEC_DX(:), EVEC_DY(:), EVEC_DZ(:): Real 1D arrays for the eigenvalues of the dipoles in X, Y, and Z directions.
+    !
+    ! Internal Operations: Allocation of matrices, diagonalization using Short_Diag, and assignment of the resultant matrices and eigenvalues.
+    !*************************************************************************************************
     subroutine DiagonalizeDipole(Dmat, EVEC_DX, zUMAT_DX, EVEC_DY, zUMAT_DY, EVEC_DZ, zUMAT_DZ)
         real   (kind(1d0)), intent(in) :: Dmat(:, :, :)
         complex(kind(1d0)), allocatable, intent(out) :: zUMAT_DX(:, :), zUMAT_DY(:, :), zUMAT_DZ(:, :)
@@ -802,15 +837,6 @@ contains
                 R_el(iPol, iAtom) = sum / sum1
             end do
         end do
-
-        !        open(newunit = uid, &
-        !                file = "R_el_bc", & !!!!!!! hard coded
-        !                form = "formatted", &
-        !                status = "unknown")
-        !        do iAtom = 1, nAtoms
-        !            write(uid, "(*(x,e24.14e3))") (R_el(iPol, iAtom), iPol = 1, 3)
-        !        end do
-        !        close(uid)
     end subroutine Compute_R_el
     subroutine AtomicRadius_Bragg_Slater_Becke(atom_names, nAtom, Radius_BS)
         real(kind(1d0)), allocatable, intent(out) :: Radius_BS(:)

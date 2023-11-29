@@ -45,11 +45,16 @@ contains
             strn(i:i) = ch2
         enddo
     end subroutine replace_char
-    character(len = 16) function int2strn(int_num) result(strn)
+
+    function int2strn(int_num) result(strn)
         integer, intent(in) :: int_num
-        write(strn, *)int_num
-        strn = trim(adjustl(strn))
+        character(len = 16) :: strn
+        write(strn, "(i16)") int_num
+        strn = adjustl(strn)
+        strn = trim(strn)
     end function int2strn
+
+
     !> Load the position of the atomic nuclei
     subroutine LoadGeometry(nAtoms, AtCoord, FileName, AtomName)
         !
@@ -226,7 +231,7 @@ contains
             write(uid_AtomicChargeALL, '(a)') '' &
                     // '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeX",' &
                     // '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeY",' &
-                    // '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeZ",'
+                    // '"Atom_' // trim(atom_names(nAtoms)) // '_ChargeZ"'
         end if
 
         ! skip the header
@@ -235,7 +240,19 @@ contains
         do it = 1, nTimes
             t = tmin + dt * dble(it - 1)
             read(uid_AtomicCharge, *) iBuf, dBuf, dBuf, ((Charge(iPol, iAtom, it), iPol = 1, 3), iAtom = 1, nAtoms)
-            write(uid_AtomicChargeALL, "(*(x,e24.16,','))") t, dble(iSim), ((Charge(iPol, iAtom, it), iPol = 1, 3), iAtom = 1, nAtoms)
+!            write(uid_AtomicChargeALL, "(*(x,e24.16,','))") t, dble(iSim), ((Charge(iPol, iAtom, it), iPol = 1, 3), iAtom = 1, nAtoms)
+            write(uid_AtomicChargeALL, "(*(x,e24.16,','))", advance = "no") t, dble(iSim)
+            do iAtom = 1, nAtoms - 1
+                write(uid_AtomicChargeALL, "(*(x,e24.16,','))", advance = "no") &
+                        Charge(1, iAtom, it), &
+                        Charge(2, iAtom, it), &
+                        Charge(3, iAtom, it)
+            end do
+            write(uid_AtomicChargeALL, "(*(x,e24.16,','))", advance = "no") &
+                    Charge(1, nAtoms, it), &
+                    Charge(2, nAtoms, it)
+            write(uid_AtomicChargeALL, "(E24.16)") &
+                    Charge(3, nAtoms, it)
         enddo
         !
         write(uid_AtomicChargeALL, *)
@@ -290,10 +307,12 @@ contains
 
         do iOmega = 1, nOmegas
             w = OmegaVec(iOmega)
-            write(uid_dipoleFT, "((i4,','),*(x,E24.16,','))") iOmega, w, &
+            write(uid_dipoleFT, "(i4,',',*(x,E24.16,','))", advance = "no")  iOmega, w, &
                     dble(DipoleFTtotal(1, iOmega)), aimag(DipoleFTtotal(1, iOmega)), &
-                    dble(DipoleFTtotal(2, iOmega)), aimag(DipoleFTtotal(2, iOmega)), &
+                    dble(DipoleFTtotal(2, iOmega)), aimag(DipoleFTtotal(2, iOmega))
+            write(uid_dipoleFT, "(E24.16,',',E24.16)") &
                     dble(DipoleFTtotal(3, iOmega)), aimag(DipoleFTtotal(3, iOmega))
+
         end do
         close(uid_dipoleFT)
     end subroutine WriteDipoleFTFile
@@ -327,6 +346,8 @@ contains
         real   (kind(1d0)) :: w
         integer :: uid_dipoleALLFT, iOmega, iPol, iPulse
         character(len = 16) :: iPulseStr
+        character(len = 32) :: header
+        character(len = 32) :: trailing_text
 
         open(newunit = uid_dipoleALLFT, &
                 file = FileName, &
@@ -367,16 +388,17 @@ contains
             !
             !        end if
             write(uid_dipoleALLFT, "(a)", advance = "no")  '"number_of_pulses",'
+
             do iPulse = 1, train(iSim)%n
                 iPulseStr = int2strn(iPulse)
-                iPulseStr = trim(iPulseStr)
-                write(uid_dipoleALLFT, "(a)", advance = "no") '"central_time_' // iPulseStr // '",'
-                write(uid_dipoleALLFT, "(a)", advance = "no") '"carrier_frequency_' // iPulseStr // '",'
-                write(uid_dipoleALLFT, "(a)", advance = "no") '"fwhm_' // iPulseStr // '",'
-                write(uid_dipoleALLFT, "(a)", advance = "no") '"carrier_envelope_phase_' // iPulseStr // '",'
-                write(uid_dipoleALLFT, "(a)", advance = "no") '"intensity_' // iPulseStr // '",'
-                write(uid_dipoleALLFT, "(a)", advance = "no") '"amplitude_' // iPulseStr // '",'
-                write(uid_dipoleALLFT, "(a)", advance = "no") '"period_' // iPulseStr // '",'
+                write(uid_dipoleALLFT, "(a)", advance = "no") '"central_time_' // trim(iPulseStr) // '",'
+                write(uid_dipoleALLFT, "(a)", advance = "no") '"carrier_frequency_' // trim(iPulseStr) // '",'
+                write(uid_dipoleALLFT, "(a)", advance = "no") '"fwhm_' // trim(iPulseStr) // '",'
+                write(uid_dipoleALLFT, "(a)", advance = "no") '"carrier_envelope_phase_' // trim(iPulseStr) // '",'
+                write(uid_dipoleALLFT, "(a)", advance = "no") '"intensity_' // trim(iPulseStr) // '",'
+                write(uid_dipoleALLFT, "(a)", advance = "no") '"amplitude_' // trim(iPulseStr) // '",'
+                write(uid_dipoleALLFT, "(a)", advance = "no") '"period_' // trim(iPulseStr) // '",'
+
             end do
             write(uid_dipoleALLFT, "(a)", advance = "no") '"iOmega","OmegaVec",'
             write(uid_dipoleALLFT, '(a)') '' &
@@ -389,9 +411,10 @@ contains
             call Write_Pulse_Columns(train(iSim), uid_dipoleALLFT)
             w = OmegaVec(iOmega)
             !
-            write(uid_dipoleALLFT, "(i4,',',*(x,E24.16,','))") iOmega, w, &
+            write(uid_dipoleALLFT, "(i4,',',*(x,E24.16,','))", advance = "no")  iOmega, w, &
                     dble(DipoleFTtotal(1, iOmega)), aimag(DipoleFTtotal(1, iOmega)), &
-                    dble(DipoleFTtotal(2, iOmega)), aimag(DipoleFTtotal(2, iOmega)), &
+                    dble(DipoleFTtotal(2, iOmega)), aimag(DipoleFTtotal(2, iOmega))
+            write(uid_dipoleALLFT, "(E24.16,',',E24.16)") &
                     dble(DipoleFTtotal(3, iOmega)), aimag(DipoleFTtotal(3, iOmega))
             !
         end do
@@ -435,10 +458,30 @@ contains
 
         do iOmega = 1, nOmegas
             w = OmegaVec(iOmega)
-            write(uid_AtomicChargeFT, "(i4,*(x,E24.16,','))") iOmega, w, ((&
-                    dble (AtomicChargeFT(iOmega, iAtom)), &
-                    aimag(AtomicChargeFT(iOmega, iAtom))), &
-            iAtom = 1, nAtoms)
+!            write(uid_AtomicChargeFT, "(i4,*(x,E24.16,','))") iOmega, w, ((&
+!                    dble (AtomicChargeFT(iOmega, iAtom)), &
+!                    aimag(AtomicChargeFT(iOmega, iAtom))), &
+!            iAtom = 1, nAtoms)
+
+            write(uid_AtomicChargeFT, "(i4,',',*(x,E24.16,','))", advance = "no") iOmega, w
+            do iAtom = 1, nAtoms - 1
+                write(uid_AtomicChargeFT, "(*(x,e24.16,','))", advance = "no") &
+                        dble(AtomicChargeFT(iOmega, iAtom)), &
+                        aimag(AtomicChargeFT(iOmega, iAtom)), &
+                        dble(AtomicChargeFT(iOmega, iAtom)), &
+                        aimag(AtomicChargeFT(iOmega, iAtom)), &
+                        dble(AtomicChargeFT(iOmega, iAtom)), &
+                        aimag(AtomicChargeFT(iOmega, iAtom))
+            end do
+            write(uid_AtomicChargeFT, "(*(x,e24.16,','))", advance = "no") &
+                    dble(AtomicChargeFT(iOmega, nAtoms)), &
+                    aimag(AtomicChargeFT(iOmega, nAtoms)), &
+                    dble(AtomicChargeFT(iOmega, nAtoms)), &
+                    aimag(AtomicChargeFT(iOmega, nAtoms))
+            write(uid_AtomicChargeFT, "(E24.16,',',E24.16)") &
+                    dble(AtomicChargeFT(iOmega, nAtoms)), &
+                    aimag(AtomicChargeFT(iOmega, nAtoms))
+            !
         end do
         close(uid_AtomicChargeFT)
     end subroutine WriteAtomicChargeFT
@@ -465,14 +508,13 @@ contains
             write(uid_AtomicChargeFT, "(a)", advance = "no")  '"number_of_pulses",'
             do iPulse = 1, train(iSim)%n
                 iPulseStr = int2strn(iPulse)
-                iPulseStr = trim(iPulseStr)
-                write(uid_AtomicChargeFT, "(a)", advance = "no") '"central_time_' // iPulseStr // '",'
-                write(uid_AtomicChargeFT, "(a)", advance = "no") '"carrier_frequency_' // iPulseStr // '",'
-                write(uid_AtomicChargeFT, "(a)", advance = "no") '"fwhm_' // iPulseStr // '",'
-                write(uid_AtomicChargeFT, "(a)", advance = "no") '"carrier_envelope_phase_' // iPulseStr // '",'
-                write(uid_AtomicChargeFT, "(a)", advance = "no") '"intensity_' // iPulseStr // '",'
-                write(uid_AtomicChargeFT, "(a)", advance = "no") '"amplitude_' // iPulseStr // '",'
-                write(uid_AtomicChargeFT, "(a)", advance = "no") '"period_' // iPulseStr // '",'
+                write(uid_AtomicChargeFT, "(a)", advance = "no") '"central_time_' // trim(iPulseStr) // '",'
+                write(uid_AtomicChargeFT, "(a)", advance = "no") '"carrier_frequency_' // trim(iPulseStr) // '",'
+                write(uid_AtomicChargeFT, "(a)", advance = "no") '"fwhm_' // trim(iPulseStr) // '",'
+                write(uid_AtomicChargeFT, "(a)", advance = "no") '"carrier_envelope_phase_' // trim(iPulseStr) // '",'
+                write(uid_AtomicChargeFT, "(a)", advance = "no") '"intensity_' // trim(iPulseStr) // '",'
+                write(uid_AtomicChargeFT, "(a)", advance = "no") '"amplitude_' // trim(iPulseStr) // '",'
+                write(uid_AtomicChargeFT, "(a)", advance = "no") '"period_' // trim(iPulseStr) // '",'
             end do
             write(uid_AtomicChargeFT, "(a)", advance = "no") '"iOmega","OmegaVec",'
             do iAtom = 1, nAtoms - 1
@@ -491,7 +533,7 @@ contains
                     // '"Atom_' // trim(AtomName(nAtoms)) // '_FTChargeY_Re",' &
                     // '"Atom_' // trim(AtomName(nAtoms)) // '_FTChargeY_Im",' &
                     // '"Atom_' // trim(AtomName(nAtoms)) // '_FTChargeZ_Re",' &
-                    // '"Atom_' // trim(AtomName(nAtoms)) // '_FTChargeZ_Im",'
+                    // '"Atom_' // trim(AtomName(nAtoms)) // '_FTChargeZ_Im"'
         end if
 
         do iOmega = 1, nOmegas
@@ -507,14 +549,14 @@ contains
                         dble(AtomicChargeFT_new(3, iOmega, iAtom)), &
                         aimag(AtomicChargeFT_new(3, iOmega, iAtom))
             end do
-            write(uid_AtomicChargeFT, "(*(x,e24.16,','))") &
+            write(uid_AtomicChargeFT, "(*(x,e24.16,','))", advance = "no") &
                     dble(AtomicChargeFT_new(1, iOmega, nAtoms)), &
                     aimag(AtomicChargeFT_new(1, iOmega, nAtoms)), &
                     dble(AtomicChargeFT_new(2, iOmega, nAtoms)), &
-                    aimag(AtomicChargeFT_new(2, iOmega, nAtoms)), &
+                    aimag(AtomicChargeFT_new(2, iOmega, nAtoms))
+            write(uid_AtomicChargeFT, "(E24.16,',',E24.16)") &
                     dble(AtomicChargeFT_new(3, iOmega, nAtoms)), &
                     aimag(AtomicChargeFT_new(3, iOmega, nAtoms))
-
         end do
         close(uid_AtomicChargeFT)
     end subroutine WriteAllAtomicChargeFTtoSingleFile
@@ -573,9 +615,10 @@ contains
         write(uid_dipoleFT, "(a)") "OmegaVec,TauOmegaVec,2DDipoleX_Re,2DDipoleX_Im,2DDipoleY_Re,2DDipoleY_Im,2DDipoleZ_Re,2DDipoleZ_Im"
         do iOmegaTau = 1, nTauOmegas
             do iOmega = 1, nOmegas
-                write(uid_dipoleFT, "(*(x,E24.16,','))") OmegaVec(iOmega), TauOmegaVec(iOmegaTau), &
+                write(uid_dipoleFT, "(*(x,E24.16,','))", advance = "no") OmegaVec(iOmega), TauOmegaVec(iOmegaTau), &
                         dble(DipoleFTww(1, iOmega, iOmegaTau)), aimag(DipoleFTww(1, iOmega, iOmegaTau)), &
-                        dble(DipoleFTww(2, iOmega, iOmegaTau)), aimag(DipoleFTww(2, iOmega, iOmegaTau)), &
+                        dble(DipoleFTww(2, iOmega, iOmegaTau)), aimag(DipoleFTww(2, iOmega, iOmegaTau))
+                write(uid_dipoleFT, "(E24.16,',',E24.16)") &
                         dble(DipoleFTww(3, iOmega, iOmegaTau)), aimag(DipoleFTww(3, iOmega, iOmegaTau))
             end do
         enddo
@@ -656,7 +699,7 @@ contains
                 // '"Atom_' // trim(AtomName(nAtoms)) // '_2DChargeY_Re",' &
                 // '"Atom_' // trim(AtomName(nAtoms)) // '_2DChargeY_Im",' &
                 // '"Atom_' // trim(AtomName(nAtoms)) // '_2DChargeZ_Re",' &
-                // '"Atom_' // trim(AtomName(nAtoms)) // '_2DChargeZ_Im",'
+                // '"Atom_' // trim(AtomName(nAtoms)) // '_2DChargeZ_Im"'
 
         do iOmegaTau = 1, nTauOmegas
             do iOmega = 1, nOmegas
@@ -671,13 +714,15 @@ contains
                             aimag(ChargeFTww_new(3, iOmega, iOmegaTau, iAtom))
 
                 end do
-                write(uid_AtomicChargeFT, "(*(x,e24.16,','))") &
+                write(uid_AtomicChargeFT, "(*(x,e24.16,','))", advance = "no") &
                         dble(ChargeFTww_new(1, iOmega, iOmegaTau, nAtoms)), &
                         aimag(ChargeFTww_new(1, iOmega, iOmegaTau, nAtoms)), &
                         dble(ChargeFTww_new(2, iOmega, iOmegaTau, nAtoms)), &
-                        aimag(ChargeFTww_new(2, iOmega, iOmegaTau, nAtoms)), &
+                        aimag(ChargeFTww_new(2, iOmega, iOmegaTau, nAtoms))
+                write(uid_AtomicChargeFT, "(e24.16,',',e24.16)") &
                         dble(ChargeFTww_new(3, iOmega, iOmegaTau, nAtoms)), &
                         aimag(ChargeFTww_new(3, iOmega, iOmegaTau, nAtoms))
+
             end do
         enddo
         close(uid_AtomicChargeFT)

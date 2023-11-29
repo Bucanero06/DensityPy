@@ -45,6 +45,8 @@ def generate_time_delays(number_of_pp, time_delay_start, time_delay_stop):
     elif number_of_pp % 2 == 0:  # even case
         change_in_delay = (time_delay_stop - time_delay_start) / (number_of_pp // 2)
         half_point = number_of_pp // 2
+
+        # TODO if non are negative then from 0 on
         time_delay_range = list(range(-half_point, half_point))
         time_delay_range = [x * change_in_delay for x in time_delay_range]
     else:  # odd case
