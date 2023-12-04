@@ -349,6 +349,27 @@ def find(filename, *args):
         logger.info("exiting...")
         sys.exit()
 
+def get_folders_in_directory(directory):
+    """
+    Returns the folders in a directory.
+
+    :param directory: The path to the directory.
+    :type directory: str
+    :return: The folders in the directory.
+    :rtype: list
+    """
+    return [f for f in os.listdir(directory) if os.path.isdir(os.path.join(directory, f))]
+
+def get_all_files_in_directory(directory):
+    """
+    Returns all files in a directory.
+
+    :param directory: The path to the directory.
+    :type directory: str
+    :return: All files in the directory.
+    :rtype: list
+    """
+    return [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
 
 def get_dipole_values_as_array(filename, string, delimiter):
     """
