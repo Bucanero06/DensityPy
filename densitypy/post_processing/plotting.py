@@ -1,8 +1,4 @@
-import os
-import re
-
-from matplotlib import pyplot as plt
-from matplotlib.colors import Normalize
+import pandas as pd
 
 DEFAULT_DIPOLE_COLUMNS_COLOR_MAPPING = {
     'DipoleX_Re': 'blue',
@@ -12,239 +8,442 @@ DEFAULT_DIPOLE_COLUMNS_COLOR_MAPPING = {
     'DipoleY_Im': 'lightgreen',
     'DipoleZ_Im': 'pink',
 }
-import pandas as pd
-import plotly.graph_objs as go
-from plotly.subplots import make_subplots
-
-from densitypy.project_utils.logger import setup_logger
-
-logger = setup_logger(__name__)
-AGGREGATE_FILES = [  # fixme
-    ('all', "DipoleFT_ALL.csv"),
-    ('ww', "DipolePP_ww.csv")
-]
 
 
-class PlotDipolesSimulation:  # todo change x axis to be time where appropriate rather than the index of timestep
-    def __init__(self, study_directory, experiment_directory, dpi=300):
-        self.palette = [
-            [0.00, 0.00, 0.00, 0.50],
-            [0.10, 0.00, 0.50, 1.00],
-            [0.17, 0.00, 1.00, 1.00],
-            [0.25, 0.00, 1.00, 0.50],
-            [0.34, 0.50, 1.00, 0.00],
-            [0.46, 1.00, 1.00, 0.00],
-            [0.61, 1.00, 0.50, 0.00],
-            [1.00, 0.50, 0.00, 0.00]
-        ]
-        self.dipoles_dir = f"{study_directory}/{experiment_directory}/Dipole"
-        self.atomic_charge_dir = f"{study_directory}/{experiment_directory}/AtomicCharge"
-        self.pulse_dir = f"{study_directory}/{experiment_directory}/Pulse"
-        self.dpi = dpi
-        self.height = 1080
-        self.width = 1920
+def plot_pulses(study_directory, experiment_directory, time_delays):
+    # pulsePP{delay}
+    # Time: The time at which the following measurements are taken, typically in atomic units (a.u.).
+    # Ax: The x-component of the vector potential. This is calculated as the real part of the difference between zw_m1 and zw_p1, normalized by sqrt(2).
+    # Ay: The y-component of the vector potential. Computed as the imaginary part of the sum of zw_m1 and zw_p1, normalized by sqrt(2).
+    # Az: The z-component of the vector potential, calculated as the real part of zw_p0.
+    # Real_zw_m1: The real part of the vector potential zw_m1, which represents one of the spherical components of the vector potential at the specified time.
+    # Imag_zw_m1: The imaginary part of zw_m1.
+    # Real_zw_p0: The real part of zw_p0, another spherical component of the vector potential.
+    # Imag_zw_p0: The imaginary part of zw_p0.
+    # Real_zw_p1: The real part of zw_p1, the third spherical component of the vector potential.
+    # Imag_zw_p1: The imaginary part of zw_p1
 
-    def load_df(self, filename_or_df):
-        if isinstance(filename_or_df, str):
-            return pd.read_csv(filename_or_df, sep=',', index_col=0)
-        elif isinstance(filename_or_df, pd.DataFrame):
-            return filename_or_df
+    zero_time_delay = min(time_delays, key=lambda x: abs(x - 0))
+    one_third_max_time_delay = min(time_delays, key=lambda x: abs(x - max(time_delays) / 3))
+    two_third_max_time_delay = min(time_delays, key=lambda x: abs(x - 2 * max(time_delays) / 3))
+    max_time_delay = min(time_delays, key=lambda x: abs(x - max(time_delays)))
+
+    # Lets also do the same for the minimum time delay and the "thirds" splits as before (remember to get as close as possible to a number
+    min_time_delay = min(time_delays, key=lambda x: abs(x - min(time_delays)))
+    one_third_min_time_delay = min(time_delays, key=lambda x: abs(x - min(time_delays) / 3))
+    two_third_min_time_delay = min(time_delays, key=lambda x: abs(x - 2 * min(time_delays) / 3))
+
+    length_of_data_to_match = None
+
+    for time_delay in ['XUV'] + time_delays:
+        file_path = f'{study_directory}/{experiment_directory}/Pulses/pulsePP{time_delay}' if time_delay != 'XUV' else f'{study_directory}/{experiment_directory}/Pulses/pulseXUV'
+
+        print(f'Plotting {file_path}')
+        try:
+            data = pd.read_csv(file_path, delim_whitespace=True, header=None,
+                               names=[
+                                   'Time',
+                                   'Ax',
+                                   'Ay',
+                                   'Az',
+                                   'Real_zw_m1',
+                                   'Imag_zw_m1',
+                                   'Real_zw_p0',
+                                   'Imag_zw_p0',
+                                   'Real_zw_p1',
+                                   'Imag_zw_p1'
+                               ])
+        except FileNotFoundError:
+            print(f'File {file_path} not found')
+            continue
+
+        if length_of_data_to_match is None:
+            length_of_data_to_match = len(data)
         else:
-            raise ValueError('filename_or_df must be a string or a pandas DataFrame')
+            assert length_of_data_to_match == len(data), f'Length of {file_path} is not the same as the previous file'
 
-    def init_plot(self):
-        fig, ax1 = plt.subplots(figsize=(self.width / self.dpi, self.height / self.dpi), dpi=self.dpi)
-        return fig, ax1
+        # print all columns in pandas
+        pd.set_option('display.max_columns', None)
+        print(data.head())
+        print(len(data))
 
-    def plot_dataframe(self, cols, filename_or_df, output_filename):
-        logger.info(f'Plotting {output_filename} using columns: {cols}')
-        df = self.load_df(filename_or_df)
-        fig, ax1 = self.init_plot()
+        # Plotting the pulse data (pulsePP0.0)
+        from matplotlib import pyplot as plt
 
-        for col in cols:
-            if df[col].std() != 0:  # Don't plot if standard deviation is zero
-                ax1.plot(df.index, df[col], color=DEFAULT_DIPOLE_COLUMNS_COLOR_MAPPING[col], label=col)
-
-        plt.xlabel('Time (a.u.)')
-        plt.ylabel('Dipole (a.u.)')
+        plt.figure(figsize=(12, 6))
+        for col in data.columns[1:]:
+            plt.plot(data['Time'], data[col], label=f'Column {col}')
+        # plt.plot(data['Time'], data['Ax'], label=f'Column Ax')
+        plt.xlabel('Time (arbitrary units)')
+        plt.ylabel('Value')
+        if time_delay != 'XUV':
+            plt.title(f'Pulse Characteristics (pulsePP{time_delay})')
+        else:
+            plt.title(f'Pulse Characteristics (pulseXUV)')
         plt.legend()
-        plt.savefig(output_filename, dpi=self.dpi)
-        plt.close()
-
-    def plot_twinx_dipoles(self, cols_re, cols_im, filename_or_df, output_filename):
-        logger.info(f'Plotting {output_filename} using columns: {cols_re} and {cols_im}')
-
-        if isinstance(filename_or_df, str):
-            df = pd.read_csv(filename_or_df, sep=',', index_col=0)
-        elif isinstance(filename_or_df, pd.DataFrame):
-            df = filename_or_df
-        else:
-            raise ValueError('filename_or_df must be a string or a pandas DataFrame')
-
-        plt.figure(figsize=(self.width / self.dpi, self.height / self.dpi), dpi=self.dpi)
-
-        fig, ax1 = plt.subplots(figsize=(self.width / self.dpi, self.height / self.dpi), dpi=self.dpi)
-        ax2 = ax1.twinx()
-
-        for col in cols_re:
-            if df[col].std() != 0:  # Don't plot if standard deviation is zero
-                ax1.plot(df.index, df[col], color=DEFAULT_DIPOLE_COLUMNS_COLOR_MAPPING[col], label=col)
-
-        for col in cols_im:
-            if df[col].std() != 0:  # Don't plot if standard deviation is zero
-                ax2.plot(df.index, df[col], color=DEFAULT_DIPOLE_COLUMNS_COLOR_MAPPING[col], label=col)
-
-        ax1.set_xlabel('Time (a.u.)')
-        ax1.set_ylabel('Dipole (Real, a.u.)')
-        ax2.set_ylabel('Dipole (Imaginary, a.u.)')
-
-        # Align zeros
-        ax1.set_ylim(bottom=-max(abs(ax1.get_ylim()[0]), ax1.get_ylim()[1]),
-                     top=max(abs(ax1.get_ylim()[0]), ax1.get_ylim()[1]))
-        ax2.set_ylim(bottom=-max(abs(ax2.get_ylim()[0]), ax2.get_ylim()[1]),
-                     top=max(abs(ax2.get_ylim()[0]), ax2.get_ylim()[1]))
-
-        fig.legend()
-        plt.savefig(output_filename, dpi=self.dpi)
-        plt.close()
-
-    def plot_interactive_dipoles(self, cols_re, cols_im, filename_or_df, output_filename):
-        logger.info(f'Plotting {output_filename} using columns: {cols_re} and {cols_im}')
-        if isinstance(filename_or_df, str):
-            df = pd.read_csv(f'{self.dipoles_dir}/DipolePP0.0.csv', sep=',', index_col=0)
-        elif isinstance(filename_or_df, pd.DataFrame):
-            df = filename_or_df
-        else:
-            raise ValueError('filename_or_df must be a string or a pandas DataFrame')
-
-        fig = make_subplots(specs=[[{"secondary_y": True}]])
-
-        min_re, max_re, min_im, max_im = float('inf'), float('-inf'), float('inf'), float('-inf')
-        for col in cols_re:
-            if df[col].std() != 0:  # Don't plot if standard deviation is zero
-                fig.add_trace(
-                    go.Scatter(x=df.index, y=df[col], name=col, line_color=DEFAULT_DIPOLE_COLUMNS_COLOR_MAPPING[col]),
-                    secondary_y=False)
-                min_re, max_re = min(min_re, df[col].min()), max(max_re, df[col].max())
-
-        for col in cols_im:
-            if df[col].std() != 0:  # Don't plot if standard deviation is zero
-                fig.add_trace(
-                    go.Scatter(x=df.index, y=df[col], name=col, line_color=DEFAULT_DIPOLE_COLUMNS_COLOR_MAPPING[col]),
-                    secondary_y=True)
-                min_im, max_im = min(min_im, df[col].min()), max(max_im, df[col].max())
-
-        # Align zeros
-        max_range_re = max(abs(min_re), abs(max_re))
-        max_range_im = max(abs(min_im), abs(max_im))
-
-        fig.update_layout(height=1080, width=1920, title_text="Dipoles")
-        fig.update_xaxes(title_text="Time (a.u.)")
-        fig.update_yaxes(title_text="Dipole (Real, a.u.)", range=[-max_range_re, max_range_re], secondary_y=False)
-        fig.update_yaxes(title_text="Dipole (Imaginary, a.u.)", range=[-max_range_im, max_range_im], secondary_y=True)
-
-        fig.write_html(output_filename)
-
-    def plot_pp_dipole_file(self, label, file_path):
-        logger.info('Plotting all dipoles')
-        df = self.load_df(f'{self.dipoles_dir}/{file_path}')
-
-        self.plot_dataframe(['DipoleX_Re', 'DipoleY_Re', 'DipoleZ_Re'], df, f'{self.dipoles_dir}/Dipole_Re_{label}.png')
-        self.plot_dataframe(['DipoleX_Im', 'DipoleY_Im', 'DipoleZ_Im'], df, f'{self.dipoles_dir}/Dipole_Im_{label}.png')
-        self.plot_dataframe(['DipoleX_Re', 'DipoleX_Im', 'DipoleY_Re', 'DipoleY_Im', 'DipoleZ_Re', 'DipoleZ_Im'], df,
-                            f'{self.dipoles_dir}/Dipole_{label}.png')
-        self.plot_twinx_dipoles(['DipoleX_Re', 'DipoleY_Re', 'DipoleZ_Re'], ['DipoleX_Im', 'DipoleY_Im', 'DipoleZ_Im'],
-                                df, f'{self.dipoles_dir}/Dipole_Re_Im_{label}.png')
-        self.plot_interactive_dipoles(['DipoleX_Re', 'DipoleY_Re', 'DipoleZ_Re'],
-                                      ['DipoleX_Im', 'DipoleY_Im', 'DipoleZ_Im'], df,
-                                      f'{self.dipoles_dir}/Dipole_Re_Im_{label}.html')
-
-    @staticmethod
-    def build_sim_tagv(time_number):
-        return f'{time_number:.1f}'
-
-    @property
-    def get_every_pp_csv_file_names(self):
-        pattern = re.compile(r'DipolePP(-?\d+\.?\d*)\.csv')
-        return [(float(pattern.match(f).group(1)), f) for f in os.listdir(self.dipoles_dir) if
-                pattern.match(f) is not None]
-
-    @property
-    def get_every_ftpp_csv_file_names(self):
-        pattern = re.compile(r'DipoleFTPP(-?\d+\.?\d*)\.csv')
-        return [(float(pattern.match(f).group(1)), f) for f in os.listdir(self.dipoles_dir) if
-                pattern.match(f) is not None]
-
-    @property
-    def get_every_aggregate_csv_file_names(self):
-        return AGGREGATE_FILES
-
-    @staticmethod
-    def interpolate_colormap(start_color, end_color, n):
-        import numpy as np
-        import matplotlib.colors as mcolors
-
-        start_rgb = np.array(mcolors.to_rgb(start_color))
-        end_rgb = np.array(mcolors.to_rgb(end_color))
-
-        return [start_rgb + i * (end_rgb - start_rgb) for i in np.linspace(0, 1, n)]
-
-    def plot_ftpp_all(self):
-        import numpy as np
-        import matplotlib.pyplot as plt
-        import matplotlib.colors as mcolors
-
-        aggregate_files = self.get_every_aggregate_csv_file_names
-
-        # Filter files with 'all'
-        all_file = [filename for keyword, filename in aggregate_files if keyword == 'all'][0]
-        # Assuming each file has similar data structure (e.g., same columns)
-        # ['number_of_pulses', 'central_time_1  ', 'carrier_frequency', 'fwhm',
-        #  'carrier_envelope_phase', 'intensity', 'amplitude', 'period',
-        #  'central_time_2  ', 'carrier_frequency.1', 'fwhm.1',
-        #  'carrier_envelope_phase.1', 'intensity.1', 'amplitude.1', 'period.1',
-        #  'iOmega', 'Omega', 'DipoleX_Re', 'DipoleX_Im', 'DipoleY_Re',
-        #  'DipoleY_Im', 'DipoleZ_Re', 'DipoleZ_Im']
-        df = self.load_df(f'{self.dipoles_dir}/{all_file}')
-
-
-        # Compute Z_Value column
-        cols = ['DipoleX_Re', # 18
-                # 'DipoleX_Im', # 19
-                'DipoleY_Re', # 20
-                # 'DipoleY_Im', # 21
-                'DipoleZ_Re', # 22
-                # 'DipoleZ_Im' # 23
-                ]
-
-        # splot [][0.2:0.48] 'sim1/Dipole/DipoleFT_ALL' u 9:17:((($18**2+$19**2+$20**2+$21**2+$22**2+$23**2)/3)**(0.5)) w l notitle
-
-
-
-        print(df.columns)
-        exit()
-        X = df["central_time"] # fixme found 2 of this column in the DipoleFT_ALL.csv file
-        Y = df["Omega"]
-        df['averaged_density'] = (sum(df[col] ** 2 for col in cols) / 3) ** 0.5
-        Z = df['averaged_density']
-
-        import matplotlib.pyplot as plt
-        from mpl_toolkits.mplot3d import Axes3D
-
-        # Create a 3D plot
-        fig = plt.figure(figsize=(10, 8))
-        ax = fig.add_subplot(111, projection='3d')
-
-        # Scatter plot
-        ax.scatter(df['central_time'], df['Omega'], df['averaged_density'], c=df['averaged_density'], cmap='viridis')
-
-        # Setting labels
-        ax.set_xlabel('Central Time')
-        ax.set_ylabel('Omega')
-        ax.set_zlabel('Averaged Density')
-        ax.set_title('3D Plot of Central Time, Omega and Averaged Density')
-
+        plt.grid(True)
         plt.show()
 
+    plt.clf()
 
 
+
+def plot_ft_pulses(study_directory, experiment_directory, time_delays):
+    # FTpulsePP{delay}
+    # Freq: The frequency at which the Fourier transform is computed.
+    # FTAx: The x-component of the Fourier-transformed vector potential.
+    # FTAy: The y-component of the Fourier-transformed vector potential.
+    # FTAz: The z-component of the Fourier-transformed vector potential.
+    # FT_Aminus1_Real and FT_Aminus1_Imag: The real and imaginary parts of the Fourier transform for the mu = -1 component.
+    # FT_A0_Real and FT_A0_Imag: The real and imaginary parts of the Fourier transform for the mu = 0 component.
+    # FT_Aplus1_Real and FT_Aplus1_Imag: The real and imaginary parts of the Fourier transform for the mu = +1 component.
+
+    zero_time_delay = min(time_delays, key=lambda x: abs(x - 0))
+    one_third_max_time_delay = min(time_delays, key=lambda x: abs(x - max(time_delays) / 3))
+    two_third_max_time_delay = min(time_delays, key=lambda x: abs(x - 2 * max(time_delays) / 3))
+    max_time_delay = min(time_delays, key=lambda x: abs(x - max(time_delays)))
+
+    # Lets also do the same for the minimum time delay and the "thirds" splits as before (remember to get as close as possible to a number
+    min_time_delay = min(time_delays, key=lambda x: abs(x - min(time_delays)))
+    one_third_min_time_delay = min(time_delays, key=lambda x: abs(x - min(time_delays) / 3))
+    two_third_min_time_delay = min(time_delays, key=lambda x: abs(x - 2 * min(time_delays) / 3))
+
+    for time_delay in ['XUV'] + time_delays:
+        file_path = f'{study_directory}/{experiment_directory}/Pulses/FTpulsePP{time_delay}' if time_delay != 'XUV' else f'{study_directory}/{experiment_directory}/Pulses/FTpulseXUV'
+        #
+        try:
+            data = pd.read_csv(file_path, delim_whitespace=True, header=None,
+                               names=[
+                                   'Freq',
+                                   'FTAx',
+                                   'FTAy',
+                                   'FTAz',
+                                   'FT_Aminus1_Real',
+                                   'FT_Aminus1_Imag',
+                                   'FT_A0_Real',
+                                   'FT_A0_Imag',
+                                   'FT_Aplus1_Real',
+                                   'FT_Aplus1_Imag'
+                               ])
+        except FileNotFoundError:
+            print(f'File {file_path} not found')
+            continue
+
+        # print all columns in pandas
+        pd.set_option('display.max_columns', None)
+        print(data.head())
+        print(len(data))
+
+        # Plotting the pulse data (pulsePP0.0)
+        from matplotlib import pyplot as plt
+
+        plt.figure(figsize=(12, 6))
+        for col in data.columns[1:]:
+            plt.plot(data['Freq'], data[col], label=f'Column {col}')
+        # plt.plot(data['Time'], data['Ax'], label=f'Column Ax')
+        plt.xlabel('Frequency (arbitrary units)')
+        plt.ylabel('Value')
+        if time_delay != 'XUV':
+            plt.title(f'Pulse Characteristics (FTpulsePP{time_delay})')
+        else:
+            plt.title(f'Pulse Characteristics (FTpulseXUV)')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    # Clear the plot
+    plt.clf()
+
+
+
+def plot_dipole_response_vs_time(study_directory, experiment_directory, time_delays):
+    # Lets plot the Dipolar Reponse vs Time (t)
+    # "itime","Time","DipoleX_Re","DipoleX_Im","DipoleY_Re","DipoleY_Im","DipoleZ_Re","DipoleZ_Im"
+
+    # Use the time_delays to get the files to plot
+    # Time delays to plot = [0, 1/3 max, 2/3 max, max] if not present then use the nearest. Do the same for min
+    zero_time_delay = min(time_delays, key=lambda x: abs(x - 0))
+    one_third_max_time_delay = min(time_delays, key=lambda x: abs(x - max(time_delays) / 3))
+    two_third_max_time_delay = min(time_delays, key=lambda x: abs(x - 2 * max(time_delays) / 3))
+    max_time_delay = min(time_delays, key=lambda x: abs(x - max(time_delays)))
+
+    # Lets also do the same for the minimum time delay and the "thirds" splits as before (remember to get as close as possible to a number
+    min_time_delay = min(time_delays, key=lambda x: abs(x - min(time_delays)))
+    one_third_min_time_delay = min(time_delays, key=lambda x: abs(x - min(time_delays) / 3))
+    two_third_min_time_delay = min(time_delays, key=lambda x: abs(x - 2 * min(time_delays) / 3))
+
+    DIPOLE_PP_FILES_TO_PLOT_PATHS = [
+        f'{study_directory}/{experiment_directory}/Dipole'
+        f'/DipoleXUV.csv',
+        f'{study_directory}/{experiment_directory}/Dipole'
+        f'/DipolePP{min_time_delay}.csv',
+        f'{study_directory}/{experiment_directory}/Dipole'
+        f'/DipolePP{one_third_min_time_delay}.csv',
+        f'{study_directory}/{experiment_directory}/Dipole'
+        f'/DipolePP{two_third_min_time_delay}.csv',
+        f'{study_directory}/{experiment_directory}/Dipole'
+        f'/DipolePP{zero_time_delay}.csv',
+        f'{study_directory}/{experiment_directory}/Dipole'
+        f'/DipolePP{one_third_max_time_delay}.csv',
+        f'{study_directory}/{experiment_directory}/Dipole'
+        f'/DipolePP{two_third_max_time_delay}.csv',
+        f'{study_directory}/{experiment_directory}/Dipole'
+        f'/DipolePP{max_time_delay}.csv',
+    ]
+
+    length_of_data_to_match = None
+    INDECES_COL_NAMES = ['itime', 'Time']
+    FEATURES_COL_NAMES = [
+        'DipoleX_Re',
+        'DipoleX_Im',
+        'DipoleY_Re',
+        'DipoleY_Im',
+        'DipoleZ_Re',
+        'DipoleZ_Im'
+    ]
+    import matplotlib.pyplot as plt
+
+    for file_path in DIPOLE_PP_FILES_TO_PLOT_PATHS:
+        print(f'Plotting {file_path}')
+        try:
+            data = pd.read_csv(file_path)
+        except FileNotFoundError:
+            print(f'File {file_path} not found')
+            continue
+
+        if length_of_data_to_match is None:
+            length_of_data_to_match = len(data)
+        else:
+            assert length_of_data_to_match == len(data), f'Length of {file_path} is not the same as the previous file'
+            assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+
+        # Extracting relevant data for plotting
+        time = data['Time']
+        dipole_x_re = data['DipoleX_Re']
+        dipole_x_im = data['DipoleX_Im']
+        dipole_y_re = data['DipoleY_Re']
+        dipole_y_im = data['DipoleY_Im']
+        dipole_z_re = data['DipoleZ_Re']
+        dipole_z_im = data['DipoleZ_Im']
+
+        # Plotting the real and imaginary parts of the dipole components
+        plt.figure(figsize=(16, 12))
+        # Add the Main Top Title for the plot (file_path)
+        plt.suptitle(file_path)
+        plt.subplot(3, 2, 1)
+        plt.plot(time, dipole_x_re)
+        plt.title('Dipole X Real')
+        plt.xlabel('Time')
+        plt.ylabel('Dipole X Re')
+
+        plt.subplot(3, 2, 2)
+        plt.plot(time, dipole_x_im)
+        plt.title('Dipole X Imaginary')
+        plt.xlabel('Time')
+        plt.ylabel('Dipole X Im')
+
+        plt.subplot(3, 2, 3)
+        plt.plot(time, dipole_y_re)
+        plt.title('Dipole Y Real')
+        plt.xlabel('Time')
+        plt.ylabel('Dipole Y Re')
+
+        plt.subplot(3, 2, 4)
+        plt.plot(time, dipole_y_im)
+        plt.title('Dipole Y Imaginary')
+        plt.xlabel('Time')
+        plt.ylabel('Dipole Y Im')
+
+        plt.subplot(3, 2, 5)
+        plt.plot(time, dipole_z_re)
+        plt.title('Dipole Z Real')
+        plt.xlabel('Time')
+        plt.ylabel('Dipole Z Re')
+
+        plt.subplot(3, 2, 6)
+        plt.plot(time, dipole_z_im)
+        plt.title('Dipole Z Imaginary')
+        plt.xlabel('Time')
+        plt.ylabel('Dipole Z Im')
+
+        plt.tight_layout()
+        plt.show()
+
+        # Lets Get the Dipole Analytical Metrics
+        # correlation = data.corr()
+
+    plt.clf()
+
+
+def plot_2d_spectrum(study_directory, experiment_directory):
+    OMEGA_TAUOMEGA_FILE_NAMES = [
+        'Dipole/DipoleFT_ww.csv',
+        'Dipole/DipoleFT_ww_reconstructed.csv',
+    ]
+    OMEGA_TAUOMEGA_FILE_PATHS = [f'{study_directory}/{experiment_directory}/{file_name}' for file_name in
+                                 OMEGA_TAUOMEGA_FILE_NAMES]
+
+    length_of_data_to_match = None
+    INDECES_COL_NAMES = ['OmegaVec', 'TauOmegaVec']
+    FEATURES_COL_NAMES = [
+        '2DDipoleX_Re',
+        '2DDipoleX_Im',
+        '2DDipoleY_Re',
+        '2DDipoleY_Im',
+        '2DDipoleZ_Re',
+        '2DDipoleZ_Im'
+    ]
+
+    for file_path in OMEGA_TAUOMEGA_FILE_PATHS:
+        # Load the CSV file
+        print(f'Plotting {file_path}')
+        data = pd.read_csv(file_path)
+
+        if length_of_data_to_match is None:
+            length_of_data_to_match = len(data)
+        else:
+            assert length_of_data_to_match == len(data), f'Length of {file_path} is not the same as the previous file'
+            assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+
+        # Displaying the first few rows of the file to understand its structure
+        print(data.head())
+
+        # Lets check length of the data
+        print(len(data))
+
+        # Calculating the average of all polarizations
+
+        averaged_density = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
+
+        # Adding the averaged density to the DataFrame
+        data['AveragedDensity'] = averaged_density
+
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        # Preparing the data for plotting
+        omega_values = data['OmegaVec'].unique()
+        tauomega_values = data['TauOmegaVec'].unique()
+
+        # Creating a meshgrid for plotting
+        omega_grid, tauomega_grid = np.meshgrid(omega_values, tauomega_values, indexing='ij')
+
+        # Reshaping 'AveragedDensity' to match the shape of the meshgrid
+        averaged_density_grid = data['AveragedDensity'].values.reshape(omega_grid.shape)
+
+        # Plotting
+        plt.figure(figsize=(10, 8))
+        plt.contourf(omega_grid, tauomega_grid, averaged_density_grid, levels=100, cmap='viridis')
+        plt.colorbar(label='Averaged Density')
+        plt.xlabel('OmegaVec')
+        plt.ylabel('TauOmegaVec')
+        plt.title(f'2D Spectra Plot of Averaged {file_path}')
+        plt.show()
+
+        ##############
+        from scipy.signal import find_peaks
+        from sklearn.preprocessing import MinMaxScaler
+
+        # Adjusting peak analysis to be sensitive to both positive and negative values
+        # Here, we'll find peaks on the absolute values of the max density along omega
+        peaks_positive, _ = find_peaks(averaged_density_grid.max(axis=0))  # positive peaks
+        peaks_negative, _ = find_peaks(-averaged_density_grid.max(axis=0))  # negative peaks
+
+        # Dynamic range adjustment for the contour plots
+        # Using percentiles to set color scale limits
+        percentile_5 = np.percentile(averaged_density_grid, 5)
+        percentile_95 = np.percentile(averaged_density_grid, 95)
+
+        # Symmetrical color map for first derivative
+        first_derivative = np.gradient(averaged_density_grid, axis=0)  # recalculating first derivative
+        derivative_min = np.percentile(first_derivative, 5)
+        derivative_max = np.percentile(first_derivative, 95)
+        derivative_abs_max = max(abs(derivative_min), abs(derivative_max))
+
+        # Plotting with adjustments
+        fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+
+        # Adjusted Peak Analysis Plot
+        axes[0, 0].plot(omega_values, averaged_density_grid.max(axis=0))
+        axes[0, 0].plot(omega_values[peaks_positive], averaged_density_grid.max(axis=0)[peaks_positive], "x",
+                        color='blue')
+        axes[0, 0].plot(omega_values[peaks_negative], averaged_density_grid.max(axis=0)[peaks_negative], "x",
+                        color='red')
+        axes[0, 0].set_title("Adjusted Peak Analysis")
+
+        # Adjusted Normalized Density
+        axes[0, 1].contourf(omega_grid, tauomega_grid, averaged_density_grid, levels=100, cmap='viridis',
+                            vmin=percentile_5, vmax=percentile_95)
+        axes[0, 1].set_title("Adjusted Normalized Density")
+
+        # Adjusted First Derivative
+        axes[1, 0].contourf(omega_grid, tauomega_grid, first_derivative, levels=100, cmap='seismic',
+                            vmin=-derivative_abs_max, vmax=derivative_abs_max)
+        axes[1, 0].set_title("Adjusted First Derivative")
+
+        # Integrated Density
+        scaler = MinMaxScaler()
+        normalized_density = scaler.fit_transform(averaged_density_grid)
+        integrated_density = np.trapz(normalized_density, axis=0)  # integrating along tauomega
+        # The plot for integrated density remains unchanged
+        axes[1, 1].plot(omega_values, integrated_density)
+        axes[1, 1].set_title("Integrated Density")
+
+        plt.tight_layout()
+        plt.show()
+
+        from scipy.signal import savgol_filter
+
+        # 1. Rethinking Peak Analysis
+        # Applying a more sophisticated peak detection method
+        filtered_density_max = savgol_filter(averaged_density_grid.max(axis=0), window_length=51, polyorder=3)
+        peaks_refined, _ = find_peaks(filtered_density_max, prominence=0.1)  # using prominence as a criterion
+
+        # 2. Reconsidering Normalization and Baseline Correction
+        # Applying a baseline correction using a polynomial fit (for example)
+        coefficients = np.polyfit(omega_values, averaged_density_grid.min(axis=0), deg=5)
+        baseline_poly = np.polyval(coefficients, omega_values)
+        corrected_density_poly = averaged_density_grid - baseline_poly[:, None]
+
+        # Normalization after baseline correction
+        normalized_density_poly = scaler.fit_transform(corrected_density_poly)
+
+        # 3. First Derivative Analysis
+        # Applying smoothing before differentiation
+        smoothed_density = savgol_filter(normalized_density_poly, window_length=51, polyorder=3, axis=0)
+        first_derivative_smoothed = np.gradient(smoothed_density, axis=0)
+
+        # 4. Contour Plot Adjustments
+        # Using standard deviations for dynamic scaling
+        std_dev = np.std(smoothed_density)
+        contour_min = np.mean(smoothed_density) - 2 * std_dev
+        contour_max = np.mean(smoothed_density) + 2 * std_dev
+
+        # 5. Integration of Density
+        # Integration considering the entire range
+        integrated_density_smoothed = np.trapz(smoothed_density, axis=0)
+
+        # Plotting with revised strategies
+        fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+
+        # Refined Peak Analysis Plot
+        axes[0, 0].plot(omega_values, filtered_density_max)
+        axes[0, 0].plot(omega_values[peaks_refined], filtered_density_max[peaks_refined], "x")
+        axes[0, 0].set_title("Refined Peak Analysis")
+
+        # Normalized Density with Baseline Correction
+        axes[0, 1].contourf(omega_grid, tauomega_grid, normalized_density_poly, levels=100, cmap='viridis',
+                            vmin=contour_min, vmax=contour_max)
+        axes[0, 1].set_title("Normalized Density with Baseline Correction")
+
+        # First Derivative (Smoothed)
+        axes[1, 0].contourf(omega_grid, tauomega_grid, first_derivative_smoothed, levels=100, cmap='seismic',
+                            vmin=-std_dev, vmax=std_dev)
+        axes[1, 0].set_title("First Derivative (Smoothed)")
+
+        # Integrated Density (Smoothed)
+        axes[1, 1].plot(omega_values, integrated_density_smoothed)
+        axes[1, 1].set_title("Integrated Density (Smoothed)")
+
+        plt.tight_layout()
+        plt.show()

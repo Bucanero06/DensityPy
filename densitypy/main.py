@@ -6,14 +6,16 @@ from os import path, system
 
 from densitypy.Default_Settings.default_config import DEFAULT_BIN_FILE_PATH
 from densitypy.charge_migration.chargemigratonscripts import Write_FieldHelp, Write_Pulses, Call_Charge_Migration, \
-    Save_Previous_FT, Call_Charge_MigrationFT, Call_Spectrum_Reconstruction_n_Difference, Save_Spectrum_Difference, \
-    generate_time_delays
+    Save_Previous_FT, Call_Charge_MigrationFT, Call_Spectrum_Reconstruction_n_Difference, \
+    Save_Previous_Spectrum_Difference, \
+    generate_time_delays, Dipole_Charge_Comparison
 from densitypy.molcas.DipolesLogParser import DipolesLogParser
 from densitypy.molcas.molcasscripts import create_help_input_file, copy_and_parse_molcas_input_file_to_edit, \
     make_better_grid, \
     make_grid_coordinates, add_grid_it_to_manual_input_file, call_open_molcas, parse_project_grid_file, \
     load_project_rasscf_h5_file, write_grid_density_file
 from densitypy.molcas.selectionofactivespace import SelectionOfActiveSpace
+from densitypy.post_processing.plotting import plot_dipole_response_vs_time, plot_pulses, plot_ft_pulses
 from densitypy.project_utils.configuration_parser import parse_configuration_file
 from densitypy.project_utils.def_functions import make_directory, file_lenth, copy_file_to, find, \
     change_directory_manager
@@ -90,6 +92,7 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
         number_of_states = project_settings['numberofstates']
         list_of_orbitals = project_settings['listofactiveorbitals']
         molcas_output_directory = project_settings['molcasoutputdirectory']
+        experiment_directory = project_settings['experimentdirectory']
 
         # Grid Settings
         nx = grid_settings['numberofpointsxaxis']
@@ -105,7 +108,6 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
         boundary = grid_settings['boundary']
 
         # Charge Migration Parameters
-        experiment_directory = charge_migration_settings['experimentdirectory']
         field_file = charge_migration_settings['fieldfile']
         number_of_times = charge_migration_settings['numberoftimes']
         min_time = charge_migration_settings['mintime']
@@ -128,6 +130,7 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
         time_delay_start = probe_settings['timedelaystart']
         time_delay_stop = probe_settings['timedelaystop']
         number_of_pp = probe_settings['numberofpp']
+        time_Delay_weight_factor = probe_settings['timedelayweightfactor']
         probe_central_frequency = probe_settings['probecentralfrequency']
         probe_periods = probe_settings['probeperiods']
         probe_phase = probe_settings['probephase']
@@ -145,12 +148,13 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
         ft_width_step = charge_migration_ft_settings['ftwidthstep']
         Volume = step_size * step_size * step_size
 
-        logger.info("Unit of Volume = " + str(Volume))
-
-        time_delay_range = generate_time_delays(number_of_pp, time_delay_start, time_delay_stop)
+        time_delay_range = generate_time_delays(number_of_pp, time_delay_start, 0.0, time_delay_stop,
+                                                time_Delay_weight_factor)
 
         print("number_of_pp = ", number_of_pp)
         print("time_delay_start = ", time_delay_start)
+        print("time_delay_stop = ", time_delay_stop)
+        print("time_delay_range = ", time_delay_range)
 
         # Useful Flags for e.g. debugging
         if justh5:
@@ -313,9 +317,20 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
 
         print(f'{run_charge_migration = }')
         print(f'{run_charge_migration_ft = }')
+        # write(*,*) "fortran t_min=", t_min
+        #     write(*,*) "fortran t_min=", t_min
+        #     write(*,*) "fortran t_max=", t_max
+        #     write(*,*) "fortran n_times=", n_times
+        #     write(*,*) "fortran dble(n_times - 1)=", dble(n_times - 1)
+        #     write(*,*) "fortran dt=", dt
+        print("python t_min = ", min_time)
+        print("python t_max = ", max_time)
+        print("python n_times = ", number_of_times)
+        dt = (max_time - min_time) / (number_of_times)
+
+
         # >ChargeMigrationFT
         if run_charge_migration_ft:
-            ##
             if save_previous:
                 Save_Previous_FT(experiment_directory, dephasing_factor, relaxation_factor, time_delay_start,
                                  time_delay_stop,
@@ -368,31 +383,34 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
         # >SpectrumReconstruction
         if run_spectrum_reconstruction:
             if save_previous:
-                Save_Spectrum_Difference(DEFAULT_BIN_FILE_PATH, experiment_directory,
-                                         'difference_' + experiment_directory,
-                                         dephasing_factor, relaxation_factor, time_delay_start, time_delay_stop,
-                                         min_omegas,
-                                         max_omegas, pump_periods, probe_periods, pump_intensity, probe_intensity,
-                                         number_of_pp, pump_phase, probe_phase, ft_time_step, ft_width_step,
-                                         pump_polarization, probe_polarization, number_of_omegas, min_tau_omega,
-                                         max_tau_omega)
-            #
-            # Call_Spectrum_Reconstruction_n_Difference(DEFAULT_BIN_FILE_PATH, molcas_output_directory,
-            #                                           experiment_directory,
-            #                                           f"{molcas_output_directory}/{xyz_geometry}", number_of_omegas,
-            #                                           min_omegas, max_omegas,
-            #                                           number_of_tau_omegas, min_tau_omega, max_tau_omega, debug_mode)
+                Save_Previous_Spectrum_Difference(DEFAULT_BIN_FILE_PATH, experiment_directory,
+                                                  'difference_' + experiment_directory, dephasing_factor,
+                                                  relaxation_factor, time_delay_start, time_delay_stop, min_omegas,
+                                                  max_omegas, pump_periods, probe_periods, pump_intensity,
+                                                  probe_intensity, number_of_pp, pump_phase, probe_phase, ft_time_step,
+                                                  ft_width_step, pump_polarization, probe_polarization,
+                                                  number_of_omegas, min_tau_omega, max_tau_omega)
 
+            #
+            Call_Spectrum_Reconstruction_n_Difference(DEFAULT_BIN_FILE_PATH, molcas_output_directory,
+                                                      experiment_directory,
+                                                      f"{molcas_output_directory}/{xyz_geometry}", number_of_omegas,
+                                                      min_omegas, max_omegas,
+                                                      number_of_tau_omegas, min_tau_omega, max_tau_omega, debug_mode)
             # logger.info("Creating difference_" + experiment_directory + " to compare the Dipole and Charge Spectra")
-            # Dipole_Charge_Comparison(experiment_directory + '/Dipole/DipoleFT_ww', experiment_directory +
-            #                          '/Dipole/DipoleFT_ww_reconstructed', 'difference_' + experiment_directory)
+            # Dipole_Charge_Comparison(experiment_directory + '/Dipole/DipoleFT_ww.csv', experiment_directory +
+            #                          '/Dipole/DipoleFT_ww_reconstructed.csv', 'difference_' + experiment_directory)
 
         if plot:
-            from densitypy.post_processing.plotting import PlotDipolesSimulation
+            # Lets Plot the Pulses
+            plot_pulses(study_directory, experiment_directory, time_delay_range)
+            plot_ft_pulses(study_directory, experiment_directory, time_delay_range)
 
-            plotter = PlotDipolesSimulation(study_directory=study_directory, experiment_directory=experiment_directory)
+            # # Lets plot the Dipolar Reponse vs Time (t)
+            # plot_dipole_response_vs_time(study_directory, experiment_directory,time_delay_range)
 
-            plotter.plot_ftpp_all()
+
+
 
 
 if __name__ == "__main__":
@@ -402,16 +420,16 @@ if __name__ == "__main__":
                                )
 
     run_densitypy(json_config_path="configuration_help.json",
-                  study_directory="/home/ruben/PycharmProjects/DensityPy/Studies/cluttertest/",
+                  study_directory="/home/ruben/PycharmProjects/DensityPy/Studies/cluttertest",
                   molcas_input=False ,#'molcas_input_help.input',
                   # molcas_input='molcas_input_help.input',
                   run_charge_migration=False,
-                  run_charge_migration_ft=True,
+                  run_charge_migration_ft=False,
                   run_spectrum_reconstruction=False,
-                  plot=False,
+                  plot=True,
                   #
                   field_file_help=False,molcas_input_help=False,
-                  lus=False, gridflag=True, write_charge_migration=None, debug_mode=True,
+                  lus=False, gridflag=True, write_charge_migration=None, debug_mode=False,
                   justh5=False, justgetdipoles=False, justgetdensity=False, weights_file=None, givenfieldfile=None,
                   old_main=True, parallel=False, save_previous=False,
                   make_fortran=False, make_fortran_config=make_fortran_config
