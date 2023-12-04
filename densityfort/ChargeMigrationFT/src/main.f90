@@ -225,7 +225,6 @@ program ChargeMigrationFT
     !.. Load the FT of the dipole, as a function of the time delay
     call LoadFTDipole_asfuncitonof_TimeDelay(OutDir // DIPOLE_FT_PATH_ALL, N_simulations, nOmegas, DipoleFTwt, tvec)
     !
-
     !.. Regularizes the dipole with respect to the time-delay edges and Compute FT with respect to time
     call Regularize_Dipole_withRespectto_TimeDelay(DipoleFTwt, tvec, N_Simulations)
     call Compute_FTofDipole_withRespectto_Time(DipoleFTwt, DipoleFTww, tvec, TauOmegaVec, N_Simulations, nTauOmegas)
@@ -235,7 +234,6 @@ program ChargeMigrationFT
     deallocate(tvec)
     !############################################################################################
     !#
-
 
     !#
     !############################################################################################

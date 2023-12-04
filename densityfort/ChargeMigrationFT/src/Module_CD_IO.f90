@@ -358,35 +358,16 @@ contains
 
         ! Header ... only write the first time, meaning if it is the first line
         if (iSim == 1) then
-            !            !    Attribute Symbols  |  Description
-            !            !    ------------------------------------------
-            !            !    n                 |  Not directly found in 'pulse', but in 'pulse_train'. Represents the number of pulses.
-            !            !    t                 |  Central Time (in atomic units) - The time at which the pulse is centered or reaches its peak.
-            !            !    o                 |  Carrier Frequency (in atomic units) - The frequency of the carrier wave of the pulse.
-            !            !    f                 |  Full Width at Half Maximum (FWHM) - The width of the pulse at half its maximum amplitude.
-            !            !    d                 |  Carrier Envelope Phase (in degrees) - Phase difference between the pulse's carrier frequency and its envelope.
-            !            !    i                 |  Intensity (in PW/cm^2) - Power of the pulse per unit area.
-            !            !    a                 |  Amplitude (in atomic units) - Maximum amplitude or height of the pulse.
-            !            !    p                 |  Period (in atomic units) - Time for one complete cycle of the wave.
-            !            write(uid_dipoleALLFT, "(a,',')", advance = "no")  '"number_of_pulses"'
-            !            do iPulse = 1, train(iSim)%n
-            !                iPulseStr = int2strn(iPulse)
-            !                iPulseStr = trim(iPulseStr)
-            !                write(uid_dipoleALLFT, "(a,',')", advance = "no") '"central_time_' // iPulseStr
-            !                write(uid_dipoleALLFT, "(a,',')", advance = "no") '"carrier_frequency_' // iPulseStr
-            !                write(uid_dipoleALLFT, "(a,',')", advance = "no") '"fwhm_' // iPulseStr
-            !                write(uid_dipoleALLFT, "(a,',')", advance = "no") '"carrier_envelope_phase_' // iPulseStr
-            !                write(uid_dipoleALLFT, "(a,',')", advance = "no") '"intensity_' // iPulseStr
-            !                write(uid_dipoleALLFT, "(a,',')", advance = "no") '"amplitude_' // iPulseStr
-            !                write(uid_dipoleALLFT, "(a,','))", advance = "no") '"period_' // iPulseStr
-            !            end do
-            !            write(uid_dipoleALLFT, "(a)", advance = "no")  '"iOmega","OmegaVec",'
-            !            write(uid_dipoleALLFT, "(a)") '' &
-            !                    // '"FTDipoleX_Re","FTDipoleX_Im",' &
-            !                    // '"FTDipoleY_Re","FTDipoleY_Im",' &
-            !                    // '"FTDipoleZ_Re","FTDipoleZ_Im"'
-            !
-            !        end if
+            !    Attribute Symbols  |  Description
+            !    ------------------------------------------
+            !    n                 |  Not directly found in 'pulse', but in 'pulse_train'. Represents the number of pulses.
+            !    t                 |  Central Time (in atomic units) - The time at which the pulse is centered or reaches its peak.
+            !    o                 |  Carrier Frequency (in atomic units) - The frequency of the carrier wave of the pulse.
+            !    f                 |  Full Width at Half Maximum (FWHM) - The width of the pulse at half its maximum amplitude.
+            !    d                 |  Carrier Envelope Phase (in degrees) - Phase difference between the pulse's carrier frequency and its envelope.
+            !    i                 |  Intensity (in PW/cm^2) - Power of the pulse per unit area.
+            !    a                 |  Amplitude (in atomic units) - Maximum amplitude or height of the pulse.
+            !    p                 |  Period (in atomic units) - Time for one complete cycle of the wave.
             write(uid_dipoleALLFT, "(a)", advance = "no")  '"number_of_pulses",'
 
             do iPulse = 1, train(iSim)%n
