@@ -9,17 +9,17 @@ Module Module_Becke
     logical :: Verbous
 
     public :: &
-        EuclDist, &
-        EllipticalCoord, &
-        Radius_Table, &
-        get_param_a, &
-        new_mu_transformation, &
-        fkfun, &
-        skfun, &
-        skfunab, &
-        Pkfuna, &
-        PkFunTot, &
-        wkfun
+            EuclDist, &
+            EllipticalCoord, &
+            Radius_Table, &
+            get_param_a, &
+            new_mu_transformation, &
+            fkfun, &
+            skfun, &
+            skfunab, &
+            Pkfuna, &
+            PkFunTot, &
+            wkfun
 
 contains
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -147,13 +147,15 @@ contains
         integer :: jAtom
         real(kind(1d0)) :: a_ij, R_i, R_j
         res = 1.d0
+        !$OMP PARALLEL DO REDUCTION(*:res) PRIVATE(jAtom, R_i, R_j, a_ij)
         do jAtom = 1, nAtoms
-            if(jAtom == iAtom) cycle
+            if (jAtom == iAtom) cycle
             R_i = Radius_BS(iAtom)
             R_j = Radius_BS(jAtom)
             a_ij = get_param_a(R_i, R_j)
             res = res * skfunab(rvec, AtCoord(:, iAtom), AtCoord(:, jAtom), k, a_ij)
-        enddo
+        end do
+        !$OMP END PARALLEL DO
     end function Pkfuna
     ! ----------------------------------------------------
     !..Eq. 3 \sum_bP_b(\vec{r}) in the denominator
@@ -164,9 +166,14 @@ contains
         integer, intent(in) :: k
         integer :: iAtom
         res = 0.d0
+        !        do iAtom = 1, nAtoms
+        !            res = res + Pkfuna(rvec, iAtom, AtCoord, nAtoms, k, Radius_BS)
+        !        enddo
+        !$OMP PARALLEL DO REDUCTION(+:res) PRIVATE(iAtom)
         do iAtom = 1, nAtoms
             res = res + Pkfuna(rvec, iAtom, AtCoord, nAtoms, k, Radius_BS)
-        enddo
+        end do
+        !$OMP END PARALLEL DO
     end function PkFunTot
     ! ----------------------------------------------------
     !.. Eq. 3 $w_a \vec(r)$  (WEIGHTS)

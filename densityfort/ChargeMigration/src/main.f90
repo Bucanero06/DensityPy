@@ -56,6 +56,7 @@ program ChargeMigration
     use ModuleRTP
     use Module_CD_IO
     use Module_Becke
+    use omp_lib
 
     implicit none
 
@@ -97,7 +98,7 @@ program ChargeMigration
     !    real(kind(1d0)) :: volume
 
     !.. Statistical Density Matrix
-    complex(kind(1d0)), allocatable :: zStatRho(:, :), zStatRho0(:, :)
+    complex(kind(1d0)), allocatable :: zStatRho(:, :)
     real   (kind(1d0)) :: t, dt
     real   (kind(1d0)), allocatable :: ChDen(:), WEIGHTV(:, :)
     real   (kind(1d0)), allocatable :: AtomicChargeVec(:), AtomicChargeEvolution(:, :)
@@ -106,7 +107,6 @@ program ChargeMigration
     character(len = 16), allocatable :: atom_names(:)
 
     integer :: iPts, it, iPol, iAtom
-    integer :: uid_AtomicCharge, uid_dipole
 
     complex(kind(1d0)), allocatable :: Liouvillian0(:, :), L0_LEvec(:, :), L0_REvec(:, :), L0_Eval(:)
 
@@ -123,8 +123,8 @@ program ChargeMigration
     complex(kind(1d0)), external :: zdotu
 
     !..Test
-    real(kind(1d0)), allocatable :: ChargeTotal1(:), ChargeTotal2(:), Becke_new(:, :, :, :), Dipole_new(:, :), Dipole_new_(:), Becke_new1(:, :, :, :), data(:, :, :, :)
-    real(kind(1d0)) :: data1, data2, data3, Orbital_overlap_self, Orbital_overlap_other, Computed_volume
+    real(kind(1d0)), allocatable :: Becke_new(:, :, :, :)
+    real(kind(1d0)) :: Computed_volume
     real   (kind(1d0)), allocatable :: AtomicChargeVec_new(:, :), AtomicChargeEvolution_new(:, :, :)
     integer :: iOrb, jOrb, number_of_orbitalss
     real(kind(1d0)), allocatable :: QchargeVec_new    (:, :), R_el(:, :)
@@ -150,15 +150,27 @@ program ChargeMigration
 
     !.. Write and Print the pulse
     !..
-    dt = (t_max - t_min) / dble(n_times - 1)
+    dt = (t_max - t_min) / dble(n_times)
+    write(*,*) "fortran t_min=", t_min
+    write(*,*) "fortran t_min=", t_min
+    write(*,*) "fortran t_max=", t_max
+    write(*,*) "fortran n_times=", n_times
+    write(*,*) "fortran dble(n_times - 1)=", dble(n_times)
+    write(*,*) "fortran dt=", dt
+
+    call omp_set_num_threads(30) ! fixme do not hard code, use number of passed or allowed threads
+
+    !$OMP PARALLEL DO PRIVATE(strn, i)
     do i = 1, N_Simulations
         write(*, *) "Writing pulse " // trim(Simulation_Tagv(i))
         strn = trim(output_directory) // "/Pulses/pulse" // trim(Simulation_Tagv(i))
         call train(i)%Write(strn, t_min, t_max, dt)  !>>pulse_trainWrite
         strn = trim(output_directory) // "/Pulses/FTpulse" // trim(Simulation_Tagv(i))
         call train(i)%WriteFTA(strn) !>>pulse_trainWriteFTA
-    enddo
+    end do
+    !$OMP END PARALLEL DO
     !
+
     call LoadEnergies(input_directory // "/ROOT_ENERGIES", nStates, Evec)
 
     !.. At the moment, we assume that the TDM are defined as
@@ -205,24 +217,21 @@ program ChargeMigration
     call ComputeNewBeckeMatrix(WeightV, OrbTab, Becke_new, R_el) !!using electronic barycenter or AtCoord for the nuclear barycenter
     !    BeckeMatrix = BeckeMatrix * Computed_volume
 
+    write(*, *) "allocating Atomic Charge matrixes"
     allocate(AtomicChargeVec(nAtoms))
     allocate(AtomicChargeEvolution(nAtoms, n_times))
     allocate(AtomicChargeEvolution_new(3, nAtoms, n_times))
 
 
     !.. Compute Liouvillian and Diagonalizes it
+    write(*, *) "Computing Liouvillian"
     call ComputeLiouvillian_0(Evec, Dmat, Liouvillian0, bath_temperature, dephasing_factor, relaxation_factor)
     call DiagonalizeLindblad_0(Liouvillian0, L0_Eval, L0_LEvec, L0_REvec)
 
     allocate(zStatRho (nStates, nStates))
-    allocate(zStatRho0(nStates, nStates))
-
     allocate(ChDen(nPts))
-
     allocate(zMuEV(3, n_times))
     zMuEV = Z0
-
-    allocate(Dipole_new(3, n_times))
 
     write(*, *) "Starting Sim Loop"
     Sim_loop : do iSim = 1, N_Simulations
@@ -240,11 +249,12 @@ program ChargeMigration
         time_loop : do it = 1, n_times
             !
             t = t_min + dt * dble(it - 1)
+            write(*, *) "t=", t
             !.. Computes the excitation density wrt ground state
             zStatRho(GS_IDX, GS_IDX) = zStatRho(GS_IDX, GS_IDX) - 1.d0
 
             !.. Evaluates the expectation value of the dipole as a function of time
-            !            write(*, *) it, iSim
+            write(*, *) it, iSim, 100.d0 * iSim / (N_Simulations)
             do iPol = 1, 3
                 zMuEV(iPol, it) = zdotu(nStates * nStates, zStatRho, 1, zDmat_t(1, 1, iPol), 1)
             enddo
@@ -281,7 +291,6 @@ program ChargeMigration
         !.. Save Q_Charge
         call Write_Q_Charge(output_directory // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)) // ".csv", &
                 AtomicChargeEvolution_new, n_times, t_min, dt, nAtoms, atom_names)
-
     end do Sim_loop
     !
     call Write_Summary(output_directory // "/Simulation_Summary", nPts, nAtoms, volume, Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
@@ -924,12 +933,14 @@ contains
         write(*, "(a)") "Computing Weights"
 
         allocate(WEIGHTV(nPts, nAtoms))
+        !$OMP PARALLEL DO PRIVATE(iPts, rvec, iAtom)
         do iPts = 1, nPts
             rvec = gridv(:, iPts)
             do iAtom = 1, nAtoms
                 WeightV(iPts, iAtom) = wkfun(rvec, iAtom, AtCoord, nAtoms, k, Radius_BS)
             enddo
         enddo
+        !$OMP END PARALLEL DO
     end subroutine ComputeAtomicWeights
     subroutine TabulateChargeDensity(Amat, OrbTab, ChDen)
         real(kind(1d0)), intent(in) :: Amat(:, :)
@@ -941,6 +952,8 @@ contains
         number_of_orbitals = size(OrbTab, 2)
         !.. Tabulate Charge Density
         ChDen = 0.d0
+
+        !$OMP PARALLEL DO PRIVATE(iPts, ii_orb, ij_orb)
         do iPts = 1, nPts
             do ii_orb = 1, number_of_orbitals
                 do ij_orb = 1, number_of_orbitals
@@ -948,6 +961,7 @@ contains
                 enddo
             enddo
         enddo
+        !$OMP END PARALLEL DO
     end subroutine TabulateChargeDensity
     subroutine ComputeNewBeckeMatrix(WeightV, OrbTab, Becke_new, Bary_center)
         real(kind(1d0)), intent(in) :: WeightV(:, :)
@@ -969,8 +983,25 @@ contains
         !        if(allocated(Becke_new))deallocate(Becke_new)
         allocate(Becke_new(3, number_of_orbitalss, number_of_orbitalss, nAtoms))
 
+        !        Becke_new = 0.d0
+        !        do iPol = 1, 3
+        !            do iAtom = 1, nAtoms
+        !                do iOrb2 = 1, number_of_orbitalss
+        !                    do iOrb1 = 1, number_of_orbitalss
+        !                        do iPts = 1, nPts
+        !                            Becke_new(iPol, iOrb1, iOrb2, iAtom) = Becke_new(iPol, iOrb1, iOrb2, iAtom) + &
+        !                                    WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2) * &
+        !                                            Bary_center(iPol, iAtom)
+        !
+        !                        enddo
+        !                    enddo
+        !                enddo
+        !            enddo
+        !        end do
         Becke_new = 0.d0
+
         do iPol = 1, 3
+            !$OMP PARALLEL DO PRIVATE(iPts, iPol, iAtom, iOrb2, iOrb1)
             do iAtom = 1, nAtoms
                 do iOrb2 = 1, number_of_orbitalss
                     do iOrb1 = 1, number_of_orbitalss
@@ -980,10 +1011,15 @@ contains
                                             Bary_center(iPol, iAtom)
 
                         enddo
+
                     enddo
+
                 enddo
             enddo
-        end do
+            !$OMP END PARALLEL DO
+
+        enddo
+
     end subroutine ComputeNewBeckeMatrix
     ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -1002,11 +1038,6 @@ contains
         if(.not.allocated(QchargeVec))allocate(QchargeVec(nAtoms))
         QchargeVec = 0.d0
         do iAtom = 1, nAtoms
-            !            do jOrb = 1, number_of_orbitalss
-            !                do iOrb = 1, number_of_orbitalss
-            !                    QchargeVec(iAtom) = QchargeVec(iAtom) + OrbitalDensity(iOrb, jOrb) * BeckeMatrix(iOrb, jOrb, iAtom)
-            !                end do
-            !            end do
             QchargeVec(iAtom) = ddot(number_of_orbitalss * number_of_orbitalss, OrbitalDensity, 1, BeckeMatrix(1, 1, iAtom), 1)
         enddo
     end subroutine ComputeAtomicCharges
