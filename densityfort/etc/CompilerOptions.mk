@@ -44,7 +44,7 @@ ifeq ($(FC),ifort)
   MOD_OPTION=-I$(MKL_INCLUDE) -module
   ifeq ($(DEB_FLAG),d)
     F77_OPTS=-c -g -traceback -safe-cray-ptr ${DEFAULT_INT} 
-    FC_OPTS=-c -p  ${DEFAULT_INT}  -warn all -check all -debug all -g -traceback -heap-arrays -safe-cray-ptr -I$(MKL_INCLUDE)
+    FC_OPTS=-c -p  ${DEFAULT_INT}  -warn all -check all -debug all -g -traceback -heap-arrays -safe-cray-ptr -I$(MKL_INCLUDE)  -qopenmp
     CC_OPTS = -c 
     FC_OPTS_ATSP=-c -p  ${DEFAULT_INT}  -g -traceback -safe-cray-ptr
     #F77_OPTS=-c -g -traceback -safe-cray-ptr ${DEFAULT_INT} 
@@ -53,7 +53,7 @@ ifeq ($(FC),ifort)
     #FC_OPTS_ATSP=-c -p  ${DEFAULT_INT}  -g -traceback -safe-cray-ptr
   else
     F77_OPTS=-c -O2  ${DEFAULT_INT}  
-    FC_OPTS=-c -O2  ${DEFAULT_INT} -heap-arrays -I$(MKL_INCLUDE)
+    FC_OPTS=-c -O2  ${DEFAULT_INT} -heap-arrays -I$(MKL_INCLUDE) -qopenmp
     FC_OPTS_ATSP=-c -O2  ${DEFAULT_INT} 
     #F77_OPTS=-c -O2  ${DEFAULT_INT}  -heap-arrays  
     #FC_OPTS=-c -O2  ${DEFAULT_INT}   -heap-arrays  -I$(MKL_INCLUDE)
@@ -71,13 +71,13 @@ else ifeq ($(FC),gfortran)
   MOD_OPTION=-J
   ifeq ($(DEB_FLAG),d)
     F77_OPTS=-c -Wall -fcray-pointer
-    FC_OPTS=-c -Wall -fcheck=all -fcray-pointer -fbacktrace -g  
+    FC_OPTS=-c -Wall -fcheck=all -fcray-pointer -fbacktrace -g   -I$(MKL_INCLUDE) -fopenmp
     CC_OPTS = -c
     FC_OPTS_ATSP=-c -Wall -fcray-pointer
   else
     #F77_OPTS=-c -O2 -heap-arrays
     F77_OPTS=-c -O2 -fcray-pointer
-    FC_OPTS=-c -O2 -fcray-pointer
+    FC_OPTS=-c -O2 -fcray-pointer -I$(MKL_INCLUDE) -fopenmp
     FC_OPTS_ATSP=-c -O2 -fcray-pointer
     CC_OPTS = -c -O2
   endif
