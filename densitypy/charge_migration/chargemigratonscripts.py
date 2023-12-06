@@ -3,11 +3,9 @@
 from os import path, system
 
 from densitypy.project_utils.def_functions import uniquify, execute_command, delete_files_or_directories
-
 from densitypy.project_utils.logger import setup_logger
 
 logger = setup_logger(__name__.split('.')[-1])
-
 
 
 def Write_FieldHelp():
@@ -42,11 +40,12 @@ def generate_time_delays(number_of_pp, start, mid, stop, weight_factor=0.5):
 
     # Calculate the number of points to allocate to each sub-range
     total_points = number_of_pp - 3  # Excluding fixed points
-    positive_points = int(total_points * weight_factor)
+    positive_points = int(round(total_points * weight_factor))  # Round up in case of a tie
     negative_points = total_points - positive_points
 
     # Generate evenly spaced points in each sub-range
-    negative_steps = [start] + [start + i * ((mid - start) / (negative_points + 1)) for i in range(1, negative_points + 1)]
+    negative_steps = [start] + [start + i * ((mid - start) / (negative_points + 1)) for i in
+                                range(1, negative_points + 1)]
     positive_steps = [mid + i * ((stop - mid) / (positive_points + 1)) for i in range(1, positive_points + 1)] + [stop]
 
     # Combine and sort the points
@@ -61,7 +60,6 @@ def Write_Pulses(field_file, type_of_pulse_pump, start_time, pump_central_freque
                  pump_periods, pump_phase, pump_intensity, pump_polarization,
                  type_of_pulse_probe, time_delay_range, probe_central_frequency,
                  probe_periods, probe_phase, probe_intensity, probe_polarization, write_charge_migration):
-
     print(f'{field_file = }')
 
     with open(field_file, 'w') as fout:
@@ -120,9 +118,9 @@ def Write_Pulses(field_file, type_of_pulse_pump, start_time, pump_central_freque
 # >Calls Charge Migration Code and gives command line arguements (1)
 def Call_Charge_Migration(Bin_Directory, input_directory, experiment_directory, number_of_times,
                           min_time, max_time, field_file, stept, stepw,
-                          geometry, orbital_list, write_charge_migrationflag, Volume, debug_mode, weights_file, dephasing_factor,
+                          geometry, orbital_list, write_charge_migrationflag, Volume, debug_mode, weights_file,
+                          dephasing_factor,
                           relaxation_factor, bath_temp, i_excitation, i_epsilon):
-
     weights_file_decoy = ""
     if weights_file:
         weights_file_decoy = "-w " + weights_file
@@ -149,7 +147,7 @@ def Call_Charge_Migration(Bin_Directory, input_directory, experiment_directory, 
         f"-stepw {str(stepw)} -xyz {str(geometry)} {weights_file_decoy} {write_charge_migrationflag_decoy} -iorb "
         f"{','.join(map(str, orbital_list))} -rf {str(relaxation_factor)} -bath {str(bath_temp)} -df "
         f"{str(dephasing_factor)} -s {i_excitation} -e {i_epsilon}"
-    , _logger=_logger)
+        , _logger=_logger)
 
     logger.info("Finished Executing ChargeMigration")
 
@@ -175,12 +173,9 @@ def Call_Charge_MigrationFT(Bin_Directory, input_directory, experiment_directory
         f'{str(geometry)} -stept {str(ft_time_step)} -stepw {str(ft_width_step)} -field {str(field_file)} -nw '
         f'{str(Number_of_Omegas)} -wmax {str(min_omegas)} -wmin {str(max_omegas)} -ntw {str(number_of_tau_omega)} '
         f'-twmax {str(min_tau_omega)} -twmin {str(max_tau_omega)} -s {i_excitation} -e {i_epsilon}'
-    , _logger=_logger)
+        , _logger=_logger)
 
     logger.info("Finished Executing ChargeMigrationFT")
-
-
-
 
 
 def Dipole_Charge_Comparison(dipole_file, charge_file, output_file):
@@ -195,7 +190,8 @@ def Dipole_Charge_Comparison(dipole_file, charge_file, output_file):
     system('rm temp_charge temp_dipole temp_difference')
 
 
-def Call_Spectrum_Reconstruction_n_Difference(Bin_Directory, molcas_output_directory, experiment_directory, xyz_file_path, Number_of_Omegas,
+def Call_Spectrum_Reconstruction_n_Difference(Bin_Directory, molcas_output_directory, experiment_directory,
+                                              xyz_file_path, Number_of_Omegas,
                                               min_omegas, max_omegas, number_of_tau_omega, min_tau_omega, max_tau_omega,
                                               debug_mode):
     screen_print = "Running Spectrum Reconstruction"
@@ -218,14 +214,15 @@ def Call_Spectrum_Reconstruction_n_Difference(Bin_Directory, molcas_output_direc
     logger.info("Finished Executing SpectrumReconstruction")
 
 
-
-def Save_Previous_Spectrum_Difference(Bin_Directory, experiment_directory, difference_file, dephasing_factor, relaxation_factor,
-                             time_delay_start,
-                             time_delay_stop, min_omegas,
-                             max_omegas, pump_periods, probe_periods, pump_intensity,
-                             probe_intensity, Number_Of_PP, pump_phase, probe_phase, ft_time_step, ft_width_step,
-                             pump_polarization, probe_polarization, Number_of_Omegas, min_tau_omega,
-                             max_tau_omega):
+def Save_Previous_Spectrum_Difference(Bin_Directory, experiment_directory, difference_file, dephasing_factor,
+                                      relaxation_factor,
+                                      time_delay_start,
+                                      time_delay_stop, min_omegas,
+                                      max_omegas, pump_periods, probe_periods, pump_intensity,
+                                      probe_intensity, Number_Of_PP, pump_phase, probe_phase, ft_time_step,
+                                      ft_width_step,
+                                      pump_polarization, probe_polarization, Number_of_Omegas, min_tau_omega,
+                                      max_tau_omega):
     FT_WW_TAIL = f'DephasingFactor_{dephasing_factor}_' \
                  f'RelaxingFactor_{relaxation_factor}_Tau_{time_delay_start}_{time_delay_stop}_' \
                  f'W_{min_omegas}_{max_omegas}_PumpPeriods_{pump_periods}_ProbePeriods_{probe_periods}_' \
@@ -246,7 +243,9 @@ def Save_Previous_Spectrum_Difference(Bin_Directory, experiment_directory, diffe
         newfilepath = uniquify(newfilepath)
         system(f'mv {oldpath} {newfilepath}')
 
-def Save_Previous_FT(experiment_directory, dephasing_factor, relaxation_factor, time_delay_start, time_delay_stop, min_omegas,
+
+def Save_Previous_FT(experiment_directory, dephasing_factor, relaxation_factor, time_delay_start, time_delay_stop,
+                     min_omegas,
                      max_omegas, pump_periods, probe_periods, pump_intensity,
                      probe_intensity, Number_Of_PP, pump_phase, probe_phase, ft_time_step, ft_width_step,
                      pump_polarization, probe_polarization, Number_of_Omegas, min_tau_omega,
