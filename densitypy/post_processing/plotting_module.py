@@ -71,7 +71,6 @@ def plot_pulses(study_directory, experiment_directory, time_delays,  min_time, m
     for time_delay in ['XUV'] + time_delays_to_plot:
         file_path = f'{study_directory}/{experiment_directory}/Pulses/pulsePP{time_delay}' if time_delay != 'XUV' else f'{study_directory}/{experiment_directory}/Pulses/pulseXUV'
 
-        logger.info(f'Plotting {file_path}')
         try:
             data = pd.read_csv(file_path, delim_whitespace=True, header=None,
                                names=[
@@ -89,6 +88,8 @@ def plot_pulses(study_directory, experiment_directory, time_delays,  min_time, m
         except FileNotFoundError:
             logger.error(f'File {file_path} not found')
             continue
+        logger.info(f'Plotting {file_path}')
+
 
         if length_of_data_to_match is None:
             length_of_data_to_match = len(data)
@@ -169,7 +170,7 @@ def plot_ft_pulses(study_directory, experiment_directory, time_delays, plot_all=
         except FileNotFoundError:
             logger.error(f'File {file_path} not found')
             continue
-
+        logger.info(f'Plotting {file_path}')
         logger.debug(data.head())
         logger.debug(f'Length of data: {len(data)}')
 
@@ -230,12 +231,13 @@ def plot_dipoles_v_time(study_directory, experiment_directory, time_delays, min_
     for time_delay in ['XUV'] + time_delays_to_plot:
         file_path = f'{study_directory}/{experiment_directory}/Dipole/DipolePP{time_delay}.csv' if time_delay != 'XUV' else f'{study_directory}/{experiment_directory}/Dipole/DipoleXUV.csv'
 
-        logger.info(f'Plotting {file_path}')
         try:
             data = pd.read_csv(file_path)
         except FileNotFoundError:
             logger.error(f'File {file_path} not found')
             continue
+        logger.info(f'Plotting {file_path}')
+
 
         if length_of_data_to_match is None:
             length_of_data_to_match = len(data)
@@ -566,7 +568,9 @@ def plot_ft_dipoles_v_time(study_directory, experiment_directory, time_delays, p
     plt.ylabel('FTDipoleZ_Im')
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
+    plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL_Clustered.png')
+
     plt.clf()
 
     # Calculating the average of the squared magnitudes of the FT dipole components
@@ -607,7 +611,9 @@ def plot_ft_dipoles_v_time(study_directory, experiment_directory, time_delays, p
     plt.legend()
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
+    plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL_Clustered.png')
+
     plt.clf()
 
     # Plot the contour map
@@ -651,7 +657,8 @@ def plot_ft_dipoles_v_time(study_directory, experiment_directory, time_delays, p
     plt.xlabel('Central Time 2')
     plt.ylabel('OmegaVec')
     plt.title('Adjusted Contour Map of Average FT Dipole Magnitude')
-    plt.show()
+    # plt.show()
+    plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL_Clustered.png')
     plt.clf()
 
     # Dynamic Range Adjustment using percentiles to set color scale limits
@@ -669,7 +676,9 @@ def plot_ft_dipoles_v_time(study_directory, experiment_directory, time_delays, p
     plt.xlabel('Central Time 2')
     plt.ylabel('OmegaVec')
     plt.title('Percentile Adjusted Contour Map of Average FT Dipole Magnitude')
-    plt.show()
+    # plt.show()
+    plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL_Clustered.png')
+
     plt.clf()
 
     # Applying the requested techniques for feature extraction:
@@ -728,7 +737,9 @@ def plot_ft_dipoles_v_time(study_directory, experiment_directory, time_delays, p
     # axes[2, 1].axis('off')
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
+    plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL_Clustered.png')
+
     plt.clf()
 
     # 7. Statistical Analysis: Clustering
@@ -747,7 +758,8 @@ def plot_ft_dipoles_v_time(study_directory, experiment_directory, time_delays, p
     plt.xlabel('Central Time 2')
     plt.ylabel('OmegaVec')
     plt.title('KMeans Clustering of Average FT Dipole Magnitude')
-    plt.show()
+    # plt.show()
+    plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL_Clustered.png')
     plt.clf()
 
     import plotly.graph_objects as go
@@ -771,4 +783,5 @@ def plot_ft_dipoles_v_time(study_directory, experiment_directory, time_delays, p
     )
 
     # Displaying the figure
-    fig.show()
+    # fig.show()
+    fig.write_html(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL.html')
