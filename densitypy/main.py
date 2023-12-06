@@ -391,14 +391,14 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
         if plot:
             # Todo perhaps we want to differenciate the min and max of time from those to use when plotting
             # Lets Plot the Pulses
-            # plot_pulses(study_directory, experiment_directory, time_delay_range, min_time, max_time, plot_all=False)
-            # plot_ft_pulses(study_directory, experiment_directory, time_delay_range, plot_all=False)
-            #
-            # # Lets plot the Dipolar Reponse vs Time (t)
-            # plot_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
-            #                     plot_all=False)
+            plot_pulses(study_directory, experiment_directory, time_delay_range, min_time, max_time, plot_all=False)
+            plot_ft_pulses(study_directory, experiment_directory, time_delay_range, plot_all=False)
+
+            # Lets plot the Dipolar Reponse vs Time (t)
+            plot_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
+                                plot_all=False)
             plot_ft_dipoles_v_time(study_directory, experiment_directory, time_delay_range, plot_all=False)
-            # plot_2d_spectrum(study_directory, experiment_directory)
+            plot_2d_spectrum(study_directory, experiment_directory)
 
 if __name__ == "__main__":
     make_fortran_config = dict(directory='/home/ruben/PycharmProjects/DensityPy/densityfort',
