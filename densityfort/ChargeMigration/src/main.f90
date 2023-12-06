@@ -249,7 +249,7 @@ program ChargeMigration
         time_loop : do it = 1, n_times
             !
             t = t_min + dt * dble(it - 1)
-            write(*, *) "t=", t
+
             !.. Computes the excitation density wrt ground state
             zStatRho(GS_IDX, GS_IDX) = zStatRho(GS_IDX, GS_IDX) - 1.d0
 
