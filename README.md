@@ -7,3 +7,4 @@ so have left this README as a placeholder for now.
 
 Thank you guys and let me know if any sections have been helpful, of course questions are welcomed, I am the only maintainer of this piece of code at the moment and there are areas yet to clean up plus more expansions that have been planned so a spare set of eyes and ears can and do go a long way.
 
+I am currently having difficulties with my knight's email, please reach out to me here, Github, otherwise either ruben.fernandez.carbon@gmail.org or ruben@carbonyl.org to DM me.
