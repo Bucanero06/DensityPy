@@ -8,6 +8,7 @@ DEFAULT_CONFIG_CONTENT = {
         "Number of States": 4,
         "List_of_Active_Orbitals": [ 18, 19, 20, 21],
         "Molcas Output Directory": "NMA_output",
+        "Experiment Directory": "sim"
     },
     "GRID settings": {
         "Number of Points X axis": 15,
@@ -23,7 +24,6 @@ DEFAULT_CONFIG_CONTENT = {
         "Boundary": 2
     },
     "Charge Migration settings": {
-        "Experiment Directory": "sim",
         "Field File": "field_file",
         "Number of Times": 1001,
         "Min Time": -4000,
@@ -46,6 +46,7 @@ DEFAULT_CONFIG_CONTENT = {
         "Time Delay Start": -2000,
         "Time Delay Stop": 3000,
         "Number Of PP": 101,
+        "Time Delay Weight Factor": 0.5,
         "Probe Central Frequency": 0.07,
         "Probe Periods": 5,
         "Probe Phase": 0,
