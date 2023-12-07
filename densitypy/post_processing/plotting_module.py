@@ -310,6 +310,8 @@ def plot_dipoles_v_time(study_directory, experiment_directory, time_delays, min_
 
     plt.clf()
 
+    
+
 
 def plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delays, plot_all=False):
     # Lets plot the Dipolar Reponse vs Time (t)
@@ -320,7 +322,33 @@ def plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delay
 
 
 
-def plot_2d_spectrum(study_directory, experiment_directory):
+def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
+                             pump_settings, probe_settings, charge_migration_ft_settings):
+    # Pump Settings
+    type_of_pulse_pump = pump_settings['typeofpulse']
+    start_time = pump_settings['starttime']
+    pump_central_frequency = pump_settings['pumpcentralfrequency']
+    pump_periods = pump_settings['pumpperiods']
+    pump_phase = pump_settings['pumpphase']
+    pump_intensity = pump_settings['pumpintensity']
+    pump_polarization = pump_settings['pumppolarization']
+
+    # Probe Settings
+    type_of_pulse_probe = probe_settings['typeofpulse']
+    time_delay_start = probe_settings['timedelaystart']
+    time_delay_stop = probe_settings['timedelaystop']
+    number_of_pp = probe_settings['numberofpp']
+    time_Delay_weight_factor = probe_settings['timedelayweightfactor']
+    probe_central_frequency = probe_settings['probecentralfrequency']
+    probe_periods = probe_settings['probeperiods']
+    probe_phase = probe_settings['probephase']
+    probe_intensity = probe_settings['probeintensity']
+    probe_polarization = probe_settings['probepolarization']
+
+    # Charge Migration Settings
+    ft_time_step = charge_migration_ft_settings['fttimestep']
+    ft_width_step = charge_migration_ft_settings['ftwidthstep']
+
     OMEGA_TAUOMEGA_FILE_NAMES = [
         'Dipole/DipoleFT_ww.csv',
         'Dipole/DipoleFT_ww_reconstructed.csv',
@@ -346,16 +374,16 @@ def plot_2d_spectrum(study_directory, experiment_directory):
 
         if length_of_data_to_match is None:
             length_of_data_to_match = len(data)
+            # assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
         else:
             assert length_of_data_to_match == len(data), f'Length of {file_path} is not the same as the previous file'
-            assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+            # assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
 
         # Displaying the first few rows of the file to understand its structure
         logger.debug(data.head())
         logger.debug(f'Length of data: {len(data)}')
 
         # Calculating the average of all polarizations
-
         averaged_density = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
 
         # Adding the averaged density to the DataFrame
@@ -376,16 +404,84 @@ def plot_2d_spectrum(study_directory, experiment_directory):
 
         # Plotting
         plt.figure(figsize=(10, 8))
-        plt.contourf(omega_grid, tauomega_grid, averaged_density_grid, levels=100, cmap='viridis')
+        # Since we are adding a bigger title to include pump and probe details lets make the figure bigger
+        # plt.figure(figsize=(16, 12))
+        # plt.contourf(omega_grid, tauomega_grid, averaged_density_grid, levels=100, cmap='viridis')
+        plt.contourf(omega_grid + tauomega_grid, omega_grid, averaged_density_grid, levels=100, cmap='viridis')
         plt.colorbar(label='Averaged Density')
         plt.xlabel('OmegaVec')
         plt.ylabel('TauOmegaVec')
-        plt.title(f'2D Spectra Plot of Averaged {file_path}')
+        plt.title(f'2D Spectra Plot of Averaged \n{file_path}\n'
+                  # Pump Details
+                    f'Pump Settings:  {pump_central_frequency}, {pump_periods}, {pump_phase}, {pump_intensity}, {pump_polarization}\n'
+                    # Probe Details
+                    f'Probe Settings:  {probe_central_frequency}, {probe_periods}, {probe_phase}, {probe_intensity}, {probe_polarization}\n'
+                    # Other Details
+                    f'Dephasing Factor: {dephasing_factor}, Relaxation Factor: {relaxation_factor}'
+                    f'FT Time Step: {ft_time_step}, FT Width Step: {ft_width_step}')
 
         # Remove the csv if it has it in the name and replace with png
         output_file = file_path.replace('.csv', '.png')
         output_file = output_file if output_file != file_path else f'{file_path}.png'
+        output_file = output_file.replace('.png', f'_0.png')
         plt.savefig(output_file)
+        plt.show()
+
+
+def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
+    OMEGA_TAUOMEGA_FILE_NAMES = [
+        'Dipole/DipoleFT_ww.csv',
+        'Dipole/DipoleFT_ww_reconstructed.csv',
+    ]
+    OMEGA_TAUOMEGA_FILE_PATHS = [f'{study_directory}/{experiment_directory}/{file_name}' for file_name in
+                                 OMEGA_TAUOMEGA_FILE_NAMES]
+
+    length_of_data_to_match = None
+    INDECES_COL_NAMES = ['OmegaVec', 'TauOmegaVec']
+    FEATURES_COL_NAMES = [
+        '2DDipoleX_Re',
+        '2DDipoleX_Im',
+        '2DDipoleY_Re',
+        '2DDipoleY_Im',
+        '2DDipoleZ_Re',
+        '2DDipoleZ_Im'
+    ]
+
+    for file_path in OMEGA_TAUOMEGA_FILE_PATHS:
+        # Load the CSV file
+        logger.info(f'Plotting {file_path}')
+        data = pd.read_csv(file_path)
+
+        if length_of_data_to_match is None:
+            length_of_data_to_match = len(data)
+            # assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+        else:
+            assert length_of_data_to_match == len(
+                data), f'Length of {file_path} is not the same as the previous file'
+            # assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+
+        # Displaying the first few rows of the file to understand its structure
+        logger.debug(data.head())
+        logger.debug(f'Length of data: {len(data)}')
+
+        # Calculating the average of all polarizations
+        averaged_density = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
+
+        # Adding the averaged density to the DataFrame
+        data['AveragedDensity'] = averaged_density
+
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        # Preparing the data for plotting
+        omega_values = data['OmegaVec'].unique()
+        tauomega_values = data['TauOmegaVec'].unique()
+
+        # Creating a meshgrid for plotting
+        omega_grid, tauomega_grid = np.meshgrid(omega_values, tauomega_values, indexing='ij')
+
+        # Reshaping 'AveragedDensity' to match the shape of the meshgrid
+        averaged_density_grid = data['AveragedDensity'].values.reshape(omega_grid.shape)
 
         ##############
         from scipy.signal import find_peaks
@@ -409,7 +505,8 @@ def plot_2d_spectrum(study_directory, experiment_directory):
 
         # Plotting with adjustments
         fig, axes = plt.subplots(2, 2, figsize=(12, 12))
-
+        # main title is the file name
+        plt.suptitle(file_path)
         # Adjusted Peak Analysis Plot
         axes[0, 0].plot(omega_values, averaged_density_grid.max(axis=0))
         axes[0, 0].plot(omega_values[peaks_positive], averaged_density_grid.max(axis=0)[peaks_positive], "x",
@@ -419,12 +516,16 @@ def plot_2d_spectrum(study_directory, experiment_directory):
         axes[0, 0].set_title("Adjusted Peak Analysis")
 
         # Adjusted Normalized Density
-        axes[0, 1].contourf(omega_grid, tauomega_grid, averaged_density_grid, levels=100, cmap='viridis',
-                            vmin=percentile_5, vmax=percentile_95)
-        axes[0, 1].set_title("Adjusted Normalized Density")
+        # axes[0, 1].contourf(omega_grid, tauomega_grid, averaged_density_grid, levels=100, cmap='viridis',
+        axes[0, 1].contourf(omega_grid + tauomega_grid, omega_grid, averaged_density_grid, levels=100,
+                            cmap='viridis',
+                            vmin=percentile_5, vmax=percentile_95
+                            )
+        axes[0, 1].set_title("Adjusted Normalized Density (5th and 95th Percentiles)")
 
         # Adjusted First Derivative
-        axes[1, 0].contourf(omega_grid, tauomega_grid, first_derivative, levels=100, cmap='seismic',
+        # axes[1, 0].contourf(omega_grid, tauomega_grid, first_derivative, levels=100, cmap='seismic',
+        axes[1, 0].contourf(omega_grid + tauomega_grid, omega_grid, first_derivative, levels=100, cmap='seismic',
                             vmin=-derivative_abs_max, vmax=derivative_abs_max)
         axes[1, 0].set_title("Adjusted First Derivative")
 
@@ -437,87 +538,129 @@ def plot_2d_spectrum(study_directory, experiment_directory):
         axes[1, 1].set_title("Integrated Density")
 
         plt.tight_layout()
-        # plt.show()
         output_file = file_path.replace('.csv', '.png')
         output_file = output_file if output_file != file_path else f'{file_path}.png'
+        output_file = output_file.replace('.png', f'_1.png')
         plt.savefig(output_file)
-
-        from scipy.signal import savgol_filter
-
-        # 1. Rethinking Peak Analysis
-        # Applying a more sophisticated peak detection method
-        filtered_density_max = savgol_filter(averaged_density_grid.max(axis=0), window_length=51, polyorder=3)
-        peaks_refined, _ = find_peaks(filtered_density_max, prominence=0.1)  # using prominence as a criterion
-
-        # 2. Reconsidering Normalization and Baseline Correction
-        # Applying a baseline correction using a polynomial fit (for example)
-        coefficients = np.polyfit(omega_values, averaged_density_grid.min(axis=0), deg=5)
-        baseline_poly = np.polyval(coefficients, omega_values)
-        corrected_density_poly = averaged_density_grid - baseline_poly[:, None]
-
-        # Normalization after baseline correction
-        normalized_density_poly = scaler.fit_transform(corrected_density_poly)
-
-        # 3. First Derivative Analysis
-        # Applying smoothing before differentiation
-        smoothed_density = savgol_filter(normalized_density_poly, window_length=51, polyorder=3, axis=0)
-        first_derivative_smoothed = np.gradient(smoothed_density, axis=0)
-
-        # 4. Contour Plot Adjustments
-        # Using standard deviations for dynamic scaling
-        std_dev = np.std(smoothed_density)
-        contour_min = np.mean(smoothed_density) - 2 * std_dev
-        contour_max = np.mean(smoothed_density) + 2 * std_dev
-
-        # 5. Integration of Density
-        # Integration considering the entire range
-        integrated_density_smoothed = np.trapz(smoothed_density, axis=0)
-
-        # Plotting with revised strategies
-        fig, axes = plt.subplots(2, 2, figsize=(12, 12))
-
-        # Refined Peak Analysis Plot
-        axes[0, 0].plot(omega_values, filtered_density_max)
-        axes[0, 0].plot(omega_values[peaks_refined], filtered_density_max[peaks_refined], "x")
-        axes[0, 0].set_title("Refined Peak Analysis")
-
-        # Normalized Density with Baseline Correction
-        axes[0, 1].contourf(omega_grid, tauomega_grid, normalized_density_poly, levels=100, cmap='viridis',
-                            vmin=contour_min, vmax=contour_max)
-        axes[0, 1].set_title("Normalized Density with Baseline Correction")
-
-        # First Derivative (Smoothed)
-        axes[1, 0].contourf(omega_grid, tauomega_grid, first_derivative_smoothed, levels=100, cmap='seismic',
-                            vmin=-std_dev, vmax=std_dev)
-        axes[1, 0].set_title("First Derivative (Smoothed)")
-
-        # Integrated Density (Smoothed)
-        axes[1, 1].plot(omega_values, integrated_density_smoothed)
-        axes[1, 1].set_title("Integrated Density (Smoothed)")
-
-        plt.tight_layout()
-        # plt.show()
-        output_file = file_path.replace('.csv', '.png')
-        output_file = output_file if output_file != file_path else f'{file_path}.png'
-        plt.savefig(output_file)
+        plt.show()
 
 
-def plot_ft_dipoles_v_time(study_directory, experiment_directory, time_delays, plot_all=False):
+
+
+def plot_2d_spectrum_interactive(study_directory, experiment_directory):
+    OMEGA_TAUOMEGA_FILE_NAMES = [
+        'Dipole/DipoleFT_ww.csv',
+        'Dipole/DipoleFT_ww_reconstructed.csv',
+    ]
+    OMEGA_TAUOMEGA_FILE_PATHS = [f'{study_directory}/{experiment_directory}/{file_name}' for file_name in
+                                 OMEGA_TAUOMEGA_FILE_NAMES]
+
+    length_of_data_to_match = None
+    INDECES_COL_NAMES = ['OmegaVec', 'TauOmegaVec']
+    FEATURES_COL_NAMES = [
+        '2DDipoleX_Re',
+        '2DDipoleX_Im',
+        '2DDipoleY_Re',
+        '2DDipoleY_Im',
+        '2DDipoleZ_Re',
+        '2DDipoleZ_Im'
+    ]
+
+    for file_path in OMEGA_TAUOMEGA_FILE_PATHS:
+        # Load the CSV file
+        logger.info(f'Plotting {file_path}')
+        data = pd.read_csv(file_path)
+
+        if length_of_data_to_match is None:
+            length_of_data_to_match = len(data)
+            # assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+        else:
+            assert length_of_data_to_match == len(
+                data), f'Length of {file_path} is not the same as the previous file'
+            # assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+
+        # Displaying the first few rows of the file to understand its structure
+        logger.debug(data.head())
+        logger.debug(f'Length of data: {len(data)}')
+
+        # Calculating the average of all polarizations
+        averaged_density = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
+        # averaged_density = (data["2DDipoleY_Re"] ** 2 + data["2DDipoleY_Im"] ** 2) ** 0.5
+
+        # Adding the averaged density to the DataFrame
+        data['AveragedDensity'] = averaged_density
+
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        # Preparing the data for plotting
+        omega_values = data['OmegaVec'].unique()
+        tauomega_values = data['TauOmegaVec'].unique()
+
+        # Creating a meshgrid for plotting
+        omega_grid, tauomega_grid = np.meshgrid(omega_values, tauomega_values, indexing='ij')
+
+        # Reshaping 'AveragedDensity' to match the shape of the meshgrid
+        averaged_density_grid = data['AveragedDensity'].values.reshape(omega_grid.shape)
+
+        # Plotting the contour map
+        import plotly.graph_objects as go
+
+        # Creating a meshgrid for plotting
+        fig = go.Figure(data=
+        go.Contour(
+            z=averaged_density_grid,
+            x=omega_values + tauomega_values,  # X-axis values
+            y=omega_values,  # Y-axis values
+            colorscale='Viridis',  # Can be dynamically changed
+            contours_coloring='heatmap',
+        )
+        )
+
+        # Add titles and labels
+        fig.update_layout(
+            title='Averaged 2D Electronic Density Spectra Plot',
+            xaxis_title='OmegaVec + TauOmegaVec',
+            yaxis_title='OmegaVec'
+        )
+
+        # Save the plot as an interactive HTML file
+        output_file = file_path.replace('.csv', '.html')
+        fig.write_html(output_file)
+        fig.show()
+
+
+def plot_ft_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
+                             pump_settings, probe_settings, charge_migration_ft_settings):
     # "number_of_pulses", "central_time_1", "carrier_frequency_1", "fwhm_1", "carrier_envelope_phase_1",
     #   "intensity_1", "amplitude_1", "period_1", "central_time_...", "carrier_frequency_...", "fwhm_...",
     #   "carrier_envelope_phase_...", "intensity_...", "amplitude_...", "period_...", "iOmega", "OmegaVec", "FTDipoleX_Re",
     #   "FTDipoleX_Im", "FTDipoleY_Re", "FTDipoleY_Im", "FTDipoleZ_Re", "FTDipoleZ_Im"
 
-    # set pm3d
-    # set pm3d interpolate 8,8
-    # set view map
-    # set hidden3d
-    # set ytics font "Arial, 120" offset -1,0,0
-    # set xtics font "Arial, 120" offset 1,-7,0
-    # set xlabel "Time delay (a.u)"      font "Arial, 156" offset  0,-20.0,0
-    # set ylabel "Emission energy (a.u)" font "Arial, 156" offset  -34.0,0,0
-    # Average
-    # splot [][0.2:0.48] 'sim1/Dipole/DipoleFT_ALL' u 9:17:((($18**2+$19**2+$20**2+$21**2+$22**2+$23**2)/3)**(0.5)) w l notitle
+    # Pump Settings
+    type_of_pulse_pump = pump_settings['typeofpulse']
+    start_time = pump_settings['starttime']
+    pump_central_frequency = pump_settings['pumpcentralfrequency']
+    pump_periods = pump_settings['pumpperiods']
+    pump_phase = pump_settings['pumpphase']
+    pump_intensity = pump_settings['pumpintensity']
+    pump_polarization = pump_settings['pumppolarization']
+
+    # Probe Settings
+    type_of_pulse_probe = probe_settings['typeofpulse']
+    time_delay_start = probe_settings['timedelaystart']
+    time_delay_stop = probe_settings['timedelaystop']
+    number_of_pp = probe_settings['numberofpp']
+    time_Delay_weight_factor = probe_settings['timedelayweightfactor']
+    probe_central_frequency = probe_settings['probecentralfrequency']
+    probe_periods = probe_settings['probeperiods']
+    probe_phase = probe_settings['probephase']
+    probe_intensity = probe_settings['probeintensity']
+    probe_polarization = probe_settings['probepolarization']
+
+    # Charge Migration Settings
+    ft_time_step = charge_migration_ft_settings['fttimestep']
+    ft_width_step = charge_migration_ft_settings['ftwidthstep']
 
     # Lets plot the Spectra FT Dipolar Reponse vs Time (t)
     # Well use "central_time_2"(PROBE),"OmegaVec","FTDipoleX_Re","FTDipoleX_Im","FTDipoleY_Re","FTDipoleY_Im","FTDipoleZ_Re","FTDipoleZ_Im"
@@ -777,7 +920,12 @@ def plot_ft_dipoles_v_time(study_directory, experiment_directory, time_delays, p
 
     # Updating layout for better visualization
     fig.update_layout(
-        title='Interactive Contour Plot of Average FT Dipole Magnitude',
+        title=f'Interactive Contour Plot of Average FT Dipole Magnitude\n'
+              f'DipoleFT_ALL.csv\n'
+    f'Pump Settings:  {pump_central_frequency}, {pump_periods}, {pump_phase}, {pump_intensity}, {pump_polarization}\n'
+    f'Probe Settings:  {probe_central_frequency}, {probe_periods}, {probe_phase}, {probe_intensity}, {probe_polarization}\n'
+    f'Dephasing Factor: {dephasing_factor}, Relaxation Factor: {relaxation_factor}'
+    f'FT Time Step: {ft_time_step}, FT Width Step: {ft_width_step}',
         xaxis_title='Central Time 2',
         yaxis_title='OmegaVec'
     )
@@ -785,3 +933,5 @@ def plot_ft_dipoles_v_time(study_directory, experiment_directory, time_delays, p
     # Displaying the figure
     # fig.show()
     fig.write_html(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL.html')
+    fig.show()
+
