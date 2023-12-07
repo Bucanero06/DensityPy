@@ -1,12 +1,14 @@
+import os
+
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
+from densitypy.molcas.molcasscripts import read_xyz
 from densitypy.project_utils.logger import setup_logger
 
 logger = setup_logger(__name__.split('.')[-1])
-
 
 DEFAULT_DIPOLE_COLUMNS_COLOR_MAPPING = {
     'DipoleX_Re': 'blue',
@@ -45,9 +47,28 @@ def calculate_min_max_significant_time(data, target_column, percentile_range=(20
 
     return min_time, max_time
 
+def __generate_atomic_charge_column_names(file_path):
+    with open(file_path, 'r') as f:
+        number_of_atoms = int(f.readline())
+        _ = f.readline()  # Skipping the molecule name line
+        atom_names = [f.readline().split()[0] for _ in range(number_of_atoms)]
 
-def plot_pulses(study_directory, experiment_directory, time_delays,  min_time, max_time, plot_all=False):
+    # Initialize counters for each atom name
+    atom_name_counts = {name: 0 for name in set(atom_names)}
 
+    # Initialize the list of column names
+    column_names = ['itime', 'Time', 'TotalCharge']
+
+    # Generate column names with suffixes for repeated atom names
+    for name in atom_names:
+        count = atom_name_counts[name]
+        suffix = f".{count}" if count > 0 else ""
+        for axis in ['X', 'Y', 'Z']:
+            column_names.append(f'Atom_{name}_Charge{axis}{suffix}')
+        atom_name_counts[name] += 1
+
+    return column_names
+def plot_pulses(study_directory, experiment_directory, time_delays, min_time, max_time, plot_all=False):
     length_of_data_to_match = None
     # Plotting the pulse data
     if plot_all:
@@ -89,7 +110,6 @@ def plot_pulses(study_directory, experiment_directory, time_delays,  min_time, m
             logger.error(f'File {file_path} not found')
             continue
         logger.info(f'Plotting {file_path}')
-
 
         if length_of_data_to_match is None:
             length_of_data_to_match = len(data)
@@ -201,16 +221,6 @@ def plot_dipoles_v_time(study_directory, experiment_directory, time_delays, min_
     # "itime","Time","DipoleX_Re","DipoleX_Im","DipoleY_Re","DipoleY_Im","DipoleZ_Re","DipoleZ_Im"
 
     length_of_data_to_match = None
-    INDECES_COL_NAMES = ['itime', 'Time']
-    FEATURES_COL_NAMES = [
-        'DipoleX_Re',
-        'DipoleX_Im',
-        'DipoleY_Re',
-        'DipoleY_Im',
-        'DipoleZ_Re',
-        'DipoleZ_Im'
-    ]
-
     if plot_all:
         time_delays_to_plot = time_delays
     else:
@@ -238,12 +248,11 @@ def plot_dipoles_v_time(study_directory, experiment_directory, time_delays, min_
             continue
         logger.info(f'Plotting {file_path}')
 
-
         if length_of_data_to_match is None:
             length_of_data_to_match = len(data)
         else:
             assert length_of_data_to_match == len(data), f'Length of {file_path} is not the same as the previous file'
-            assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+            # assert data.columns.tolist() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
 
         # Extracting relevant data for plotting
         time = data['Time']
@@ -310,20 +319,188 @@ def plot_dipoles_v_time(study_directory, experiment_directory, time_delays, min_
 
     plt.clf()
 
-    
+
+def plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delays, min_time, max_time,
+                               xyz_geometry_path, plot_all=False):
+    # Read the XYZ file to get the number of atoms, the name of the atom and the atom names
+    # (this is the order in which the atoms are listed in the CSV file)
+    with open(xyz_geometry_path, 'r') as f:
+        number_of_atoms = int(f.readline())
+        name_of_molecule = f.readline().split()[0]
+        atom_names = [f.readline().split()[0] for _ in range(number_of_atoms)]
+
+    print(number_of_atoms)
+    print(name_of_molecule)
+    print(atom_names)
 
 
-def plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delays, plot_all=False):
-    # Lets plot the Dipolar Reponse vs Time (t)
-    # "itime","Time","DipoleX_Re","DipoleX_Im","DipoleY_Re","DipoleY_Im","DipoleZ_Re","DipoleZ_Im"
-    ...
+    COL_NAMES = __generate_atomic_charge_column_names(xyz_geometry_path)
+
+    print(f'{COL_NAMES  = }')
+    assert len(
+        COL_NAMES) == 3 * number_of_atoms + 3, f'Number of columns in {xyz_geometry_path} does not match the number of atoms'
+
+    if plot_all:
+        time_delays_to_plot = time_delays
+    else:
+        # Time delays to plot = [0, 1/3 max, 2/3 max, max] if not present then use the nearest. Do the same for min
+        zero_time_delay = min(time_delays, key=lambda x: abs(x - 0))
+        one_third_max_time_delay = min(time_delays, key=lambda x: abs(x - max(time_delays) / 3))
+        two_third_max_time_delay = min(time_delays, key=lambda x: abs(x - 2 * max(time_delays) / 3))
+        max_time_delay = min(time_delays, key=lambda x: abs(x - max(time_delays)))
+        min_time_delay = min(time_delays, key=lambda x: abs(x - min(time_delays)))
+        one_third_min_time_delay = min(time_delays, key=lambda x: abs(x - min(time_delays) / 3))
+        two_third_min_time_delay = min(time_delays, key=lambda x: abs(x - 2 * min(time_delays) / 3))
+
+        time_delays_to_plot = [zero_time_delay, one_third_max_time_delay, two_third_max_time_delay, max_time_delay,
+                               min_time_delay, one_third_min_time_delay, two_third_min_time_delay]
+
+    from matplotlib import pyplot as plt
+
+    length_of_data_to_match = None
+    for time_delay in ['XUV'] + time_delays_to_plot:
+        file_path = f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargePP{time_delay}.csv' if time_delay != 'XUV' else f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeXUV.csv'
+        try:
+            data = pd.read_csv(file_path)
+        except FileNotFoundError:
+            logger.error(f'File {file_path} not found')
+            continue
+        logger.info(f'Plotting {file_path}')
+        print(f'{data.head()}')
+        print(f'{data.columns  = }')
+        print(f'{data.columns.tolist()  = }')
+        print(f'{COL_NAMES  = }')
+        if length_of_data_to_match is None:
+            length_of_data_to_match = len(data)
+        else:
+            assert length_of_data_to_match == len(data), f'Length of {file_path} is not the same as the previous file'
+            # assert data.columns.tolist() in COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
 
 
+        # Extracting relevant data for plotting
+        # "itime", "Time", "TotalCharge", "...
+        time = data['Time']
+        total_charge = data['TotalCharge']
+        atom_charges = data.drop(columns=['itime', 'Time', 'TotalCharge'])
 
+        # Subplots for xyz and total charge in one figure , each of the xyz will have all the atoms
+        # Plotting charge thus is all real
+        plt.figure(figsize=(16, 12))
+        # Add the Main Top Title for the plot (file_path)
+        plt.suptitle(file_path)
+
+        plt.subplot(2, 2, 1)
+        plt.plot(time, total_charge)
+        plt.xlim(min_time, max_time)
+        plt.title('Total Charge')
+        plt.xlabel('Time')
+        plt.ylabel('Total Charge')
+
+        # use the same legend for all subplots
+
+        plt.subplot(2, 2, 2)
+        for col in atom_charges.columns:
+            plt.plot(time, atom_charges[col], label=f'Column {col}')
+        plt.xlim(min_time, max_time)
+        plt.title('Atomic Charges')
+        plt.xlabel('Time')
+        plt.ylabel('Atomic Charges')
+        plt.legend()
+
+        plt.subplot(2, 2, 3)
+        for col in atom_charges.columns:
+            plt.plot(time, atom_charges[col], label=f'Column {col}')
+        plt.xlim(min_time, max_time)
+        plt.title('Atomic Charges')
+        plt.xlabel('Time')
+        plt.ylabel('Atomic Charges')
+        # plt.legend()
+
+        plt.subplot(2, 2, 4)
+        for col in atom_charges.columns:
+            plt.plot(time, atom_charges[col], label=f'Column {col}')
+        plt.xlim(min_time, max_time)
+        plt.title('Atomic Charges')
+        plt.xlabel('Time')
+        plt.ylabel('Atomic Charges')
+        # plt.legend()
+
+        plt.tight_layout()
+        # plt.show()
+        output_file = file_path.replace('.csv', '.png')
+        output_file = output_file if output_file != file_path else f'{file_path}.png'
+        plt.savefig(output_file)
+
+        plt.clf()
+
+        plt.figure(figsize=(16, 12))
+
+def difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delays, min_time, max_time,
+                                 xyz_geometry_path, plot_all=False):
+    import pandas as pd
+
+    # Load the datasets
+    atomic_charge_file = f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeXUV.csv'
+    dipole_file = f'{study_directory}/{experiment_directory}/Dipole/DipoleXUV.csv'
+
+    atomic_charge_data = pd.read_csv(atomic_charge_file)
+    dipole_data = pd.read_csv(dipole_file)
+
+    atomic_column_names = __generate_atomic_charge_column_names(xyz_geometry_path)
+    # Extract the 'TotalCharge' column from the atomic charge data
+    total_charge = atomic_charge_data['TotalCharge']
+    xyz_file_content = read_xyz(xyz_geometry_path)
+    print(f'{xyz_file_content  = }')
+    # xyz_file_content  = {'n_atoms': 12, 'title': 'NMA\n', 'atoms': {'O': (0.0, 1.23, 0.0), 'N': (1.13043, -0.791536, 0.0), 'C': (0.0, 0.0, 0.0), 'C_1': (2.474847, -0.248356, 0.0), 'C_2': (-1.277179, -0.767407, 0.0), 'H': (1.094833, -1.810914, 0.0), 'H_1': (3.189951, -1.070989, 0.0), 'H_2': (-2.13204, -0.075154, 0.0), 'H_3': (-1.274878, -1.466574, -0.849212), 'H_4': (-1.274881, -1.466568, 0.849216), 'H_5': (2.58097, 0.436291, -0.841485), 'H_6': (2.58098, 0.436267, 0.841503)}}
+    atomic_dipole_data = pd.DataFrame()
+    for i,atom_name in enumerate(xyz_file_content['atoms'].keys()):
+        for j, axis in enumerate(['X', 'Y', 'Z']):
+            column_name = atomic_column_names[3*i + j + 3]
+            print(f'{column_name  = }')
+            atomic_dipole_data[column_name] = atomic_charge_data[column_name] * xyz_file_content['atoms'][atom_name][j]
+    print(f'{atomic_dipole_data  = }')
+    # Sum of all charge dipoles
+    sum_atomic_dipole = atomic_dipole_data.sum(axis=1)
+    print(f'{sum_atomic_dipole  = }')
+
+
+    # Sum of all dipole components (both real and imaginary parts)
+    sum_dipole = dipole_data.iloc[:, 2:].sum(axis=1)
+
+    # Comparing the sum of all dipoles with the total charge
+    comparison_with_sum = pd.DataFrame({
+        'Time': atomic_charge_data['Time'],
+        'TotalCharge': total_charge,
+        'SumAtomicDipole': sum_atomic_dipole,
+        'SumDipole': sum_dipole
+    })
+
+    comparison_with_sum.head()
+
+    # Plotting the comparison
+    import matplotlib.pyplot as plt
+
+    plt.figure(figsize=(16, 12))
+    plt.plot(comparison_with_sum['Time'], comparison_with_sum['TotalCharge'], label='Total Charge', alpha=0.5)
+    plt.plot(comparison_with_sum['Time'], comparison_with_sum['SumDipole'], label='Sum of Dipoles', alpha=0.5)
+    plt.plot(comparison_with_sum['Time'], comparison_with_sum['SumAtomicDipole'], label='Sum of Atomic Dipoles',
+                alpha=0.5)
+
+    plt.xlim(min_time, max_time)
+    plt.title('Comparison of Total Charge and Sum of Dipoles')
+    plt.xlabel('Time')
+    plt.ylabel('Value')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    output_file = f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeXUV_vs_DipoleXUV.png'
+    plt.savefig(output_file)
+
+    plt.clf()
 
 
 def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
-                             pump_settings, probe_settings, charge_migration_ft_settings):
+                     pump_settings, probe_settings, charge_migration_ft_settings):
     # Pump Settings
     type_of_pulse_pump = pump_settings['typeofpulse']
     start_time = pump_settings['starttime']
@@ -357,7 +534,6 @@ def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, re
                                  OMEGA_TAUOMEGA_FILE_NAMES]
 
     length_of_data_to_match = None
-    INDECES_COL_NAMES = ['OmegaVec', 'TauOmegaVec']
     FEATURES_COL_NAMES = [
         '2DDipoleX_Re',
         '2DDipoleX_Im',
@@ -374,10 +550,10 @@ def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, re
 
         if length_of_data_to_match is None:
             length_of_data_to_match = len(data)
-            # assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+            # assert data.columns.tolist() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
         else:
             assert length_of_data_to_match == len(data), f'Length of {file_path} is not the same as the previous file'
-            # assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+            # assert data.columns.tolist() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
 
         # Displaying the first few rows of the file to understand its structure
         logger.debug(data.head())
@@ -413,12 +589,12 @@ def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, re
         plt.ylabel('TauOmegaVec')
         plt.title(f'2D Spectra Plot of Averaged \n{file_path}\n'
                   # Pump Details
-                    f'Pump Settings:  {pump_central_frequency}, {pump_periods}, {pump_phase}, {pump_intensity}, {pump_polarization}\n'
-                    # Probe Details
-                    f'Probe Settings:  {probe_central_frequency}, {probe_periods}, {probe_phase}, {probe_intensity}, {probe_polarization}\n'
-                    # Other Details
-                    f'Dephasing Factor: {dephasing_factor}, Relaxation Factor: {relaxation_factor}'
-                    f'FT Time Step: {ft_time_step}, FT Width Step: {ft_width_step}')
+                  f'Pump Settings:  {pump_central_frequency}, {pump_periods}, {pump_phase}, {pump_intensity}, {pump_polarization}\n'
+                  # Probe Details
+                  f'Probe Settings:  {probe_central_frequency}, {probe_periods}, {probe_phase}, {probe_intensity}, {probe_polarization}\n'
+                  # Other Details
+                  f'Dephasing Factor: {dephasing_factor}, Relaxation Factor: {relaxation_factor}'
+                  f'FT Time Step: {ft_time_step}, FT Width Step: {ft_width_step}')
 
         # Remove the csv if it has it in the name and replace with png
         output_file = file_path.replace('.csv', '.png')
@@ -454,11 +630,11 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
 
         if length_of_data_to_match is None:
             length_of_data_to_match = len(data)
-            # assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+            # assert data.columns.tolist() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
         else:
             assert length_of_data_to_match == len(
                 data), f'Length of {file_path} is not the same as the previous file'
-            # assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+            # assert data.columns.tolist() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
 
         # Displaying the first few rows of the file to understand its structure
         logger.debug(data.head())
@@ -573,11 +749,11 @@ def plot_2d_spectrum_interactive(study_directory, experiment_directory):
 
         if length_of_data_to_match is None:
             length_of_data_to_match = len(data)
-            # assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+            # assert data.columns.tolist() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
         else:
             assert length_of_data_to_match == len(
                 data), f'Length of {file_path} is not the same as the previous file'
-            # assert data.columns.all() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+            # assert data.columns.tolist() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
 
         # Displaying the first few rows of the file to understand its structure
         logger.debug(data.head())
@@ -590,7 +766,6 @@ def plot_2d_spectrum_interactive(study_directory, experiment_directory):
         # Adding the averaged density to the DataFrame
         data['AveragedDensity'] = averaged_density
 
-        import matplotlib.pyplot as plt
         import numpy as np
 
         # Preparing the data for plotting
@@ -631,7 +806,7 @@ def plot_2d_spectrum_interactive(study_directory, experiment_directory):
 
 
 def plot_ft_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
-                             pump_settings, probe_settings, charge_migration_ft_settings):
+                           pump_settings, probe_settings, charge_migration_ft_settings):
     # "number_of_pulses", "central_time_1", "carrier_frequency_1", "fwhm_1", "carrier_envelope_phase_1",
     #   "intensity_1", "amplitude_1", "period_1", "central_time_...", "carrier_frequency_...", "fwhm_...",
     #   "carrier_envelope_phase_...", "intensity_...", "amplitude_...", "period_...", "iOmega", "OmegaVec", "FTDipoleX_Re",
@@ -908,8 +1083,8 @@ def plot_ft_dipoles_v_time(study_directory, experiment_directory, dephasing_fact
     import plotly.graph_objects as go
 
     average_ft_dipole = np.sqrt((data['FTDipoleX_Re'] ** 2 + data['FTDipoleX_Im'] ** 2 +
-                                    data['FTDipoleY_Re'] ** 2 + data['FTDipoleY_Im'] ** 2 +
-                                    data['FTDipoleZ_Re'] ** 2 + data['FTDipoleZ_Im'] ** 2) / 3)
+                                 data['FTDipoleY_Re'] ** 2 + data['FTDipoleY_Im'] ** 2 +
+                                 data['FTDipoleZ_Re'] ** 2 + data['FTDipoleZ_Im'] ** 2) / 3)
 
     # Creating an interactive plot using Plotly
     fig = go.Figure(data=go.Contour(
@@ -922,10 +1097,10 @@ def plot_ft_dipoles_v_time(study_directory, experiment_directory, dephasing_fact
     fig.update_layout(
         title=f'Interactive Contour Plot of Average FT Dipole Magnitude\n'
               f'DipoleFT_ALL.csv\n'
-    f'Pump Settings:  {pump_central_frequency}, {pump_periods}, {pump_phase}, {pump_intensity}, {pump_polarization}\n'
-    f'Probe Settings:  {probe_central_frequency}, {probe_periods}, {probe_phase}, {probe_intensity}, {probe_polarization}\n'
-    f'Dephasing Factor: {dephasing_factor}, Relaxation Factor: {relaxation_factor}'
-    f'FT Time Step: {ft_time_step}, FT Width Step: {ft_width_step}',
+              f'Pump Settings:  {pump_central_frequency}, {pump_periods}, {pump_phase}, {pump_intensity}, {pump_polarization}\n'
+              f'Probe Settings:  {probe_central_frequency}, {probe_periods}, {probe_phase}, {probe_intensity}, {probe_polarization}\n'
+              f'Dephasing Factor: {dephasing_factor}, Relaxation Factor: {relaxation_factor}'
+              f'FT Time Step: {ft_time_step}, FT Width Step: {ft_width_step}',
         xaxis_title='Central Time 2',
         yaxis_title='OmegaVec'
     )
@@ -934,4 +1109,3 @@ def plot_ft_dipoles_v_time(study_directory, experiment_directory, dephasing_fact
     # fig.show()
     fig.write_html(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL.html')
     fig.show()
-

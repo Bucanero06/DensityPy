@@ -125,7 +125,7 @@ def Write_Pulses(field_file, type_of_pulse_pump, start_time, pump_central_freque
 # >Calls Charge Migration Code and gives command line arguements (1)
 def Call_Charge_Migration(Bin_Directory, input_directory, experiment_directory, number_of_times,
                           min_time, max_time, field_file, stept, stepw,
-                          geometry, orbital_list, write_charge_migrationflag, Volume, debug_mode, weights_file,
+                          geometry_file, orbital_list, write_charge_migrationflag, Volume, debug_mode, weights_file,
                           dephasing_factor,
                           relaxation_factor, bath_temp, i_excitation, i_epsilon):
     weights_file_decoy = ""
@@ -151,7 +151,7 @@ def Call_Charge_Migration(Bin_Directory, input_directory, experiment_directory, 
         f"{Bin_Directory}/"
         f"{debug_mode_decoy}ChargeMigration -i {input_directory} -o {experiment_directory} -nt {str(number_of_times)} "
         f"-t_min {str(min_time)} -t_max {str(max_time)} -field {field_file} -vol {str(Volume)} -stept {str(stept)} "
-        f"-stepw {str(stepw)} -xyz {str(geometry)} {weights_file_decoy} {write_charge_migrationflag_decoy} -iorb "
+        f"-stepw {str(stepw)} -xyz {str(geometry_file)} {weights_file_decoy} {write_charge_migrationflag_decoy} -iorb "
         f"{','.join(map(str, orbital_list))} -rf {str(relaxation_factor)} -bath {str(bath_temp)} -df "
         f"{str(dephasing_factor)} -s {i_excitation} -e {i_epsilon}"
         , _logger=_logger)

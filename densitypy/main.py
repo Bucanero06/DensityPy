@@ -17,7 +17,8 @@ from densitypy.molcas.molcasscripts import create_help_input_file, copy_and_pars
 from densitypy.molcas.selectionofactivespace import SelectionOfActiveSpace
 from densitypy.post_processing.plotting_module import plot_dipoles_v_time, plot_ft_pulses, plot_pulses, \
     plot_2d_spectrum, \
-    plot_ft_dipoles_v_time, plot_2d_spectrum_peak_analysis, plot_2d_spectrum_interactive
+    plot_ft_dipoles_v_time, plot_2d_spectrum_peak_analysis, plot_2d_spectrum_interactive, plot_atomic_dipoles_v_time, \
+    difference_between_dipole_and_atomic_charges_v_time
 from densitypy.project_utils.configuration_parser import parse_configuration_file
 from densitypy.project_utils.def_functions import make_directory, file_lenth, copy_file_to, find, \
     change_directory_manager
@@ -90,7 +91,7 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
 
         # Project Settings
         project_name = project_settings['projectname']
-        xyz_geometry = project_settings['xyzmoleculegeometry']
+        xyz_geometry_path = project_settings['xyzmoleculegeometry']
         number_of_states = project_settings['numberofstates']
         list_of_orbitals = project_settings['listofactiveorbitals']
         molcas_output_directory = project_settings['molcasoutputdirectory']
@@ -189,7 +190,7 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                                                                              project_name=project_name,
                                                                              molcas_directory=molcas_output_directory)
 
-            copy_file_to(xyz_geometry, molcas_output_directory)
+            copy_file_to(xyz_geometry_path, molcas_output_directory)
 
             # gridflag can be
             #   True = use gridit on molcas with with uniform grid points
@@ -199,7 +200,8 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
             #   'manual' = Use a grid file to create a grid, this is the only option that requires a grid file to be specified in the config file
             if gridflag in ['smart', 'limited']:
                 limitedgrid = True if gridflag == 'limited' else False
-                n_points = make_better_grid(molcas_output_directory, xyz_geometry, step_size, boundary, limitedgrid)
+                n_points = make_better_grid(molcas_output_directory, xyz_geometry_path, step_size, boundary,
+                                            limitedgrid)
             elif gridflag == 'manual':
                 gridfile = json_config['grid_settings']['default_grid_file']
                 system(f"cp {gridfile} {molcas_output_directory}/gridcoord")
@@ -220,7 +222,7 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
             copy_file_to(molcas_input, molcas_output_directory + "/")
             logfilepath = find(project_name + ".log", ".", molcas_output_directory)
             copy_file_to(logfilepath + "/" + project_name + ".log ", molcas_output_directory + "/")
-            copy_file_to(xyz_geometry, molcas_output_directory + "/")
+            copy_file_to(xyz_geometry_path, molcas_output_directory + "/")
 
             if "RASSI" in keywords_needed_found:  # todo add to documentation that dipoles are only parsed for RASSI
                 project = DipolesLogParser(log_path=f'{molcas_output_directory}/{project_name}.log')
@@ -268,13 +270,10 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
             i_excitation = -1  # Just Ground and Prepare
             i_epsilon = -1  # Just Ground and Prepare
             Call_Charge_Migration(DEFAULT_BIN_FILE_PATH, molcas_output_directory, experiment_directory, number_of_times,
-                                  min_time,
-                                  max_time,
-                                  f"{experiment_directory}/{field_file}", ft_time_step, ft_width_step,
-                                  f"{molcas_output_directory}/{xyz_geometry}", list_of_orbitals, write_charge_migration,
-                                  Volume,
-                                  debug_mode, weights_file, dephasing_factor, relaxation_factor, bath_temperature,
-                                  i_excitation, i_epsilon)
+                                  min_time, max_time, f"{experiment_directory}/{field_file}", ft_time_step,
+                                  ft_width_step, f"{molcas_output_directory}/{xyz_geometry_path}", list_of_orbitals,
+                                  write_charge_migration, Volume, debug_mode, weights_file, dephasing_factor,
+                                  relaxation_factor, bath_temperature, i_excitation, i_epsilon)
 
             if old_main:
                 pass
@@ -295,7 +294,7 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                 pool.starmap_async(Call_Charge_Migration,
                                    [(molcas_output_directory, experiment_directory, number_of_times,
                                      min_time, max_time, f"{experiment_directory}/{field_file}", ft_time_step,
-                                     ft_width_step, f"{molcas_output_directory}/{xyz_geometry}",
+                                     ft_width_step, f"{molcas_output_directory}/{xyz_geometry_path}",
                                      list_of_orbitals, write_charge_migration, Volume, debug_mode, weights_file,
                                      dephasing_factor,
                                      relaxation_factor, bath_temperature, i_excitation, i_epsilon) for
@@ -308,13 +307,10 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                 i_excitation = 0
                 i_epsilon = 0
                 Call_Charge_Migration(DEFAULT_BIN_FILE_PATH, molcas_output_directory, experiment_directory,
-                                      number_of_times,
-                                      min_time,
-                                      max_time, f"{experiment_directory}/{field_file}", ft_time_step, ft_width_step,
-                                      f"{molcas_output_directory}/{xyz_geometry}", list_of_orbitals,
-                                      write_charge_migration, Volume, debug_mode, weights_file, dephasing_factor,
-                                      relaxation_factor,
-                                      bath_temperature, i_excitation, i_epsilon)
+                                      number_of_times, min_time, max_time, f"{experiment_directory}/{field_file}",
+                                      ft_time_step, ft_width_step, f"{molcas_output_directory}/{xyz_geometry_path}",
+                                      list_of_orbitals, write_charge_migration, Volume, debug_mode, weights_file,
+                                      dephasing_factor, relaxation_factor, bath_temperature, i_excitation, i_epsilon)
             copy_file_to(json_config_path, f"{experiment_directory}")
 
         # >ChargeMigrationFT
@@ -352,7 +348,7 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                 pool = Pool(Number_CPU)
                 pool.starmap_async(Call_Charge_MigrationFT,
                                    [(molcas_output_directory, experiment_directory,
-                                     f"{molcas_output_directory}/{xyz_geometry}", number_of_omegas,
+                                     f"{molcas_output_directory}/{xyz_geometry_path}", number_of_omegas,
                                      min_omegas, max_omegas, number_of_tau_omegas, min_tau_omega, max_tau_omega,
                                      ft_time_step, ft_width_step, f"{experiment_directory}/{field_file}", debug_mode,
                                      i_excitation, i_epsilon) for
@@ -363,7 +359,7 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                 i_excitation = 0
                 i_epsilon = 0
                 Call_Charge_MigrationFT(DEFAULT_BIN_FILE_PATH, molcas_output_directory, experiment_directory,
-                                        f"{molcas_output_directory}/{xyz_geometry}",
+                                        f"{molcas_output_directory}/{xyz_geometry_path}",
                                         number_of_omegas,
                                         min_omegas, max_omegas, number_of_tau_omegas, min_tau_omega, max_tau_omega,
                                         ft_time_step, ft_width_step, f"{experiment_directory}/{field_file}", debug_mode,
@@ -382,7 +378,7 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
             #
             Call_Spectrum_Reconstruction_n_Difference(DEFAULT_BIN_FILE_PATH, molcas_output_directory,
                                                       experiment_directory,
-                                                      f"{molcas_output_directory}/{xyz_geometry}", number_of_omegas,
+                                                      f"{molcas_output_directory}/{xyz_geometry_path}", number_of_omegas,
                                                       min_omegas, max_omegas,
                                                       number_of_tau_omegas, min_tau_omega, max_tau_omega, debug_mode)
             # logger.info("Creating difference_" + experiment_directory + " to compare the Dipole and Charge Spectra")
@@ -390,16 +386,22 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
             #                          '/Dipole/DipoleFT_ww_reconstructed.csv', 'difference_' + experiment_directory)
 
         if plot:
-            # Todo perhaps we want to differenciate the min and max of time from those to use when plotting
-            # Lets Plot the Pulses
+            # Lets plot the Pulses
             plot_pulses(study_directory, experiment_directory, time_delay_range, min_time, max_time, plot_all=False)
             plot_ft_pulses(study_directory, experiment_directory, time_delay_range, plot_all=False)
 
             # Lets plot the Dipolar Reponse vs Time (t)
             plot_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
                                 plot_all=False)
+            plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
+                                       xyz_geometry_path,plot_all=False)
+            difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time, xyz_geometry_path, plot_all=False)
+
+            # Lets plot the Dipolar Reponse vs Time (t) in the Frequency Domain (w)
             plot_ft_dipoles_v_time(study_directory, experiment_directory,dephasing_factor, relaxation_factor,
                              pump_settings, probe_settings, charge_migration_ft_settings)
+
+            # Lets plot the 2D Spectrum
             plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
                              pump_settings, probe_settings, charge_migration_ft_settings)
             plot_2d_spectrum_peak_analysis(study_directory, experiment_directory)

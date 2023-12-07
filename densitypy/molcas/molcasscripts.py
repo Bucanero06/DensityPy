@@ -121,9 +121,9 @@ def make_new_grid(atomic_coordinates, step_size, boundary, limitedgrid, np=None)
     return gridcoord, initial_Npoints
 
 
-def make_better_grid(molcas_directory, geometry, step_size, Boundary, limitedgrid, ):
+def make_better_grid(molcas_directory, geometry_path, step_size, Boundary, limitedgrid, ):
     logger.info("Making Grid")
-    atomic_coordinates = read_xyz(geometry)
+    atomic_coordinates = read_xyz(geometry_path, return_coordinates_only=True)
     # > Make_Grid(maxi, mini, Npoints)
     gridcoord, initial_Npoints = make_new_grid(atomic_coordinates, step_size, Boundary, limitedgrid)
     n_points = len(gridcoord)
@@ -170,7 +170,7 @@ def add_grid_it_to_manual_input_file(pymolcas_input, project_name, molcas_direct
             fout.write(','.join(row) + '\n')
 
 
-def read_xyz(xyz_file):
+def read_xyz(xyz_file, return_coordinates_only=False):
     atoms = []
     x = []
     y = []
@@ -184,9 +184,9 @@ def read_xyz(xyz_file):
             stop = stop + 1
             atom_, x_, y_, z_ = line.split()
             atoms.append(atom_)
-            x.append([float(x_)])
-            y.append([float(y_)])
-            z.append([float(z_)])
+            x.append(float(x_))
+            y.append(float(y_))
+            z.append(float(z_))
             if (stop == n_atoms):
                 break
 
@@ -196,9 +196,30 @@ def read_xyz(xyz_file):
     logger.info("filename:         %s" % xyz_file)
     logger.info("title:            %s" % title)
     logger.info("number of atoms:  %d" % n_atoms)
+    logger.info("atoms:            %s" % atoms)
 
-    return atomic_coordinates
+    if return_coordinates_only:
+        return atomic_coordinates
+    else:
+        # return n_atoms, title, atoms, atomic_coordinates
 
+        # Combine atom sand atomic_coordinates into a dictionary since they are in the same order
+        returning_dict = {}
+        for i in range(0, len(atoms)):
+            # In case the atom name has already been used lets number them
+            if atoms[i] in returning_dict.keys():
+                number_of_times_atom_has_been_used = len([key for key in returning_dict.keys() if atoms[i] in key])
+                returning_dict[f'{atoms[i]}_{number_of_times_atom_has_been_used}'] = atomic_coordinates[i]
+            else:
+                returning_dict[atoms[i]] = atomic_coordinates[i]
+
+
+
+        return {
+            'n_atoms': n_atoms,
+            'title': title,
+            'atoms': returning_dict
+        }
 
 def distance(avec, bvec):
     c = np.square(np.subtract(avec, bvec))
