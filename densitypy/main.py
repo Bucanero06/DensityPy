@@ -15,8 +15,9 @@ from densitypy.molcas.molcasscripts import create_help_input_file, copy_and_pars
     make_grid_coordinates, add_grid_it_to_manual_input_file, call_open_molcas, parse_project_grid_file, \
     load_project_rasscf_h5_file, write_grid_density_file
 from densitypy.molcas.selectionofactivespace import SelectionOfActiveSpace
-from densitypy.post_processing.plotting_module import plot_dipoles_v_time, plot_ft_pulses, plot_pulses, plot_2d_spectrum, \
-    plot_ft_dipoles_v_time
+from densitypy.post_processing.plotting_module import plot_dipoles_v_time, plot_ft_pulses, plot_pulses, \
+    plot_2d_spectrum, \
+    plot_ft_dipoles_v_time, plot_2d_spectrum_peak_analysis, plot_2d_spectrum_interactive
 from densitypy.project_utils.configuration_parser import parse_configuration_file
 from densitypy.project_utils.def_functions import make_directory, file_lenth, copy_file_to, find, \
     change_directory_manager
@@ -314,7 +315,7 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                                       write_charge_migration, Volume, debug_mode, weights_file, dephasing_factor,
                                       relaxation_factor,
                                       bath_temperature, i_excitation, i_epsilon)
-            copy_file_to(json_config_path, f"{experiment_directory}/")
+            copy_file_to(json_config_path, f"{experiment_directory}")
 
         # >ChargeMigrationFT
         if run_charge_migration_ft:
@@ -397,8 +398,13 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
             # Lets plot the Dipolar Reponse vs Time (t)
             plot_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
                                 plot_all=False)
-            plot_ft_dipoles_v_time(study_directory, experiment_directory, time_delay_range, plot_all=False)
-            plot_2d_spectrum(study_directory, experiment_directory)
+            plot_ft_dipoles_v_time(study_directory, experiment_directory,dephasing_factor, relaxation_factor,
+                             pump_settings, probe_settings, charge_migration_ft_settings)
+            plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
+                             pump_settings, probe_settings, charge_migration_ft_settings)
+            plot_2d_spectrum_peak_analysis(study_directory, experiment_directory)
+            plot_2d_spectrum_interactive(study_directory, experiment_directory)
+
 
 if __name__ == "__main__":
     make_fortran_config = dict(directory='/home/ruben/PycharmProjects/DensityPy/densityfort',
