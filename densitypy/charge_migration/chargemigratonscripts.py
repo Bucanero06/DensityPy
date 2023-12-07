@@ -35,6 +35,13 @@ def Write_FieldHelp():
 
 
 def generate_time_delays(number_of_pp, start, mid, stop, weight_factor=0.5):
+    if number_of_pp < 3:
+        raise ValueError('Number of time delays must be at least 3')
+
+    if start >= mid or mid >= stop:
+        raise ValueError('Start, mid and stop must be in ascending order')
+
+
     # Ensure the weight factor is between 0 and 1
     weight_factor = max(0, min(1, weight_factor))
 
