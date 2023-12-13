@@ -17,8 +17,9 @@ from densitypy.molcas.molcasscripts import create_help_input_file, copy_and_pars
 from densitypy.molcas.selectionofactivespace import SelectionOfActiveSpace
 from densitypy.post_processing.plotting_module import plot_dipoles_v_time, plot_ft_pulses, plot_pulses, \
     plot_2d_spectrum, \
-    plot_ft_dipoles_v_time, plot_2d_spectrum_peak_analysis, plot_2d_spectrum_interactive, plot_atomic_dipoles_v_time, \
-    difference_between_dipole_and_atomic_charges_v_time
+    plot_ft_all_dipoles_v_time, plot_2d_spectrum_peak_analysis, plot_2d_spectrum_interactive, \
+    plot_atomic_dipoles_v_time, \
+    difference_between_dipole_and_atomic_charges_v_time, plot_ft_all_atomic_dipoles_v_time, plot_becke_weights
 from densitypy.project_utils.configuration_parser import parse_configuration_file
 from densitypy.project_utils.def_functions import make_directory, file_lenth, copy_file_to, find, \
     change_directory_manager
@@ -244,17 +245,6 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                 exit()
             make_directory(experiment_directory)
 
-            if write_charge_migration:
-                pass
-            elif (weights_file == None):
-                if path.exists("Weights_File"):
-                    logger.info("Found Weight_File in curent directory, did you forget to use \"-w\"")
-                    userinput_weights = input("\"Y\" to use Weights_File:").upper().replace(
-                        " ", "")
-                    yes_input = ["yes", "y", "Yes", "Y", "YES"]
-                    if (userinput_weights in yes_input):
-                        weights_file = "Weights_File"
-                        logger.info("Using \"-w\" flag")
             if givenfieldfile:
                 field_file = givenfieldfile
             else:
@@ -386,6 +376,9 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
             #                          '/Dipole/DipoleFT_ww_reconstructed.csv', 'difference_' + experiment_directory)
 
         if plot:
+            # Becke Weights
+            plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path, weights_file)
+
             # Lets plot the Pulses
             plot_pulses(study_directory, experiment_directory, time_delay_range, min_time, max_time, plot_all=False)
             plot_ft_pulses(study_directory, experiment_directory, time_delay_range, plot_all=False)
@@ -395,11 +388,14 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                                 plot_all=False)
             plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
                                        xyz_geometry_path,plot_all=False)
-            difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time, xyz_geometry_path, plot_all=False)
+            difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time, xyz_geometry_path)
 
             # Lets plot the Dipolar Reponse vs Time (t) in the Frequency Domain (w)
-            plot_ft_dipoles_v_time(study_directory, experiment_directory,dephasing_factor, relaxation_factor,
-                             pump_settings, probe_settings, charge_migration_ft_settings)
+            plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
+                                       pump_settings, probe_settings, charge_migration_ft_settings)
+            plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
+                                            pump_settings, probe_settings, charge_migration_ft_settings,
+                                          xyz_geometry_path)
 
             # Lets plot the 2D Spectrum
             plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
