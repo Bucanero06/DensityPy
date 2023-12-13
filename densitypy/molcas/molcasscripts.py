@@ -212,9 +212,6 @@ def read_xyz(xyz_file, return_coordinates_only=False):
                 returning_dict[f'{atoms[i]}_{number_of_times_atom_has_been_used}'] = atomic_coordinates[i]
             else:
                 returning_dict[atoms[i]] = atomic_coordinates[i]
-
-
-
         return {
             'n_atoms': n_atoms,
             'title': title,
