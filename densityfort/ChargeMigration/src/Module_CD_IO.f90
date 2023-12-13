@@ -258,9 +258,9 @@ contains
             read(uid, '(A)', iostat = iostat) line
             read(line, *) x, y, z
             gridv(:, i) = [x, y, z]
-            ! Display the gridv values
         enddo
         close(uid)
+
     end subroutine LoadGrid
     !
     !> Loads the Orbitals found inside the input_directory

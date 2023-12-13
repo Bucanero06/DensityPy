@@ -48,10 +48,9 @@ program ChargeMigrationFT
     !.. Data for FT
     !..
     complex(kind(1d0)), allocatable :: DipoleFTtotal(:, :), DipoleFTminus(:, :), DipoleFTplus (:, :)
-    complex(kind(1d0)), allocatable :: AtomicChargeFT(:, :)
-    !    complex(kind(1d0)), allocatable :: AtomicChargeFT(:, :, :)
     complex(kind(1d0)), allocatable :: DipoleFTwt(:, :, :), DipoleFTww(:, :, :)
-    complex(kind(1d0)), allocatable :: ChargeFTwt(:, :, :), ChargeFTww(:, :, :)
+    complex(kind(1d0)), allocatable :: AtomicChargeFT(:, :, :), ChargeFTwt(:, :, :, :), ChargeFTww(:, :, :, :), XUVCharge(:, :, :)
+
     real   (kind(1d0)), allocatable :: OmegaVec(:), TauOmegaVec(:)
     real   (kind(1d0)), allocatable :: tvec(:)
     integer :: iOmega, ntimes, i
@@ -81,8 +80,6 @@ program ChargeMigrationFT
     !.. Statistical Density Matrix
     !..
     real   (kind(1d0)) :: dt
-    real   (kind(1d0)), allocatable :: AtomicChargeEvolution(:, :), AtomicChargeEvolutionComponent(:, :, :)
-
     !.. Pulse parameters
     !..
     integer :: iSim, N_Simulations
@@ -91,15 +88,14 @@ program ChargeMigrationFT
 
     !.. XUV_Dipole and XUV_Charge
     !..
-    complex(kind(1d0)), allocatable :: XUVDipole(:, :), XUVCharge(:, :)!, XUVChargeComponent(:, :, :)
+    complex(kind(1d0)), allocatable :: XUVDipole(:, :)
     complex(kind(1d0)), allocatable :: XUVDipoleFT(:, :)
 
 
 
     !..Test
     !..
-    complex(kind(1d0)), allocatable :: AtomicChargeFT_new(:, :, :), ChargeFTwt_new(:, :, :, :), ChargeFTww_new(:, :, :, :), XUVCharge_new(:, :, :)
-    real   (kind(1d0)), allocatable :: AtomicChargeEvolution_new(:, :, :)
+    real   (kind(1d0)), allocatable :: AtomicChargeEvolution(:, :, :)
     complex(kind(1d0)), allocatable :: Debug(:, :, :)
     external :: system
     integer :: iPol, iAtom, it, iCoord
@@ -147,8 +143,8 @@ program ChargeMigrationFT
     !#
     !############################################################################################
     !.. Load XUVCharge from file, Regularize it and Compute FT of XUVCharge
-    call Load_XUVAtomicCharge(OutDir // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(N_Simulations)) // '.csv', XUVCharge_new, nTimes, nAtoms)
-    call Regularize_XUVAtomicCharge(XUVCharge_new, tmin, dt, nTimes, StepTime, StepWidth)
+    call Load_XUVAtomicCharge(OutDir // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(N_Simulations)) // '.csv', XUVCharge, nTimes, nAtoms)
+    call Regularize_XUVAtomicCharge(XUVCharge, tmin, dt, nTimes, StepTime, StepWidth)
     !##########################################################################################
     !#
     !############################################################################################
@@ -169,10 +165,8 @@ program ChargeMigrationFT
     allocate(DipoleFTminus(3, nOmegas))
     allocate(DipoleFTtotal(3, nOmegas))
     allocate(zMuEV        (3, nTimes))
-    !    allocate(XUVChargeComponent(3, nAtoms, nTimes))
-    allocate(AtomicChargeEvolution_new(3, nAtoms, nTimes)) !delete
-    allocate(AtomicChargeFT(nOmegas, nAtoms))
-    !    allocate(AtomicChargeFT(3, nOmegas, nAtoms)
+    allocate(AtomicChargeEvolution(3, nAtoms, nTimes)) !delete
+    allocate(AtomicChargeFT(3, nOmegas, nAtoms))
     Sim_loop : do iSim = 1, N_Simulations
         write(*, *) "iSim =", iSim, "   N_Simulations =", N_Simulations
 
@@ -180,18 +174,17 @@ program ChargeMigrationFT
         call Load_Dipole(OutDir // "/Dipole/Dipole" // trim(Simulation_tagv(iSim)) // '.csv', zMuEV, nTimes)
 
         call Load_Q_Charge_and_Write2ALL(OutDir // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)) // '.csv', &
-                AtomicChargeEvolution_new, nTimes, tmin, dt, nAtoms, iSim, AtomName, uid_AtomicChargeALL)
+                AtomicChargeEvolution, nTimes, tmin, dt, nAtoms, iSim, AtomName, uid_AtomicChargeALL)
 
 
         !.. Compute the regularized dipole $\mu_-(t)$ and Atomic Charges and FT
-        !                call Regularize_Dipole_and_AtomicCharge(zMuEV, AtomicChargeEvolution, tmin, dt, nTimes, StepTime, StepWidth)
-        call Regularize_Dipole_and_AtomicCharge1(zMuEV, AtomicChargeEvolution_new, tmin, dt, nTimes, StepTime, StepWidth)
+        call Regularize_Dipole_and_AtomicCharge1(zMuEV, AtomicChargeEvolution, tmin, dt, nTimes, StepTime, StepWidth)
 
         zMuEV = zMuEV - XUVDipole
-        AtomicChargeEvolution_new = AtomicChargeEvolution_new - XUVCharge_new!!!
+        AtomicChargeEvolution = AtomicChargeEvolution - XUVCharge!!!
 
-        call ComputeFT_Dipole_and_AtomicCharges(DipoleFTminus, AtomicChargeFT_new, zMuEV, OmegaVec, &
-                AtomicChargeEvolution_new, tmin, dt, nTimes, nOmegas)
+        call ComputeFT_Dipole_and_AtomicCharges(DipoleFTminus, AtomicChargeFT, zMuEV, OmegaVec, &
+                AtomicChargeEvolution, tmin, dt, nTimes, nOmegas)
 
         !..Compute DipoleFTtotal
         DipoleFTplus = Z0
@@ -210,7 +203,7 @@ program ChargeMigrationFT
                 AtomicChargeFT, OmegaVec, nOmegas, nAtoms, AtomName)
         !
         !.. Save Atomic Charge FT in a single file
-        call WriteAllAtomicChargeFTtoSingleFile(OutDir // CHARGE_FT_PATH_ALL, AtomicChargeFT_new, OmegaVec, &
+        call WriteAllAtomicChargeFTtoSingleFile(OutDir // CHARGE_FT_PATH_ALL, AtomicChargeFT, OmegaVec, &
                 nOmegas, nAtoms, iSim, train, AtomName)
 
     end do Sim_loop
@@ -240,18 +233,18 @@ program ChargeMigrationFT
     !.. COMPUTE 2D SPECTRUM CHARGE
     !..
     !.. Load the FT of the charge, as a functAtomicChargeion of the time delay
-    call LoadFTofChargeasFuncofTimeDelay(OutDir // CHARGE_FT_PATH_ALL, N_simulations, nOmegas, nAtoms, tvec, ChargeFTwt_new)
+    call LoadFTofChargeasFuncofTimeDelay(OutDir // CHARGE_FT_PATH_ALL, N_simulations, nOmegas, nAtoms, tvec, ChargeFTwt)
     !
 
     !.. Regularizes the charge with respect to the time-delay edges
-    call Regularize_Charge_withtimedelay (ChargeFTwt_new, tvec, nAtoms, N_Simulations)
+    call Regularize_Charge_withtimedelay (ChargeFTwt, tvec, nAtoms, N_Simulations)
 
     !.. Compute the FT wrt the time delay
-    call Compute_FTCharge_withTimeDelay(ChargeFTwt_new, tvec, ChargeFTww_new, N_simulations, nOmegas, nAtoms, nTauOmegas, TauOmegaVec)
+    call Compute_FTCharge_withTimeDelay(ChargeFTwt, tvec, ChargeFTww, N_simulations, nOmegas, nAtoms, nTauOmegas, TauOmegaVec)
 
     !.. Write the Bidimensional spectrum to file
     !    call Write_BidimentionalChargeFTww(OutDir // "/AtomicCharge/AtomicChargeFT_ww", ChargeFTww, TauOmegaVec, OmegaVec, nTauOmegas, nOmegas, nAtoms)
-    call Write_BidimentionalChargeFTww(OutDir // "/AtomicCharge/AtomicChargeFT_ww.csv", ChargeFTww_new, TauOmegaVec, OmegaVec, nTauOmegas, nOmegas, nAtoms, AtomName)
+    call Write_BidimentionalChargeFTww(OutDir // "/AtomicCharge/AtomicChargeFT_ww.csv", ChargeFTww, TauOmegaVec, OmegaVec, nTauOmegas, nOmegas, nAtoms, AtomName)
     !############################################################################################
     !#
 
@@ -368,12 +361,12 @@ contains
     end subroutine Regularize_Dipole_and_AtomicCharge1
 
 
-    subroutine ComputeFT_Dipole_and_AtomicCharges(DipoleFTminus, AtomicChargeFT_new, Dipole, OmegaVec, &
-            AtomicChargeEvolution_new, tmin, dt, nTimes, nOmegas)
+    subroutine ComputeFT_Dipole_and_AtomicCharges(DipoleFTminus, AtomicChargeFT, Dipole, OmegaVec, &
+            AtomicChargeEvolution, tmin, dt, nTimes, nOmegas)
         complex(kind(1d0)), intent(out) :: DipoleFTminus(:, :)
-        complex(kind(1d0)), allocatable, intent(out) :: AtomicChargeFT_new(:, :, :)
+        complex(kind(1d0)), allocatable, intent(out) :: AtomicChargeFT(:, :, :)
         complex(kind(1d0)), intent(in) :: Dipole(:, :)
-        real   (kind(1d0)), intent(in) :: OmegaVec(:), AtomicChargeEvolution_new(:, :, :)
+        real   (kind(1d0)), intent(in) :: OmegaVec(:), AtomicChargeEvolution(:, :, :)
         real(kind(1d0)), intent(in) :: tmin, dt
         integer, intent(in) :: nTimes, nOmegas
 
@@ -381,10 +374,10 @@ contains
         real(kind(1d0)) :: t, w
         integer :: iOmega, it, iPol
 
-        if (.not.allocated(AtomicChargeFT_new))allocate(AtomicChargeFT_new(3, nOmegas, nAtoms))
+        if (.not.allocated(AtomicChargeFT))allocate(AtomicChargeFT(3, nOmegas, nAtoms))
 
         DipoleFTminus = Z0
-        AtomicChargeFT_new = Z0
+        AtomicChargeFT = Z0
 
         do iOmega = 1, nOmegas
             w = OmegaVec(iOmega)
@@ -393,13 +386,14 @@ contains
                 zexpFact = exp(Zi * w * t)
                 DipoleFTminus(:, iOmega) = DipoleFTminus(:, iOmega) + zExpFact * Dipole(:, it)
                 do iPol = 1, 3
-                    AtomicChargeFT_new(iPol, iOmega, :) = AtomicChargeFT_new(iPol, iOmega, :) + &
-                            zExpFact * AtomicChargeEvolution_new(iPol, :, it)
+                    AtomicChargeFT(iPol, iOmega, :) = AtomicChargeFT(iPol, iOmega, :) + &
+                            zExpFact * AtomicChargeEvolution(iPol, :, it)
                 end do
+!            WRITE(*, *) "AtomicChargeEvolution(iPol, :, it)=", AtomicChargeEvolution(1, 1, it)
             enddo
         end do
         DipoleFTminus = DipoleFTminus * dt / (2.d0 * PI)                 !((2.d0 * PI)**(1 / 2))
-        AtomicChargeFT_new = AtomicChargeFT_new * dt / (2.d0 * PI)       !((2.d0 * PI)**(1 / 2))
+        AtomicChargeFT = AtomicChargeFT * dt / (2.d0 * PI)       !((2.d0 * PI)**(1 / 2))
     end subroutine ComputeFT_Dipole_and_AtomicCharges
     !
     !
@@ -460,8 +454,8 @@ contains
 
     !.. Regularizes the charge with respect to the time-delay edges
     !..
-    subroutine Regularize_Charge_withtimedelay (ChargeFTwt_new, tvec, nAtoms, N_Simulations)
-        complex(kind(1d0)), intent(inout) :: ChargeFTwt_new(:, :, :, :)
+    subroutine Regularize_Charge_withtimedelay (ChargeFTwt, tvec, nAtoms, N_Simulations)
+        complex(kind(1d0)), intent(inout) :: ChargeFTwt(:, :, :, :)
         real   (kind(1d0)), intent(in) :: tvec(:)
         integer, intent(in) :: nAtoms, N_Simulations
 
@@ -478,24 +472,24 @@ contains
                 t = tvec(iSim)
                 dstep = NCD_Phi(t, tStep1, StepWidth) * (1.d0 - NCD_Phi(t, tStep2, StepWidth))
                 do iPol = 1, 3
-                    ChargeFTwt_new(iPol, :, iSim, iAtom) = dstep * ChargeFTwt_new(iPol, :, iSim, iAtom)
+                    ChargeFTwt(iPol, :, iSim, iAtom) = dstep * ChargeFTwt(iPol, :, iSim, iAtom)
                 end do
             enddo
         enddo
     end subroutine Regularize_Charge_withtimedelay
 
 
-    subroutine Compute_FTCharge_withTimeDelay(ChargeFTwt_new, tvec, ChargeFTww_new, N_simulations, nOmegas, nAtoms, nTauOmegas, TauOmegaVec)
-        complex(kind(1d0)), intent(in) :: ChargeFTwt_new(:, :, :, :)
+    subroutine Compute_FTCharge_withTimeDelay(ChargeFTwt, tvec, ChargeFTww, N_simulations, nOmegas, nAtoms, nTauOmegas, TauOmegaVec)
+        complex(kind(1d0)), intent(in) :: ChargeFTwt(:, :, :, :)
         real   (kind(1d0)), intent(in) :: tvec(:), TauOmegaVec(:)
-        complex(kind(1d0)), allocatable, intent(out) :: ChargeFTww_new(:, :, :, :)
+        complex(kind(1d0)), allocatable, intent(out) :: ChargeFTww(:, :, :, :)
         integer, intent(in) :: N_simulations, nOmegas, nAtoms, nTauOmegas
 
         complex(kind(1d0)) :: zExpFact
         real(kind(1d0)) :: dt, w, t
         integer :: iAtom, iOmega, iSim
 
-        allocate(ChargeFTww_new(3, nOmegas, nTauOmegas, nAtoms))
+        allocate(ChargeFTww(3, nOmegas, nTauOmegas, nAtoms))
         dt = (tvec(N_simulations) - tvec(1)) / dble(N_simulations - 1)
         do iAtom = 1, nAtoms
             do iOmega = 1, nTauOmegas
@@ -505,84 +499,18 @@ contains
                     zexpFact = exp(Zi * w * t)
                     !!$           if(iAtom==1)write(*,*) iSim, iOmega, t, w
                     do iPol = 1, 3
-                        ChargeFTww_new(iPol, :, iOmega, iAtom) = ChargeFTww_new(iPol, :, iOmega, iAtom) + &
-                                zExpFact * ChargeFTwt_new(iPol, :, iSim, iAtom)
+                        ChargeFTww(iPol, :, iOmega, iAtom) = ChargeFTww(iPol, :, iOmega, iAtom) + &
+                                zExpFact * ChargeFTwt(iPol, :, iSim, iAtom)
                     end do
                 end do
             enddo
         enddo
-        ChargeFTww_new = ChargeFTww_new * dt / (2.d0 * PI)                  ! ((2.d0 * PI)**(1 / 2))
+        ChargeFTww = ChargeFTww * dt / (2.d0 * PI)                  ! ((2.d0 * PI)**(1 / 2))
     end subroutine Compute_FTCharge_withTimeDelay
-
-    !#########################
-    !    trick
-    subroutine LoadMadeUpDipoles(FileName, N_simulations, nOmegas, DipoleFTwt, tvec, OmegaVec)!, TauOmegaVec)
-        character(len = *), intent(in) :: FileName
-        integer, intent(in) :: N_simulations, nOmegas
-        complex(kind(1d0)), allocatable, intent(out) :: DipoleFTwt(:, :, :)
-        real   (kind(1d0)), allocatable, intent(out) :: tvec(:), OmegaVec(:)!, TauOmegaVec(:)
-
-        real   (kind(1d0)) :: drx
-        integer :: iSim, iOmega, uid_dipoleFT
-        integer :: iostat
-        character(len = 1000) :: iomsg
-
-        allocate(DipoleFTwt(3, nOmegas, N_Simulations))
-        allocate(tvec(N_Simulations))
-        allocate(OmegaVec(nOmegas))
-        !allocate(TauOmegaVec(nOmegas))
-
-        open(newunit = uid_dipoleFT, &
-                file = FileName, &
-                form = "formatted", &
-                status = "old", &
-                action = "read", &
-                iostat = iostat, &
-                iomsg = iomsg)
-        read(uid_dipoleFT, *)
-        do iSim = 1, N_simulations
-            do iOmega = 1, nOmegas
-                read(uid_dipoleFT, *, iostat = iostat) tvec(iSim), OmegaVec(iOmega), drx
-                if(iostat/=0)exit
-                DipoleFTwt(1, iOmega, iSim) = Z1 * drx
-                DipoleFTwt(2, iOmega, iSim) = Z1 * drx
-                DipoleFTwt(3, iOmega, iSim) = Z1 * drx
-            end do
-
-            read(uid_dipoleFT, *, iostat = iostat)
-            if(iostat/=0)exit
-        enddo
-        close(uid_dipoleFT)
-
-        !
-        !do iOmega = 1, size(OmegaVec)
-        !  TauOmegaVec(iOmega) = OmegaVec(iOmega)
-        !end do
-        close(uid_dipoleFT)
-    end subroutine LoadMadeUpDipoles
-    !#########################
 
 end program ChargeMigrationFT
 
 !!!!!this are notes and aspirations .. :]
-!    DipoleFTminus = DipoleFTminus * dt / (2.d0 * PI)
-!     AtomicChargeFT=AtomicChargeFT * dt / (2.d0 * PI)
-!
-!*** MUST GO TO A SEPARATE SUBROUTINE
-!!$     !.. Save Dipole FT File
-!!$     open(newunit = uid_dipoleFT, &
-!!$          file    ="DipoleFT-"//trim(Simulation_tagv(iSim)), &
-!!$          form    ="formatted", &
-!!$          status  ="unknown"  , &
-!!$          action  ="write"    )
-!!$     do iOmega = 1, nOmegas
-!!$        w = OmegaVec( iOmega )
-!!$        write(uid_dipoleFT,"(i4,*(x,E24.16))") iOmega, w, &
-!!$             ((dble(DipoleFTminus(iPol,iOmega)),aimag(DipoleFTminus(iPol,iOmega))),iPol=1,3)
-!!$     end do
-!!$     close( uid_dipoleFT )
-
-
 !*** THE FT OF THE DIPOLE FOR LARGE TIME STILL DOES NOT WORK
 !     DipoleFTplus = Z0
 !!$     call ComputeDipoleFTplus( L0_Eval, L0_LEvec, L0_REvec, &

@@ -403,7 +403,7 @@ contains
     end subroutine AppendDipole2FTAllFile
 
     subroutine WriteAtomicChargeFT (FileName, AtomicChargeFT, OmegaVec, nOmegas, nAtoms, AtomName)
-        complex(kind(1d0)), intent(in) :: AtomicChargeFT(:, :)
+        complex(kind(1d0)), intent(in) :: AtomicChargeFT(:, :, :)
         character(len = *), intent(in) :: FileName
         integer, intent(in) :: nOmegas, nAtoms
         character(len = 16), intent(in) :: AtomName(:)
@@ -439,29 +439,24 @@ contains
 
         do iOmega = 1, nOmegas
             w = OmegaVec(iOmega)
-!            write(uid_AtomicChargeFT, "(i4,*(x,E24.16,','))") iOmega, w, ((&
-!                    dble (AtomicChargeFT(iOmega, iAtom)), &
-!                    aimag(AtomicChargeFT(iOmega, iAtom))), &
-!            iAtom = 1, nAtoms)
-
             write(uid_AtomicChargeFT, "(i4,',',*(x,E24.16,','))", advance = "no") iOmega, w
             do iAtom = 1, nAtoms - 1
                 write(uid_AtomicChargeFT, "(*(x,e24.16,','))", advance = "no") &
-                        dble(AtomicChargeFT(iOmega, iAtom)), &
-                        aimag(AtomicChargeFT(iOmega, iAtom)), &
-                        dble(AtomicChargeFT(iOmega, iAtom)), &
-                        aimag(AtomicChargeFT(iOmega, iAtom)), &
-                        dble(AtomicChargeFT(iOmega, iAtom)), &
-                        aimag(AtomicChargeFT(iOmega, iAtom))
+                        dble(AtomicChargeFT(1,iOmega, iAtom)), &
+                        aimag(AtomicChargeFT(1,iOmega, iAtom)), &
+                        dble(AtomicChargeFT(2,iOmega, iAtom)), &
+                        aimag(AtomicChargeFT(2,iOmega, iAtom)), &
+                        dble(AtomicChargeFT(3,iOmega, iAtom)), &
+                        aimag(AtomicChargeFT(3,iOmega, iAtom))
             end do
             write(uid_AtomicChargeFT, "(*(x,e24.16,','))", advance = "no") &
-                    dble(AtomicChargeFT(iOmega, nAtoms)), &
-                    aimag(AtomicChargeFT(iOmega, nAtoms)), &
-                    dble(AtomicChargeFT(iOmega, nAtoms)), &
-                    aimag(AtomicChargeFT(iOmega, nAtoms))
+                    dble(AtomicChargeFT(1,iOmega, nAtoms)), &
+                    aimag(AtomicChargeFT(1,iOmega, nAtoms)), &
+                    dble(AtomicChargeFT(2,iOmega, nAtoms)), &
+                    aimag(AtomicChargeFT(2,iOmega, nAtoms))
             write(uid_AtomicChargeFT, "(E24.16,',',E24.16)") &
-                    dble(AtomicChargeFT(iOmega, nAtoms)), &
-                    aimag(AtomicChargeFT(iOmega, nAtoms))
+                    dble(AtomicChargeFT(3,iOmega, nAtoms)), &
+                    aimag(AtomicChargeFT(3,iOmega, nAtoms))
             !
         end do
         close(uid_AtomicChargeFT)

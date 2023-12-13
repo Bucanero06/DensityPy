@@ -151,12 +151,12 @@ program ChargeMigration
     !.. Write and Print the pulse
     !..
     dt = (t_max - t_min) / dble(n_times)
-    write(*,*) "fortran t_min=", t_min
-    write(*,*) "fortran t_min=", t_min
-    write(*,*) "fortran t_max=", t_max
-    write(*,*) "fortran n_times=", n_times
-    write(*,*) "fortran dble(n_times - 1)=", dble(n_times)
-    write(*,*) "fortran dt=", dt
+    write(*, *) "fortran t_min=", t_min
+    write(*, *) "fortran t_min=", t_min
+    write(*, *) "fortran t_max=", t_max
+    write(*, *) "fortran n_times=", n_times
+    write(*, *) "fortran dble(n_times - 1)=", dble(n_times)
+    write(*, *) "fortran dt=", dt
 
     call omp_set_num_threads(30) ! fixme do not hard code, use number of passed or allowed threads
 
@@ -216,6 +216,9 @@ program ChargeMigration
     !.. Compute Becke's Matrix
     call ComputeNewBeckeMatrix(WeightV, OrbTab, Becke_new, R_el) !!using electronic barycenter or AtCoord for the nuclear barycenter
     !    BeckeMatrix = BeckeMatrix * Computed_volume
+    write(*, *) "Becke_new", sum(Becke_new(1, :, :, 1))
+    write(*, *) "Becke_new", sum(Becke_new(2, :, :, 1))
+    write(*, *) "Becke_new", sum(Becke_new(3, :, :, 1))
 
     write(*, *) "allocating Atomic Charge matrixes"
     allocate(AtomicChargeVec(nAtoms))
@@ -254,7 +257,7 @@ program ChargeMigration
             zStatRho(GS_IDX, GS_IDX) = zStatRho(GS_IDX, GS_IDX) - 1.d0
 
             !.. Evaluates the expectation value of the dipole as a function of time
-            write(*, *) it, iSim, 100.d0 * iSim / (N_Simulations)
+            !            write(*, *) it, iSim, 100.d0 * iSim / (N_Simulations)
             do iPol = 1, 3
                 zMuEV(iPol, it) = zdotu(nStates * nStates, zStatRho, 1, zDmat_t(1, 1, iPol), 1)
             enddo
@@ -265,6 +268,7 @@ program ChargeMigration
             call ComputeNewAtomicCharges(OrbitalDensity, Becke_new, AtomicChargeVec_new)
             AtomicChargeVec_new = AtomicChargeVec_new * Computed_volume
             AtomicChargeEvolution_new(:, :, it) = AtomicChargeVec_new
+
 
             !$> this needs to be be moved outside of this module or loop since is costly and can be computed when needed
             if(save_charge_migration_flag)then
@@ -285,6 +289,7 @@ program ChargeMigration
             call LiouvillianPropagator(L0_Eval, L0_LEvec, L0_REvec, zStatRho)
             !
         enddo time_loop
+
         !.. Save Dipole to filerc
         call Write_Dipole(output_directory // "/Dipole/Dipole" // trim(Simulation_tagv(iSim)) // ".csv", zMuEV, n_times, t_min, dt)
 
@@ -863,10 +868,9 @@ contains
         real(kind(1d0)), intent(in) :: Becke_new(:, :, :, :)
         real(kind(1d0)), allocatable, intent(out) :: QchargeVec_new    (:, :)
 
-        integer :: iAtom, nAtoms, number_of_orbitalss, jOrb, iOrb, nPts, iPol
+        integer :: iAtom, nAtoms, number_of_orbitalss, jOrb, iOrb, iPol
         real(kind(1d0)), external :: DDOT
         real(kind(1d0)) :: dsum
-        nPts = size(Becke_new, 1)
         number_of_orbitalss = size(Becke_new, 2)
         nAtoms = size(Becke_new, 4)
         allocate(QchargeVec_new(3, nAtoms))
@@ -878,7 +882,6 @@ contains
                     do iOrb = 1, number_of_orbitalss
                         QchargeVec_new(iPol, iAtom) = QchargeVec_new(iPol, iAtom) + OrbitalDensity(iOrb, jOrb) &
                                 * Becke_new(iPol, iOrb, jOrb, iAtom)
-                        !                QchargeVec_new(iPol, iAtom) = ddot(number_of_orbitalss * number_of_orbitalss, OrbitalDensity, 1, Becke_new(iPol, 1, 1, iAtom), 1)
                     end do
                 end do
             enddo
@@ -982,26 +985,9 @@ contains
 
         !        if(allocated(Becke_new))deallocate(Becke_new)
         allocate(Becke_new(3, number_of_orbitalss, number_of_orbitalss, nAtoms))
-
-        !        Becke_new = 0.d0
-        !        do iPol = 1, 3
-        !            do iAtom = 1, nAtoms
-        !                do iOrb2 = 1, number_of_orbitalss
-        !                    do iOrb1 = 1, number_of_orbitalss
-        !                        do iPts = 1, nPts
-        !                            Becke_new(iPol, iOrb1, iOrb2, iAtom) = Becke_new(iPol, iOrb1, iOrb2, iAtom) + &
-        !                                    WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2) * &
-        !                                            Bary_center(iPol, iAtom)
-        !
-        !                        enddo
-        !                    enddo
-        !                enddo
-        !            enddo
-        !        end do
         Becke_new = 0.d0
-
+        !$omp parallel do private(iOrb2, iOrb1, iPts) shared(Becke_new, WeightV, OrbTab, Bary_center)
         do iPol = 1, 3
-            !$OMP PARALLEL DO PRIVATE(iPts, iPol, iAtom, iOrb2, iOrb1)
             do iAtom = 1, nAtoms
                 do iOrb2 = 1, number_of_orbitalss
                     do iOrb1 = 1, number_of_orbitalss
@@ -1009,16 +995,12 @@ contains
                             Becke_new(iPol, iOrb1, iOrb2, iAtom) = Becke_new(iPol, iOrb1, iOrb2, iAtom) + &
                                     WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2) * &
                                             Bary_center(iPol, iAtom)
-
-                        enddo
-
-                    enddo
-
-                enddo
-            enddo
-            !$OMP END PARALLEL DO
-
-        enddo
+                        end do
+                    end do
+                end do
+            end do
+        end do
+        !$omp end parallel do
 
     end subroutine ComputeNewBeckeMatrix
     ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
