@@ -293,6 +293,7 @@ def call_open_molcas(project_name, molcas_directory):
         except Exception as e:
             logger.error('Error in call_open_molcas')
             print_molcas_log_errors(project_name + ".log", "Timing")
+            logger.error(e)
             raise e
 
     logger.info("Done Running OpenMolcas")
