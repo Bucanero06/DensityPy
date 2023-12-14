@@ -306,7 +306,6 @@ def plot_dipoles_v_time(study_directory, experiment_directory, time_delays, min_
         plt.clf()
 
 
-
 def plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delays, min_time, max_time,
                                xyz_geometry_path, plot_all=False):
     # Read the XYZ file to get the number of atoms, the name of the atom and the atom names
@@ -411,14 +410,13 @@ def plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delay
         plt.legend()
 
         plt.tight_layout()
-        plt.show()
+        # plt.show()
         output_file = file_path.replace('.csv', '.png')
         output_file = output_file if output_file != file_path else f'{file_path}.png'
         plt.savefig(output_file)
 
         plt.clf()
 
-        break # TODO: Remove this break
 
 
 def difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delays, min_time,
@@ -430,35 +428,30 @@ def difference_between_dipole_and_atomic_charges_v_time(study_directory, experim
     atomic_charge_file = f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeXUV.csv'
     dipole_file = f'{study_directory}/{experiment_directory}/Dipole/DipoleXUV.csv'
 
-    atomic_charge_data = pd.read_csv(atomic_charge_file)
+    atomic_charge_data = pd.read_csv(atomic_charge_file)[::-1]
     dipole_data = pd.read_csv(dipole_file)
 
     ATOMIC_COL_NAMES = __generate_atomic_charge_column_names(xyz_geometry_path)
-    # Extract the 'TotalCharge' column from the atomic charge data
-    total_charge = atomic_charge_data['TotalCharge']
     xyz_file_content = read_xyz(xyz_geometry_path)
-    print(f'{xyz_file_content  = }')
-    # xyz_file_content  = {'n_atoms': 12, 'title': 'NMA\n', 'atoms': {'O': (0.0, 1.23, 0.0), 'N': (1.13043, -0.791536, 0.0), 'C': (0.0, 0.0, 0.0), 'C_1': (2.474847, -0.248356, 0.0), 'C_2': (-1.277179, -0.767407, 0.0), 'H': (1.094833, -1.810914, 0.0), 'H_1': (3.189951, -1.070989, 0.0), 'H_2': (-2.13204, -0.075154, 0.0), 'H_3': (-1.274878, -1.466574, -0.849212), 'H_4': (-1.274881, -1.466568, 0.849216), 'H_5': (2.58097, 0.436291, -0.841485), 'H_6': (2.58098, 0.436267, 0.841503)}}
+
+    # Reconstruct Dipole Response from Atomic Charges
+    R_el_bc = pd.read_csv(f'{study_directory}/{experiment_directory}/R_el_bc.csv')
+    print(f'{R_el_bc.keys()}')
+
     atomic_dipole_data = pd.DataFrame()
     for i, atom_name in enumerate(xyz_file_content['atoms'].keys()):
         for j, axis in enumerate(['X', 'Y', 'Z']):
             column_name = ATOMIC_COL_NAMES[3 * i + j]
-            print(f'{column_name  = }')
+            # atomic_dipole_data[column_name] = atomic_charge_data[column_name] * R_el_bc[axis + '_Position'][i]
             atomic_dipole_data[column_name] = atomic_charge_data[column_name] * xyz_file_content['atoms'][atom_name][j]
-    print(f'{atomic_dipole_data  = }')
-    # Sum of all charge dipoles
-    sum_atomic_dipole = atomic_dipole_data.sum(axis=1)
-    print(f'{sum_atomic_dipole  = }')
-
-    # Sum of all dipole components (both real and imaginary parts)
-    sum_dipole = dipole_data.iloc[:, 2:].sum(axis=1)
 
     # Comparing the sum of all dipoles with the total charge
     comparison_with_sum = pd.DataFrame({
         'Time': atomic_charge_data['Time'],
-        'TotalCharge': total_charge,
-        'SumAtomicDipole': sum_atomic_dipole,
-        'SumDipole': sum_dipole
+        'Total_Charge': atomic_charge_data['TotalCharge'],
+        # dont know why atomic needs to be reversed, is seen across this file
+        'Sum_Dipole_across_XYZ_ReIm': dipole_data.iloc[:, 2:].sum(axis=1),
+        # 'Sum_Reconstructed_Dipole_across_XYZ': atomic_dipole_data.sum(axis=1)
     })
 
     print(comparison_with_sum.head())
@@ -467,18 +460,31 @@ def difference_between_dipole_and_atomic_charges_v_time(study_directory, experim
     import matplotlib.pyplot as plt
 
     plt.figure(figsize=(16, 12))
-    plt.plot(comparison_with_sum['Time'], comparison_with_sum['TotalCharge'], label='Total Charge', alpha=0.5)
-    plt.plot(comparison_with_sum['Time'], comparison_with_sum['SumDipole'], label='Sum of Dipoles', alpha=0.5)
-    plt.plot(comparison_with_sum['Time'], comparison_with_sum['SumAtomicDipole'], label='Sum of Atomic Dipoles',
-             alpha=0.5)
+    plt.suptitle(f'{study_directory}/{experiment_directory} Dipole/Charge XUV Comparison')
 
-    plt.xlim(min_time, max_time)
-    plt.title('Comparison of Total Charge and Sum of Dipoles')
+    for i, col in enumerate(comparison_with_sum.columns[1:]):
+        # Subplots for xyz and total charge in one figure , each of the xyz will have all the atoms
+        # Plotting charge thus is all real
+        plt.subplot(2, 2, i + 1)
+        plt.plot(comparison_with_sum['Time'], comparison_with_sum[col], label=f'Column {col}')
+        # subtitle for subplot
+        plt.title(f'{col}')
+
+    # Find the Error between the sum of the dipoles and the total charge
+    comparison_with_sum['Mean Absolute Error (MAE)'] = comparison_with_sum.apply(
+        lambda row: np.abs(-row['Total_Charge'] - row['Sum_Dipole_across_XYZ_ReIm']),
+        axis=1)  # fixme this is wrong right? but error big when not negating the charge
+
+    plt.subplot(2, 2, 4)
+    plt.plot(comparison_with_sum['Time'], comparison_with_sum['Mean Absolute Error (MAE)'], label=f'MAE')
+    plt.title(f'Error')
+    plt.legend()
+
     plt.xlabel('Time')
     plt.ylabel('Value')
     plt.legend()
     plt.grid(True)
-    plt.show()
+    # plt.show()
     output_file = f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeXUV_vs_DipoleXUV.png'
     plt.savefig(output_file)
 
@@ -489,7 +495,7 @@ def difference_between_dipole_and_atomic_charges_v_time(study_directory, experim
 
 
 def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
-                               pump_settings, probe_settings, charge_migration_ft_settings):
+                               pump_settings, probe_settings, charge_migration_ft_settings, try_color_maps=False):
     """
     Plotting the FT dipole data vs time, vs frequency and vs time and frequency
 
@@ -555,7 +561,7 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
         plt.ylabel(f'FTDipole{col_end_name}')
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
     plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL_Components_vs_central_time_2.png')
     plt.clf()
 
@@ -616,83 +622,102 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
     plt.legend()
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
     plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_vs_OmegaVec.png')
     plt.clf()
 
-    """
-    Alternative Plots for Understanding the Data (Plotly Contour Maps need to be 2D not 1D so we create mesh)
-    """
-    # Creating a grid for contour plot
-    ct2_grid, omega_grid = np.meshgrid(data['central_time_2'].unique(), data['OmegaVec'].unique(), indexing='ij')
+    if try_color_maps:
+        color_maps = ['viridis', 'seismic', 'inferno', 'twilight_shifted']
+    else:
+        color_maps = ['seismic']
+    # Create a plot per Atom
+    for color_map in color_maps:
+        """
+        Alternative Plots for Understanding the Data (Plotly Contour Maps need to be 2D not 1D so we create mesh)
+        """
+        # Creating a grid for contour plot
+        ct2_grid, omega_grid = np.meshgrid(data['central_time_2'].unique(), data['OmegaVec'].unique(), indexing='ij')
 
-    # Reshaping the data to match the grid
-    ft_dipole_x_re_grid = data['FTDipoleX_Re'].values.reshape(ct2_grid.shape)
-    ft_dipole_x_im_grid = data['FTDipoleX_Im'].values.reshape(ct2_grid.shape)
-    ft_dipole_y_re_grid = data['FTDipoleY_Re'].values.reshape(ct2_grid.shape)
-    ft_dipole_y_im_grid = data['FTDipoleY_Im'].values.reshape(ct2_grid.shape)
-    ft_dipole_z_re_grid = data['FTDipoleZ_Re'].values.reshape(ct2_grid.shape)
-    ft_dipole_z_im_grid = data['FTDipoleZ_Im'].values.reshape(ct2_grid.shape)
+        # Reshaping the data to match the grid
+        ft_dipole_x_re_grid = data['FTDipoleX_Re'].values.reshape(ct2_grid.shape)
+        ft_dipole_x_im_grid = data['FTDipoleX_Im'].values.reshape(ct2_grid.shape)
+        ft_dipole_y_re_grid = data['FTDipoleY_Re'].values.reshape(ct2_grid.shape)
+        ft_dipole_y_im_grid = data['FTDipoleY_Im'].values.reshape(ct2_grid.shape)
+        ft_dipole_z_re_grid = data['FTDipoleZ_Re'].values.reshape(ct2_grid.shape)
+        ft_dipole_z_im_grid = data['FTDipoleZ_Im'].values.reshape(ct2_grid.shape)
 
-    # Calculating the Z value for the contour plot (average FT dipole magnitude)
-    average_ft_dipole_grid = np.sqrt((ft_dipole_x_re_grid ** 2 + ft_dipole_x_im_grid ** 2 +
-                                      ft_dipole_y_re_grid ** 2 + ft_dipole_y_im_grid ** 2 +
-                                      ft_dipole_z_re_grid ** 2 + ft_dipole_z_im_grid ** 2) / 3)
+        # Calculating the Z value for the contour plot (average FT dipole magnitude)
+        average_ft_dipole_grid = np.sqrt((ft_dipole_x_re_grid ** 2 + ft_dipole_x_im_grid ** 2 +
+                                          ft_dipole_y_re_grid ** 2 + ft_dipole_y_im_grid ** 2 +
+                                          ft_dipole_z_re_grid ** 2 + ft_dipole_z_im_grid ** 2) / 3)
 
-    fig, axes = plt.subplots(3, 2, figsize=(24, 18))
+        fig, axes = plt.subplots(3, 2, figsize=(24, 18))
 
-    # Dynamic Range Adjustment using different percentiles
-    percentile_1 = np.percentile(average_ft_dipole_grid, 1)
-    percentile_99 = np.percentile(average_ft_dipole_grid, 99)
-    norm_1_99 = colors.Normalize(vmin=percentile_1, vmax=percentile_99)
-    axes[0, 0].contourf(ct2_grid, omega_grid, average_ft_dipole_grid, levels=100, cmap='viridis', norm=norm_1_99)
-    axes[0, 0].set_title('Percentile (1% - 99%) Adjusted Contour Map')
-    axes[0, 0].set_xlabel('Central Time 2')
-    axes[0, 0].set_ylabel('OmegaVec')
-    #
-    percentile_5 = np.percentile(average_ft_dipole_grid, 5)
-    percentile_95 = np.percentile(average_ft_dipole_grid, 95)
-    norm_5_95 = colors.Normalize(vmin=percentile_5, vmax=percentile_95)
-    axes[0, 1].contourf(ct2_grid, omega_grid, average_ft_dipole_grid, levels=100, cmap='viridis', norm=norm_5_95)
-    axes[0, 1].set_title('Percentile (5% - 95%) Adjusted Contour Map')
-    axes[0, 1].set_xlabel('Central Time 2')
-    axes[0, 1].set_ylabel('OmegaVec')
+        # Dynamic Range Adjustment using different percentiles
+        percentile_1 = np.percentile(average_ft_dipole_grid, 1)
+        percentile_99 = np.percentile(average_ft_dipole_grid, 99)
+        norm_1_99 = colors.Normalize(vmin=percentile_1, vmax=percentile_99)
+        # axes[0, 0].contourf(ct2_grid, omega_grid, average_ft_dipole_grid, levels=100, cmap=color_map, norm=norm_1_99)
+        plt.colorbar(axes[0, 0].contourf(ct2_grid, omega_grid, average_ft_dipole_grid,
+                                         levels=100, cmap=color_map, norm=norm_1_99), ax=axes[0, 0])
+        axes[0, 0].set_title('Percentile (1% - 99%) Adjusted Contour Map')
+        axes[0, 0].set_xlabel('Central Time 2')
+        axes[0, 0].set_ylabel('OmegaVec')
+        #
+        percentile_5 = np.percentile(average_ft_dipole_grid, 5)
+        percentile_95 = np.percentile(average_ft_dipole_grid, 95)
+        norm_5_95 = colors.Normalize(vmin=percentile_5, vmax=percentile_95)
+        # axes[0, 1].contourf(ct2_grid, omega_grid, average_ft_dipole_grid, levels=100, cmap=color_map, norm=norm_5_95)
+        plt.colorbar(axes[0, 1].contourf(ct2_grid, omega_grid, average_ft_dipole_grid,
+                                         levels=100, cmap=color_map, norm=norm_5_95), ax=axes[0, 1])
+        axes[0, 1].set_title('Percentile (5% - 95%) Adjusted Contour Map')
+        axes[0, 1].set_xlabel('Central Time 2')
+        axes[0, 1].set_ylabel('OmegaVec')
 
-    # Logarithmic Scaling
-    log_scaled_data = np.log1p(np.abs(average_ft_dipole_grid))  # Adding 1 to avoid log(0)
-    axes[1, 0].contourf(ct2_grid, omega_grid, log_scaled_data, levels=100, cmap='viridis')
-    axes[1, 0].set_title('Logarithmic Scaled Data Contour Map')
-    axes[1, 0].set_xlabel('Central Time 2')
-    axes[1, 0].set_ylabel('OmegaVec')
+        # Logarithmic Scaling
+        log_scaled_data = np.log1p(np.abs(average_ft_dipole_grid))  # Adding 1 to avoid log(0)
+        # axes[1, 0].contourf(ct2_grid, omega_grid, log_scaled_data, levels=100, cmap=color_map)
+        plt.colorbar(axes[1, 0].contourf(ct2_grid, omega_grid, log_scaled_data, levels=100, cmap=color_map),
+                     ax=axes[1, 0])
+        axes[1, 0].set_title('Logarithmic Scaled Data Contour Map')
+        axes[1, 0].set_xlabel('Central Time 2')
+        axes[1, 0].set_ylabel('OmegaVec')
 
-    # Derivative Plots
-    axes[1, 1].contourf(ct2_grid, omega_grid, np.gradient(average_ft_dipole_grid, axis=0), levels=100, cmap='seismic')
-    axes[1, 1].set_title('First Derivative of Data')
-    axes[1, 1].set_xlabel('Central Time 2')
-    axes[1, 1].set_ylabel('OmegaVec')
+        # Derivative Plots
+        # axes[1, 1].contourf(ct2_grid, omega_grid, np.gradient(average_ft_dipole_grid, axis=0), levels=100,
+        #                     cmap=color_map)
+        plt.colorbar(axes[1, 1].contourf(ct2_grid, omega_grid, np.gradient(average_ft_dipole_grid, axis=0),
+                                         levels=100, cmap=color_map), ax=axes[1, 1])
+        axes[1, 1].set_title('First Derivative of Data')
+        axes[1, 1].set_xlabel('Central Time 2')
+        axes[1, 1].set_ylabel('OmegaVec')
 
-    # Smoothing (Gaussian Filter) and Filtering
-    smoothed_data = gaussian_filter(average_ft_dipole_grid, sigma=1)  # Applying a Gaussian filter
-    axes[2, 0].contourf(ct2_grid, omega_grid, smoothed_data, levels=100, cmap='viridis')
-    axes[2, 0].set_title('Smoothed Data Contour Map')
-    axes[2, 0].set_xlabel('Central Time 2')
-    axes[2, 0].set_ylabel('OmegaVec')
+        # Smoothing (Gaussian Filter) and Filtering
+        smoothed_data = gaussian_filter(average_ft_dipole_grid, sigma=1)  # Applying a Gaussian filter
+        # axes[2, 0].contourf(ct2_grid, omega_grid, smoothed_data, levels=100, cmap=color_map)
+        plt.colorbar(axes[2, 0].contourf(ct2_grid, omega_grid, smoothed_data, levels=100, cmap=color_map),
+                     ax=axes[2, 0])
+        axes[2, 0].set_title('Smoothed Data Contour Map')
+        axes[2, 0].set_xlabel('Central Time 2')
+        axes[2, 0].set_ylabel('OmegaVec')
 
-    # Derivative Plots
-    axes[2, 1].contourf(ct2_grid, omega_grid, np.gradient(smoothed_data, axis=0), levels=100, cmap='seismic')
-    axes[2, 1].set_title('First Derivative of Smoothed Data')
-    axes[2, 1].set_xlabel('Central Time 2')
-    axes[2, 1].set_ylabel('OmegaVec')
+        # Derivative Plots
+        # axes[2, 1].contourf(ct2_grid, omega_grid, np.gradient(smoothed_data, axis=0), levels=100, cmap=color_map)
+        plt.colorbar(axes[2, 1].contourf(ct2_grid, omega_grid, np.gradient(smoothed_data, axis=0), levels=100,
+                                         cmap=color_map), ax=axes[2, 1])
+        axes[2, 1].set_title('First Derivative of Smoothed Data')
+        axes[2, 1].set_xlabel('Central Time 2')
+        axes[2, 1].set_ylabel('OmegaVec')
 
-    plt.tight_layout()
-    plt.show()
-    plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL_Alternative_Plots.png')
-    plt.clf()
+        plt.tight_layout()
+        # plt.show()
+        plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL_Alternative_{color_map}_Plots.png')
+        plt.clf()
 
 
 def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
                                       pump_settings, probe_settings, charge_migration_ft_settings,
-                                      xyz_geometry_path):
+                                      xyz_geometry_path, try_color_maps=False):
     """
     This function plots the Fourier Transform of the atomic charges/dipoles vs time
     """
@@ -707,11 +732,9 @@ def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dep
     # Read the XYZ file to get the number of atoms, the name of the atom and the atom names
     # (this is the order in which the atoms are listed in the CSV file)
     xyz_file_content = read_xyz(xyz_geometry_path)
-    number_of_atoms = xyz_file_content['n_atoms']
-    name_of_molecule = xyz_file_content['title']
-    atoms = xyz_file_content['atoms']
     ATOMIC_FT_COL_NAMES = __generate_atomic_FTcharge_column_names(
         xyz_geometry_path)  # Rereads file but is intended for modularity and readability
+    R_el_bc = pd.read_csv(f'{study_directory}/{experiment_directory}/R_el_bc.csv')
 
     FILE_PATH = f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFT_ALL.csv'
 
@@ -758,8 +781,6 @@ def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dep
         columns_to_plot = [col_name for col_name in ATOMIC_FT_COL_NAMES if component in col_name]
         plt.subplot(3, 2, i + 1)
         for col_name in columns_to_plot:
-            print(f'{col_name = }')
-            print(data[col_name].sum())
             plt.plot(data['central_time_2'], data[col_name], label=col_name)
         plt.title(f'ChargeFT{component}')
         plt.xlabel('central_time_2')
@@ -767,10 +788,180 @@ def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dep
         plt.legend()
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
     plt.savefig(
         f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFT_ALL_Components_vs_central_time_2.png')
     plt.clf()
+
+    # Calculating the average of the squared magnitudes of the FT dipole components
+    sum_of_squares = 0
+    for i in ATOMIC_FT_COL_NAMES:
+        sum_of_squares += (data[i]) ** 2
+    average_ft_atomic_dipole = np.sqrt(sum_of_squares / 3)
+
+    # Creating an interactive plot using Plotly
+    _plot_contour_map(x=data['central_time_2'],
+                      y=data['OmegaVec'],
+                      z=average_ft_atomic_dipole,
+                      title=f'Contour Map of Average FT Dipole Magnitude\n'
+                            f'AtomicChargeFT_ALL.csv\n'
+                            f'Pump Settings:  {pump_central_frequency}, {pump_periods}, {pump_phase}, {pump_intensity}, {pump_polarization}\n'
+                            f'Probe Settings:  {probe_central_frequency}, {probe_periods}, {probe_phase}, {probe_intensity}, {probe_polarization}\n'
+                            f'Dephasing Factor: {dephasing_factor}, Relaxation Factor: {relaxation_factor}'
+                            f'FT Time Step: {ft_time_step}, FT Width Step: {ft_width_step}',
+                      x_label='Central Time 2 - Probe (tau)',
+                      y_label='OmegaVec',
+                      output_file=f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFT_ALL_Contour.html')
+
+    # Plotting
+    plt.figure(figsize=(15, 10))
+
+    # Plotting the real parts
+    plt.subplot(2, 2, 1)
+    for i in ATOMIC_FT_COL_NAMES:
+        if i not in data.columns:
+            print(f'{i} not in data.columns')
+        if '_Re' in i:
+            plt.plot(data['OmegaVec'], data[i], label=i)
+    plt.title('Real Components of FT Atomic Charges vs OmegaVec')
+    plt.xlabel('OmegaVec')
+    plt.ylabel('Real Part of FT Atomic Charge')
+
+    # Plotting the imaginary parts
+    plt.subplot(2, 2, 2)
+    for i in ATOMIC_FT_COL_NAMES:
+        if '_Im' in i:
+            plt.plot(data['OmegaVec'], data[i], label=i)
+    plt.title('Imaginary Components of FT Atomic Charges vs OmegaVec')
+    plt.xlabel('OmegaVec')
+    plt.ylabel('Imaginary Part of FT Atomic Charge')
+    plt.legend(
+        bbox_to_anchor=(1.05, 1),
+        loc='best',
+        borderaxespad=0.0,
+        title='Legend',
+        title_fontsize=12,
+        fontsize=12,
+        labelspacing=0.1,
+        fancybox=True,
+        shadow=True,
+        ncol=1,
+        framealpha=0.5
+    )
+
+    # Plotting the average FT dipole strength
+    plt.subplot(2, 1, 2)
+    # plt.plot(omega_vec, average_ft_dipole, label='Average FT Dipole Magnitude', color='black')
+    plt.plot(data['OmegaVec'], average_ft_atomic_dipole, label='Average FT Atomic Dipole Magnitude', color='black')
+    plt.title('Average FT Atomic Dipole Magnitude vs OmegaVec')
+    plt.xlabel('OmegaVec')
+    plt.ylabel('Average FT Atomic Dipole Magnitude')
+
+    plt.tight_layout()
+    # plt.show()
+    plt.savefig(f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFT_vs_OmegaVec.png')
+    plt.clf()
+
+    ############
+    """
+    Alternative Plots for Understanding the Data (Plotly Contour Maps need to be 2D not 1D so we create mesh)
+    """
+    # Creating a grid for contour plot
+    ct2_grid, omega_grid = np.meshgrid(data['central_time_2'].unique(), data['OmegaVec'].unique(), indexing='ij')
+
+    if try_color_maps:
+        color_maps = ['viridis', 'seismic', 'inferno', 'twilight_shifted']
+    else:
+        color_maps = ['seismic']
+    # Create a plot per Atom
+    for color_map in color_maps:
+        for i, _atom_name in enumerate(xyz_file_content['atoms'].keys()):
+            fig, axes = plt.subplots(3, 2, figsize=(24, 18))
+            # Set the title for the plot
+            fig.suptitle(FILE_PATH)
+            split_atom_name = _atom_name.split('_')
+            if len(split_atom_name) == 1:
+                atom_name = _atom_name
+                atom_subscript = ''
+            elif len(split_atom_name) == 2:
+                atom_name = split_atom_name[0]
+                atom_subscript = f'.{split_atom_name[1]}'
+            else:
+                logger.error(f'Atom name {_atom_name} is not valid')
+
+            # Reshaping the data to match the grid
+            atomic_ft_dipole_x_re_grid = data[f'Atom_{atom_name}_FTChargeX_Re{atom_subscript}'].values.reshape(
+                ct2_grid.shape)
+            atomic_ft_dipole_x_im_grid = data[f'Atom_{atom_name}_FTChargeX_Im{atom_subscript}'].values.reshape(
+                ct2_grid.shape)
+            atomic_ft_dipole_y_re_grid = data[f'Atom_{atom_name}_FTChargeY_Re{atom_subscript}'].values.reshape(
+                ct2_grid.shape)
+            atomic_ft_dipole_y_im_grid = data[f'Atom_{atom_name}_FTChargeY_Im{atom_subscript}'].values.reshape(
+                ct2_grid.shape)
+            atomic_ft_dipole_z_re_grid = data[f'Atom_{atom_name}_FTChargeZ_Re{atom_subscript}'].values.reshape(
+                ct2_grid.shape)
+            atomic_ft_dipole_z_im_grid = data[f'Atom_{atom_name}_FTChargeZ_Im{atom_subscript}'].values.reshape(
+                ct2_grid.shape)
+
+            # Calculating the Z value for the contour plot (average FT dipole magnitude)
+            average_ft_atomic_dipole_grid = np.sqrt((atomic_ft_dipole_x_re_grid ** 2 + atomic_ft_dipole_x_im_grid ** 2 +
+                                                     atomic_ft_dipole_y_re_grid ** 2 + atomic_ft_dipole_y_im_grid ** 2 +
+                                                     atomic_ft_dipole_z_re_grid ** 2 + atomic_ft_dipole_z_im_grid ** 2) / 3)
+
+            # Dynamic Range Adjustment using different percentiles
+            percentile_1 = np.percentile(average_ft_atomic_dipole_grid, 1)
+            percentile_99 = np.percentile(average_ft_atomic_dipole_grid, 99)
+            norm_1_99 = colors.Normalize(vmin=percentile_1, vmax=percentile_99)
+            plt.colorbar(axes[0, 0].contourf(ct2_grid, omega_grid, average_ft_atomic_dipole_grid,
+                                             levels=100, cmap=color_map, norm=norm_1_99), ax=axes[0, 0])
+            axes[0, 0].set_title(f'Percentile (1% - 99%) Adjusted Contour Map of Atom {_atom_name} FT Charge Averaged')
+            axes[0, 0].set_xlabel('Central Time 2')
+            axes[0, 0].set_ylabel('OmegaVec')
+
+            #
+            percentile_5 = np.percentile(average_ft_atomic_dipole_grid, 5)
+            percentile_95 = np.percentile(average_ft_atomic_dipole_grid, 95)
+            norm_5_95 = colors.Normalize(vmin=percentile_5, vmax=percentile_95)
+            plt.colorbar(axes[0, 1].contourf(ct2_grid, omega_grid, average_ft_atomic_dipole_grid,
+                                             levels=100, cmap=color_map, norm=norm_5_95), ax=axes[0, 1])
+            axes[0, 1].set_title(f'Percentile (5% - 95%) Adjusted Contour Map of Atom {_atom_name} FT Charge Averaged')
+            axes[0, 1].set_xlabel('Central Time 2')
+            axes[0, 1].set_ylabel('OmegaVec')
+
+            # Logarithmic Scaling
+            log_scaled_data = np.log1p(np.abs(average_ft_atomic_dipole_grid))
+            plt.colorbar(axes[1, 0].contourf(ct2_grid, omega_grid, log_scaled_data, levels=100, cmap=color_map),
+                         ax=axes[1, 0])
+            axes[1, 0].set_title(f'Logarithmic Scaled Data Contour Map of Atom {_atom_name} FT Charge Averaged')
+            axes[1, 0].set_xlabel('Central Time 2')
+            axes[1, 0].set_ylabel('OmegaVec')
+
+            # Derivative Plots
+            plt.colorbar(axes[1, 1].contourf(ct2_grid, omega_grid, np.gradient(average_ft_atomic_dipole_grid, axis=0),
+                                             levels=100, cmap=color_map), ax=axes[1, 1])
+            axes[1, 1].set_title(f'First Derivative of Data of Atom {_atom_name} FT Charge Averaged')
+            axes[1, 1].set_xlabel('Central Time 2')
+            axes[1, 1].set_ylabel('OmegaVec')
+
+            # Smoothing (Gaussian Filter) and Filtering
+            smoothed_data = gaussian_filter(average_ft_atomic_dipole_grid, sigma=1)  # Applying a Gaussian filter
+            plt.colorbar(axes[2, 0].contourf(ct2_grid, omega_grid, smoothed_data, levels=100, cmap=color_map),
+                         ax=axes[2, 0])
+            axes[2, 0].set_title(f'Smoothed Data Contour Map of Atom {_atom_name} FT Charge Averaged')
+            axes[2, 0].set_xlabel('Central Time 2')
+
+            # Derivative Plots
+            plt.colorbar(axes[2, 1].contourf(ct2_grid, omega_grid, np.gradient(smoothed_data, axis=0), levels=100,
+                                             cmap=color_map), ax=axes[2, 1])
+            axes[2, 1].set_title(f'First Derivative of Smoothed Data of Atom {_atom_name} FT Charge Averaged')
+            axes[2, 1].set_xlabel('Central Time 2')
+            axes[2, 1].set_ylabel('OmegaVec')
+
+            plt.tight_layout()
+            # plt.show()
+            plt.savefig(
+                f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFT_ALL_Alternative_{color_map}_Plots_{_atom_name}.png')
+            plt.clf()
 
 
 '''Dipolar 2D Spectra'''
@@ -837,20 +1028,34 @@ def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, re
         logger.debug(f'Length of data: {len(data)}')
 
         # Calculating the average of all polarizations
-        averaged_density = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
-
-        # Adding the averaged density to the DataFrame
-        data['AveragedDensity'] = averaged_density
-
+        data['AveragedDensity'] = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
+        if 'DipoleFT_ww_reconstructed' in file_path:
+            # FIXME Flip accross the frequency axis but keep the same index (idk why this bug exists)
+            data['AveragedDensity'] = pd.Series(data['AveragedDensity'].values[::-1],
+                                                index=data['AveragedDensity'].index)
         import matplotlib.pyplot as plt
         import numpy as np
 
+        # # Creating an interactive plot using Plotly
+        # _plot_contour_map(x=data['OmegaVec'] + data['TauOmegaVec'],
+        #                   y=data['OmegaVec'],
+        #                   z=data['AveragedDensity'],
+        #                   title=f'Contour Map of Average FT Dipole Magnitude\n'
+        #                         f'DipoleFT_ALL.csv\n'
+        #                         f'Pump Settings:  {pump_central_frequency}, {pump_periods}, {pump_phase}, {pump_intensity}, {pump_polarization}\n'
+        #                         f'Probe Settings:  {probe_central_frequency}, {probe_periods}, {probe_phase}, {probe_intensity}, {probe_polarization}\n'
+        #                         f'Dephasing Factor: {dephasing_factor}, Relaxation Factor: {relaxation_factor}'
+        #                         f'FT Time Step: {ft_time_step}, FT Width Step: {ft_width_step}',
+        #                   x_label='Central Time 2 - Probe (tau)',
+        #                   y_label='OmegaVec',
+        #                   output_file=f'{file_path}'.replace('.csv', '.html'))
+
         # Preparing the data for plotting
-        omega_values = data['OmegaVec'].unique()
-        tauomega_values = data['TauOmegaVec'].unique()
+        omega_unique_values = data['OmegaVec'].unique()
+        tauomega_unique_values = data['TauOmegaVec'].unique()
 
         # Creating a meshgrid for plotting
-        omega_grid, tauomega_grid = np.meshgrid(omega_values, tauomega_values, indexing='ij')
+        omega_grid, tauomega_grid = np.meshgrid(omega_unique_values, tauomega_unique_values, indexing='ij')
 
         # Reshaping 'AveragedDensity' to match the shape of the meshgrid
         averaged_density_grid = data['AveragedDensity'].values.reshape(omega_grid.shape)
@@ -858,9 +1063,10 @@ def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, re
         # Plotting
         plt.figure(figsize=(10, 8))
         # Since we are adding a bigger title to include pump and probe details lets make the figure bigger
-        # plt.figure(figsize=(16, 12))
-        # plt.contourf(omega_grid, tauomega_grid, averaged_density_grid, levels=100, cmap='viridis')
-        plt.contourf(omega_grid + tauomega_grid, omega_grid, averaged_density_grid, levels=100, cmap='viridis')
+        plt.contourf(omega_grid + tauomega_grid, omega_grid, averaged_density_grid,
+                     levels=100, cmap='viridis',
+                     vmin=0, vmax=60  # Setting the colormap limits
+                     )
         plt.colorbar(label='Averaged Density')
         plt.xlabel('OmegaVec')
         plt.ylabel('TauOmegaVec')
@@ -876,9 +1082,9 @@ def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, re
         # Remove the csv if it has it in the name and replace with png
         output_file = file_path.replace('.csv', '.png')
         output_file = output_file if output_file != file_path else f'{file_path}.png'
-        output_file = output_file.replace('.png', f'_0.png')
         plt.savefig(output_file)
         plt.show()
+        plt.clf()
 
 
 def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
@@ -918,13 +1124,14 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
         logger.debug(f'Length of data: {len(data)}')
 
         # Calculating the average of all polarizations
-        averaged_density = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
+        data['AveragedDensity'] = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
 
-        # Adding the averaged density to the DataFrame
-        data['AveragedDensity'] = averaged_density
+        if 'DipoleFT_ww_reconstructed' in file_path:
+            # FIXME Flip accross the frequency axis but keep the same index (idk why this bug exists)
+            data['AveragedDensity'] = pd.Series(data['AveragedDensity'].values[::-1],
+                                                index=data['AveragedDensity'].index)
 
         import matplotlib.pyplot as plt
-        import numpy as np
 
         # Preparing the data for plotting
         omega_values = data['OmegaVec'].unique()
@@ -958,8 +1165,8 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
 
         # Plotting with adjustments
         fig, axes = plt.subplots(2, 2, figsize=(12, 12))
-        # main title is the file name
         plt.suptitle(file_path)
+
         # Adjusted Peak Analysis Plot
         axes[0, 0].plot(omega_values, averaged_density_grid.max(axis=0))
         axes[0, 0].plot(omega_values[peaks_positive], averaged_density_grid.max(axis=0)[peaks_positive], "x",
@@ -969,17 +1176,21 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
         axes[0, 0].set_title("Adjusted Peak Analysis")
 
         # Adjusted Normalized Density
-        # axes[0, 1].contourf(omega_grid, tauomega_grid, averaged_density_grid, levels=100, cmap='viridis',
-        axes[0, 1].contourf(omega_grid + tauomega_grid, omega_grid, averaged_density_grid, levels=100,
-                            cmap='viridis',
-                            vmin=percentile_5, vmax=percentile_95
-                            )
+        # axes[0, 1].contourf(omega_grid + tauomega_grid, omega_grid, averaged_density_grid, levels=100,
+        #                     cmap='viridis',
+        #                     vmin=percentile_5, vmax=percentile_95
+        #                     )
+        norm_5_95 = colors.Normalize(vmin=percentile_5, vmax=percentile_95)
+        plt.colorbar(axes[0, 1].contourf(omega_grid + tauomega_grid, omega_grid, averaged_density_grid,
+                                         levels=100, cmap='viridis', norm=norm_5_95), ax=axes[0, 1])
         axes[0, 1].set_title("Adjusted Normalized Density (5th and 95th Percentiles)")
 
         # Adjusted First Derivative
-        # axes[1, 0].contourf(omega_grid, tauomega_grid, first_derivative, levels=100, cmap='seismic',
-        axes[1, 0].contourf(omega_grid + tauomega_grid, omega_grid, first_derivative, levels=100, cmap='seismic',
-                            vmin=-derivative_abs_max, vmax=derivative_abs_max)
+        # axes[1, 0].contourf(omega_grid + tauomega_grid, omega_grid, first_derivative, levels=100, cmap='seismic',
+        #                     vmin=-derivative_abs_max, vmax=derivative_abs_max)
+        plt.colorbar(axes[1, 0].contourf(omega_grid + tauomega_grid, omega_grid,first_derivative,
+                                         levels=100,
+                                         cmap='viridis'), ax=axes[1, 0])
         axes[1, 0].set_title("Adjusted First Derivative")
 
         # Integrated Density
@@ -995,7 +1206,7 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
         output_file = output_file if output_file != file_path else f'{file_path}.png'
         output_file = output_file.replace('.png', f'_1.png')
         plt.savefig(output_file)
-        plt.show()
+        # plt.show()
 
 
 def plot_2d_spectrum_interactive(study_directory, experiment_directory):
@@ -1035,12 +1246,14 @@ def plot_2d_spectrum_interactive(study_directory, experiment_directory):
         logger.debug(f'Length of data: {len(data)}')
 
         # Calculating the average of all polarizations
-        averaged_density = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
+        data['AveragedDensity'] = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
         # averaged_density = (data["2DDipoleY_Re"] ** 2 + data["2DDipoleY_Im"] ** 2) ** 0.5
 
         # Adding the averaged density to the DataFrame
-        data['AveragedDensity'] = averaged_density
-
+        if 'DipoleFT_ww_reconstructed' in file_path:
+            # FIXME Flip accross the frequency axis but keep the same index (idk why this bug exists)
+            data['AveragedDensity'] = pd.Series(data['AveragedDensity'].values[::-1],
+                                                index=data['AveragedDensity'].index)
         import numpy as np
 
         # Preparing the data for plotting
@@ -1078,28 +1291,7 @@ def plot_2d_spectrum_interactive(study_directory, experiment_directory):
         output_file = file_path.replace('.csv', '.html')
         fig.write_html(output_file)
         fig.show()
-
-
-def __generate_becke_atomic_weghts_column_names(xyz_geometry_path):
-    xyz_file_content = read_xyz(xyz_geometry_path)
-    atoms = xyz_file_content['atoms']
-
-    # Initialize counters for each atom name
-    atom_name_counts = {name: 0 for name in set([atom_name.split('_')[0] for atom_name in atoms.keys()])}
-
-    # Initialize the list of column names
-    column_names = []
-
-    # Generate column names with suffixes for repeated atom names
-    for name in atoms.keys():
-        _name = name.split('_')[0]
-        count = atom_name_counts[_name]
-        suffix = f".{count}" if count > 0 else ""
-        column_names.append(f'Atom_{_name}_ChargeDensity{suffix}')
-        atom_name_counts[_name] += 1
-
-    return column_names
-
+        break
 
 '''Becke Plots'''
 
@@ -1140,14 +1332,12 @@ def plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path,
     # Plotting
     import plotly.graph_objects as go
 
-
     for col in data.columns[3:]:
         print(f'{col} = {data[col].sum()}')
         if data[col].min() != 0:
             logger.warning(f'{col} has a min value of {data[col].min()} rather than 0')
         if data[col].max() != 1:
             logger.warning(f'{col} has a max value of {data[col].max()} rather than 1')
-
 
     # Plot only one atom type for debugging
     fig = go.Figure(data=go.Scatter3d(
@@ -1171,32 +1361,18 @@ def plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path,
 
     import plotly.graph_objects as go
 
-    # Manually creating the DataFrame
-    data = pd.DataFrame({
-        'Atom Index': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        'Atom Name': ['O', 'N', 'C', 'C', 'C', 'H', 'H', 'H', 'H', 'H', 'H', 'H'],
-        'X Position': [-0.07126411307121, 1.04185194584435, 0.03487782751090, 2.16700544144725,
-                       -0.98099316311319, 1.69427031327723, 2.77985142247971, -1.65782286861781,
-                       -1.11377254826595, -1.11377490986092, 1.93015526019949, 1.93018964279058],
-        'Y Position': [2.30457942716860, -0.61416187727967, 0.04679493632641, -0.62352078448538,
-                       -0.47892496257572, -1.77124405319568, -1.48736577051015, 1.26578032027380,
-                       -1.12889045879090, -1.12888690420504, 1.13437013574216, 1.13430325044931],
-        'Z Position': [0.00000141047634, -0.00000245456477, -0.00000115408771, -0.00001000839462,
-                       -0.00000319061686, -0.00000241500998, -0.00000591538630, -0.00000324475991,
-                       -1.50089541713585, 1.50089663009806, -1.36058305350774, 1.36062049358343]
-    })
-
+    R_el_bc = pd.read_csv(f'{study_directory}/{experiment_directory}/R_el_bc.csv')
     # Create the figure
     fig = go.Figure()
 
     # Add a trace for each unique atom type
-    for atom_name in data['Atom Name'].unique():
-        atom_data = data[data['Atom Name'] == atom_name]
+    for atom_name in R_el_bc['Atom_Name'].unique():
+        atom_data = R_el_bc[R_el_bc['Atom_Name'] == atom_name]
         fig.add_trace(
             go.Scatter3d(
-                x=atom_data['X Position'],
-                y=atom_data['Y Position'],
-                z=atom_data['Z Position'],
+                x=atom_data['X_Position'],
+                y=atom_data['Y_Position'],
+                z=atom_data['Z_Position'],
                 mode='markers',
                 marker=dict(size=5, opacity=0.8),
                 name=atom_name,
@@ -1219,6 +1395,15 @@ def plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path,
 
 
 '''__helper_functions__'''
+
+
+def _plot_contour_map(x, y, z, title, x_label, y_label, output_file):
+    # Creating an interactive plot using Plotly
+    import plotly.graph_objects as go
+    fig = go.Figure(data=go.Contour(z=z, x=x, y=y))
+    fig.update_layout(title=title, xaxis_title=x_label, yaxis_title=y_label)
+    fig.write_html(output_file)
+    fig.show()
 
 
 def _calculate_min_max_significant_time(data, target_column, percentile_range=(20, 60)):
@@ -1295,10 +1480,22 @@ def __generate_atomic_FTcharge_column_names(file_path):
     return column_names
 
 
-def _plot_contour_map(x, y, z, title, x_label, y_label, output_file):
-    # Creating an interactive plot using Plotly
-    import plotly.graph_objects as go
-    fig = go.Figure(data=go.Contour(z=z, x=x, y=y))
-    fig.update_layout(title=title, xaxis_title=x_label, yaxis_title=y_label)
-    fig.write_html(output_file)
-    fig.show()
+def __generate_becke_atomic_weghts_column_names(xyz_geometry_path):
+    xyz_file_content = read_xyz(xyz_geometry_path)
+    atoms = xyz_file_content['atoms']
+
+    # Initialize counters for each atom name
+    atom_name_counts = {name: 0 for name in set([atom_name.split('_')[0] for atom_name in atoms.keys()])}
+
+    # Initialize the list of column names
+    column_names = []
+
+    # Generate column names with suffixes for repeated atom names
+    for name in atoms.keys():
+        _name = name.split('_')[0]
+        count = atom_name_counts[_name]
+        suffix = f".{count}" if count > 0 else ""
+        column_names.append(f'Atom_{_name}_ChargeDensity{suffix}')
+        atom_name_counts[_name] += 1
+
+    return column_names
