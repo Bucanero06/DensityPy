@@ -699,7 +699,7 @@ contains
         open(newunit = uid, file = output_directory // "/" // "R_el_bc.csv", form = "formatted", status = "unknown", action = "write")
 
         ! Write headers with fixed-width format
-        write(uid, "(A14,',',A20,',',A20,',',A20,',',A20)") "Atom Index", "Atom Name", "X Position", "Y Position", "Z Position"
+        write(uid, "(a)") '"Atom_Index","Atom_Name","X_Position","Y_Position","Z_Position"'
 
         ! Loop over atoms and write their positions to the file
         do iAtom = 1, nAtoms
