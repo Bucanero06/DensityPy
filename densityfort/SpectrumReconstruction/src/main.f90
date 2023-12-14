@@ -47,54 +47,22 @@ program ChargeMigration
 
     !.. Data for FT
     !..
-    complex(kind(1d0)), allocatable :: DipoleFTtotal(:, :), DipoleFTminus(:, :), DipoleFTplus (:, :)
     complex(kind(1d0)), allocatable :: AtomicChargeFT(:, :)
-    complex(kind(1d0)), allocatable :: DipoleFTwt(:, :, :), DipoleFTww(:, :, :), Reconstructed_Dipole(:, :, :)
-    complex(kind(1d0)), allocatable :: ChargeFTwt(:, :, :), ChargeFTww(:, :, :), ChargeFTwwComponent(:, :, :, :), ChargeFTww_new(:, :, :, :)
+    complex(kind(1d0)), allocatable :: DipoleFTww(:, :, :), Reconstructed_Dipole(:, :, :)
+    complex(kind(1d0)), allocatable :: ChargeFTww(:, :, :), ChargeFTww_new(:, :, :, :)
     real   (kind(1d0)), allocatable :: OmegaVec(:), TauOmegaVec(:)
-    real   (kind(1d0)), allocatable :: tvec(:)
     integer :: iOmega, iOmegaTau, ntimes, i, iAtom
     real(kind(1d0)) :: tmin, tmax
-
-    !.. Local parameters
-    !..
-    character(len = *), parameter :: DIPOLE_FT_PATH_ALL = "/Dipole/DipoleFT_ALL.csv"
-    character(len = *), parameter :: CHARGE_FT_PATH_ALL = "/AtomicCharge/AtomicChargeFT_ALL.csv"
-    integer, parameter :: GS_IDX = 1
-    integer :: nStates
-    integer :: uid_AtomicChargeALL, uid
-    real(kind(1d0)), allocatable :: Evec(:)
-    real(kind(1d0)), external :: NCD_Phi
-    complex(kind(1d0)), external :: zdotu
-
-    !.. Expectation Value of the Dipole Moment (Mu)
-    !..
-    complex(kind(1d0)), allocatable :: zMuEV(:, :)
 
     !.. Molecular Geometry
     !..
     integer :: nAtoms
     real(kind(1d0)), allocatable :: AtCoord(:, :) ! 3 x npts
+    real(kind(1d0)), allocatable :: R_el_bc(:, :) ! 3 x npts
     character(len = 16), allocatable :: AtomName(:)
 
-    !.. Statistical Density Matrix
-    !..
     real   (kind(1d0)) :: dt
-    real   (kind(1d0)), allocatable :: AtomicChargeEvolution(:, :)
-
-    !.. Pulse parameters
-    !..
-    integer :: iSim, N_Simulations
-    character(len = 64), pointer :: Simulation_Tagv(:)
-    type(pulse_train), pointer :: train(:)
-
-    !.. XUV_Dipole
-    !..
-    complex(kind(1d0)), allocatable :: XUVDipole(:, :)
-    complex(kind(1d0)), allocatable :: XUVDipoleFT(:, :), DipoleDifference(:, :, :)
-
-    !    trick
-    complex(kind(1d0)), allocatable :: Debug(:, :, :)
+    integer :: uid
     external :: system
 
     call GetRunTimeParameters(InpDir, OutDir, FileGeometry, StepTime, StepWidth, &
@@ -107,84 +75,69 @@ program ChargeMigration
 
     call LoadGeometry(nAtoms, AtCoord, FileGeometry, AtomName)
 
+    ! Load R el barycenter
+    ! example file
+    ! "Atom_Index","Atom_Name","X_Position","Y_Position","Z_Position"
+    !    1,                   O,   -0.07126411307121,    2.30457942716860,    0.00000141047634
+    !    2,                   N,    1.04185194584435,   -0.61416187727967,   -0.00000245456477
+    !    3,                   C,    0.03487782751090,    0.04679493632641,   -0.00000115408771
+    !    4,                   C,    2.16700544144725,   -0.62352078448538,   -0.00001000839462
+    !    5,                   C,   -0.98099316311318,   -0.47892496257572,   -0.00000319061686
+    !    6,                   H,    1.69427031327723,   -1.77124405319568,   -0.00000241500998
+    !    7,                   H,    2.77985142247970,   -1.48736577051015,   -0.00000591538630
+    !    8,                   H,   -1.65782286861781,    1.26578032027380,   -0.00000324475991
+    !    9,                   H,   -1.11377254826595,   -1.12889045879090,   -1.50089541713585
+    !   10,                   H,   -1.11377490986092,   -1.12888690420504,    1.50089663009806
+    !   11,                   H,    1.93015526019949,    1.13437013574216,   -1.36058305350774
+    !   12,                   H,    1.93018964279058,    1.13430325044931,    1.36062049358343
+
+    open(newunit = uid, file = OutDir // "/R_el_bc.csv", status = "old", action = "read")
+    allocate(R_el_bc(3, nAtoms))
+    read(uid, *)
+    do iAtom = 1, nAtoms
+        read(uid, *) i, AtomName(iAtom), R_el_bc(1, iAtom), R_el_bc(2, iAtom), R_el_bc(3, iAtom)
+    end do
+    close(uid)
+
     !>Load Dipole and Charge ww
     call LoadBidimentioal_Dipole_Spectrum(OutDir // "/Dipole/DipoleFT_ww.csv", DipoleFTww, TauOmegaVec, OmegaVec, nTauOmegas, nOmegas)
 
     call Load_BidimentionalChargeFTww(OutDir // "/AtomicCharge/AtomicChargeFT_ww.csv", ChargeFTww_new, TauOmegaVec, OmegaVec, nTauOmegas, nOmegas, nAtoms)
 
     !>Reconstruct and Save Dipole from Charge
-    call ReconstructDipole_from_AtomicCharge_times_XYZ (ChargeFTww_new, Reconstructed_Dipole, AtCoord, nAtoms, nOmegas, nTauOmegas)
+    call ReconstructDipole_from_AtomicCharge_times_XYZ(ChargeFTww_new, Reconstructed_Dipole, AtCoord, nAtoms, nOmegas, nTauOmegas)
 
-    write(*, *) sum(ChargeFTww_new(1, 5, 5, :))
     call Write_2DReconstructDipole(OutDir // "/Dipole/DipoleFT_ww_reconstructed.csv", Reconstructed_Dipole, TauOmegaVec, OmegaVec, nTauOmegas, nOmegas)
     !
 contains
 
 
-
-    subroutine ReconstructDipole_from_AtomicCharge_times_XYZ (ChargeFTww_new, Reconstructed_Dipole, AtCoord, nAtoms, nOmegas, nTauOmegas)
+    subroutine ReconstructDipole_from_AtomicCharge_times_XYZ (ChargeFTww_new, Reconstructed_Dipole, R_el_bc, nAtoms, nOmegas, nTauOmegas)
         complex(kind(1d0)), intent(in) :: ChargeFTww_new(:, :, :, :)
-        real(kind(1d0)), intent(in) :: AtCoord(:, :)
+        real(kind(1d0)), intent(in) :: R_el_bc(:, :)
         complex(kind(1d0)), allocatable, intent(out) :: Reconstructed_Dipole(:, :, :)
         integer, intent(in) :: nAtoms, nOmegas, nTauOmegas
 
         integer :: iAtom, iPol, iOmega, iOmegaTau, uid
 
         allocate(Reconstructed_Dipole(3, nOmegas, nTauOmegas))
-        !        do iAtom = 1, nAtoms
-        do iOmega = 1, nOmegas
-            do iOmegaTau = 1, nTauOmegas
+        Reconstructed_Dipole = 0d0
+        do iOmegaTau = 1, nTauOmegas
+            do iOmega = 1, nOmegas
                 do iPol = 1, 3
-                    Reconstructed_Dipole(iPol, iOmega, iOmegaTau) = sum(ChargeFTww_new(iPol, iOmega, iOmegaTau, :))
+                    do iAtom = 1, nAtoms
+                        !                        Reconstructed_Dipole(iPol, iOmega, iOmegaTau) = sum(ChargeFTww_new(iPol, iOmega, iOmegaTau, :))
+                        Reconstructed_Dipole(iPol, iOmega, iOmegaTau) = &
+                                Reconstructed_Dipole(iPol, iOmega, iOmegaTau) + &
+                                        ChargeFTww_new(iPol, iOmega, iOmegaTau, iAtom) !* &
+                                        !R_el_bc(iPol, iAtom)
+
+                    end do
                 end do
             end do
         end do
-        !        end do
 
     end subroutine ReconstructDipole_from_AtomicCharge_times_XYZ
-
-
-
-
-
-    !    subroutine DetermineFrequencies (FileName, OmegaMin, OmegaMax, nOmegas, TauOmegaMin, TauOmegaMax, nTauOmegas)
-    !        character(len = *), intent(in) :: FileName
-    !        integer, intent(out) :: nTauOmegas, nOmegas
-    !        real   (kind(1d0)), intent(out) :: TauOmegaMin, TauOmegaMax, OmegaMin, OmegaMax
-    !
-    !        real   (kind(1d0)) :: dBuf1, dBuf2, dBuf
-    !        integer :: uid, iBuf, iostat
-    !
-    !        open(newunit = uid, &
-    !                file = FileName, &
-    !                form = "formatted", &
-    !                status = "old", &
-    !                action = "read")
-    !        !
-    !        read(uid, *, iostat = iostat) dBuf1, dBuf2, dBuf, dBuf, dBuf, dBuf, dBuf, dBuf
-    !        if(iostat/=0)then
-    !            write(*, *) FileName // "   IS EMPTY"
-    !            stop
-    !        end if
-    !        TauOmegaMin = dBuf1
-    !        TauOmegaMax = TauOmegaMin
-    !        nTauOmegas = 1
-    !
-    !        OmegaMin = dBuf2
-    !        OmegaMax = OmegaMin
-    !        nOmegas = 1
-    !        do
-    !            read(uid, *, iostat = iostat) dBuf1, dBuf2
-    !            if(iostat/=0)exit
-    !            TauOmegaMax = dBuf1
-    !            nTauOmegas = nTauOmegas + 1
-    !
-    !            OmegaMax = dBuf2
-    !            nOmegas = nOmegas + 1
-    !        enddo
-    !        close(uid)
-    !        write(*, *) "nOmegas = ", nOmegas, "nTauOmegas = ", nTauOmegas
-    !end subroutine DetermineFrequencies
 
 
 end program ChargeMigration
