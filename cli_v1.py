@@ -11,7 +11,7 @@ import click
 @click.option("--field_file_help", is_flag=True, help="Enable field file help", default=False)
 @click.option("--molcas_input_help", is_flag=True, help="Enable Molcas input help", default=False)
 @click.option("--lus", is_flag=True, help="Enable LUS", default=False)
-@click.option("--gridflag", is_flag=True, help="Enable grid flag", default=False)
+@click.option("--gridit", is_flag=True, help="Enable grid flag", default=False)
 @click.option("--write_charge_migration", is_flag=True, help="Write charge migration", default=False)
 @click.option("--debug_mode", is_flag=True, help="Enable debug mode", default=False)
 @click.option("--justh5", is_flag=True, help="Enable just h5", default=False)
@@ -27,7 +27,7 @@ import click
 @click.option("--make_flags", help="Path to the Fortran compilation make flags", required=False, default="all DEB_FLAG=d")
 @click.option("--plot", is_flag=True, help="Enable plotting", default=False)
 def cli_run(json_config_path, study_directory, molcas_input, run_charge_migration,
-            run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, lus, gridflag,
+            run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, lus, gridit,
             write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file, givenfieldfile,
             old_main, parallel, save_previous,
             make, make_directory, make_flags, plot):
@@ -36,7 +36,7 @@ def cli_run(json_config_path, study_directory, molcas_input, run_charge_migratio
     from densitypy.main import run_densitypy
     run_densitypy(json_config_path, study_directory, molcas_input, run_charge_migration,
                   run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, lus,
-                  gridflag, write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file,
+                  gridit, write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file,
                   givenfieldfile, old_main, parallel, save_previous,
                   make_fortran=make,
                   make_fortran_config=dict(directory=make_directory, make_flags=make_flags),
