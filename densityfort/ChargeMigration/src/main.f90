@@ -212,11 +212,7 @@ program ChargeMigration
     call Write_R_el_bc(output_directory, atom_names, nAtoms, R_el)
 
     !.. Compute Becke's Matrix
-    call ComputeNewBeckeMatrix(WeightV, OrbTab, Becke_new, R_el) !!using electronic barycenter or AtCoord for the nuclear barycenter
-    !    BeckeMatrix = BeckeMatrix * Computed_volume
-    write(*, *) "Becke_new", sum(Becke_new(1, :, :, 1))
-    write(*, *) "Becke_new", sum(Becke_new(2, :, :, 1))
-    write(*, *) "Becke_new", sum(Becke_new(3, :, :, 1))
+    call ComputeBeckeMatrix(WeightV, OrbTab, BeckeMatrix, AtCoord) !!using electronic barycenter or AtCoord for the nuclear barycenter
 
     write(*, *) "allocating Atomic Charge matrixes"
     allocate(AtomicChargeEvolution(3, nAtoms, n_times))
