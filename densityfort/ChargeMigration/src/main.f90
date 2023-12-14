@@ -25,11 +25,11 @@
 !!
 !! ComputeOrbitalDensity: Builds the orbital density matrix Amat from the state density matrix zStatRho and transition density matrices TDM.
 !!
-!! ComputeNewAtomicCharges: Calculates new atomic charges QchargeVec_new from the orbital density OrbitalDensity and Becke matrix Becke_new.
+!! ComputeAtomicCharges: Calculates new atomic charges QchargeVec from the orbital density OrbitalDensity and Becke matrix BeckeMatrix.
 !!
 !! TabulateChargeDensity: Generates charge density ChDen from the orbital density matrix Amat and orbital table OrbTab.
 !!
-!! ComputeNewBeckeMatrix: Constructs the Becke matrix Becke_new using weights WeightV, orbital table OrbTab, and barycenter coordinates Bary_center.
+!! ComputeBeckeMatrix: Constructs the Becke matrix BeckeMatrix using weights WeightV, orbital table OrbTab, and barycenter coordinates Bary_center.
 !!
 !! ComputeAtomicWeights: Calculates atomic weights WeightV for a given set of points gridv, atomic coordinates AtCoord, and radii Radius_BS.
 !!
@@ -101,7 +101,7 @@ program ChargeMigration
     complex(kind(1d0)), allocatable :: zStatRho(:, :)
     real   (kind(1d0)) :: t, dt
     real   (kind(1d0)), allocatable :: ChDen(:), WEIGHTV(:, :)
-    real   (kind(1d0)), allocatable :: AtomicChargeVec(:), AtomicChargeEvolution(:, :)
+    real   (kind(1d0)), allocatable :: AtomicChargeVec(:, :), AtomicChargeEvolution(:, :, :)
 
     character(len = 30) :: istrn
     character(len = 16), allocatable :: atom_names(:)
@@ -116,18 +116,16 @@ program ChargeMigration
     character(len = 1000) :: strn
     type(pulse_train), pointer :: train(:)
     !..
-    !    B_{ij}^{\alpha} = \int d^3r \phi_i(\vec{r})\phi_j(\vec{r}) w_\alpha(\vec{r}) = BeckeMatrix(i,j,alpha)
-    real(kind(1d0)), allocatable :: BeckeMatrix   (:, :, :)
+    !  B_{ij}^{\alpha} = \int d^3r \phi_i(\vec{r})\phi_j(\vec{r}) w_\alpha(\vec{r}) = BeckeMatrix(i,j,alpha)
+    real(kind(1d0)), allocatable :: BeckeMatrix(:, :, :, :)
     real(kind(1d0)), allocatable :: OrbitalDensity(:, :)
     real(kind(1d0)), allocatable :: Radius_BS(:)
     complex(kind(1d0)), external :: zdotu
 
     !..Test
-    real(kind(1d0)), allocatable :: Becke_new(:, :, :, :)
     real(kind(1d0)) :: Computed_volume
-    real   (kind(1d0)), allocatable :: AtomicChargeVec_new(:, :), AtomicChargeEvolution_new(:, :, :)
-    integer :: iOrb, jOrb, number_of_orbitalss
-    real(kind(1d0)), allocatable :: QchargeVec_new    (:, :), R_el(:, :)
+    integer :: iOrb, jOrb
+    real(kind(1d0)), allocatable :: QchargeVec(:, :), R_el(:, :)
 
     call GetRunTimeParameters(input_directory, output_directory, molecular_geometry_file, &
             n_times, t_min, t_max, Ext_field_file, Verbous, Weight_File, read_precomputed_weights_flag, &
@@ -221,10 +219,7 @@ program ChargeMigration
     write(*, *) "Becke_new", sum(Becke_new(3, :, :, 1))
 
     write(*, *) "allocating Atomic Charge matrixes"
-    allocate(AtomicChargeVec(nAtoms))
-    allocate(AtomicChargeEvolution(nAtoms, n_times))
-    allocate(AtomicChargeEvolution_new(3, nAtoms, n_times))
-
+    allocate(AtomicChargeEvolution(3, nAtoms, n_times))
 
     !.. Compute Liouvillian and Diagonalizes it
     write(*, *) "Computing Liouvillian"
@@ -265,9 +260,9 @@ program ChargeMigration
             call ComputeOrbitalDensity(zStatRho, TDM, OrbitalDensity)
 
             !
-            call ComputeNewAtomicCharges(OrbitalDensity, Becke_new, AtomicChargeVec_new)
-            AtomicChargeVec_new = AtomicChargeVec_new * Computed_volume
-            AtomicChargeEvolution_new(:, :, it) = AtomicChargeVec_new
+            call ComputeAtomicCharges(OrbitalDensity, BeckeMatrix, AtomicChargeVec)
+            AtomicChargeVec = AtomicChargeVec * Computed_volume
+            AtomicChargeEvolution(:, :, it) = AtomicChargeVec
 
 
             !$> this needs to be be moved outside of this module or loop since is costly and can be computed when needed
@@ -295,7 +290,7 @@ program ChargeMigration
 
         !.. Save Q_Charge
         call Write_Q_Charge(output_directory // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)) // ".csv", &
-                AtomicChargeEvolution_new, n_times, t_min, dt, nAtoms, atom_names)
+                AtomicChargeEvolution, n_times, t_min, dt, nAtoms, atom_names)
     end do Sim_loop
     !
     call Write_Summary(output_directory // "/Simulation_Summary", nPts, nAtoms, volume, Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
@@ -817,36 +812,35 @@ contains
         enddo
 
     end subroutine Computevolume
-    subroutine Compute_R_el(gridv, WeightV, OrbTab, R_el) !!!***** refactor writing to Module RTP, hard coded... *****
+    subroutine Compute_R_el(gridv, WeightV, OrbTab, R_el)
         real(kind(1d0)), allocatable, intent(in) :: OrbTab (:, :), gridv(:, :), WeightV(:, :)
         real(kind(1d0)), allocatable, intent(out) :: R_el(:, :)
 
         real(kind(1d0)) :: sum, m, r, sum1
-        integer :: nAtoms, nPts, number_of_orbitalss, iOrb, jOrb, uid
+        integer :: nAtoms, nPts, number_of_orbitals, iOrb, jOrb, uid
         nAtoms = size(WeightV, 2)
         nPts = size(WeightV, 1)
-        number_of_orbitalss = size(OrbTab, 2)
+        number_of_orbitals = size(OrbTab, 2)
 
         !
         write(*, "(a)") "Computing Barycenters of the Atomic Charges"
         !
         allocate(R_el(3, nAtoms))
 
-        do iPol = 1, 3
-            do iAtom = 1, nAtoms
+        do iAtom = 1, nAtoms
+            do iPol = 1, 3
                 sum = 0.d0
                 sum1 = 0.d0
                 do iOrb = 1, number_of_orbitals
                     do jOrb = 1, number_of_orbitals
                         do iPts = 1, nPts
-                            m = WeightV(iPts, iAtom) * OrbTab(iPts, iOrb) * OrbTab(iPts, iOrb)
+                            m = WeightV(iPts, iAtom) * OrbTab(iPts, iOrb) * OrbTab(iPts, jOrb)
                             r = gridv(iPol, iPts)
                             sum = sum + ((m * r))
                             sum1 = sum1 + m
                         end do
                     end do
                 end do
-                !
                 !
                 R_el(iPol, iAtom) = sum / sum1
             end do
@@ -863,30 +857,30 @@ contains
             Radius_BS(iAtom) = Radius_Table(atom_names(iAtom))
         end do
     end subroutine AtomicRadius_Bragg_Slater_Becke
-    subroutine ComputeNewAtomicCharges(OrbitalDensity, Becke_new, QchargeVec_new)
+    subroutine ComputeAtomicCharges(OrbitalDensity, BeckeMatrix, QchargeVec)
         real(kind(1d0)), intent(in) :: OrbitalDensity(:, :)
-        real(kind(1d0)), intent(in) :: Becke_new(:, :, :, :)
-        real(kind(1d0)), allocatable, intent(out) :: QchargeVec_new    (:, :)
+        real(kind(1d0)), intent(in) :: BeckeMatrix(:, :, :, :)
+        real(kind(1d0)), allocatable, intent(out) :: QchargeVec    (:, :)
 
-        integer :: iAtom, nAtoms, number_of_orbitalss, jOrb, iOrb, iPol
+        integer :: iAtom, nAtoms, number_of_orbitals, jOrb, iOrb, iPol
         real(kind(1d0)), external :: DDOT
         real(kind(1d0)) :: dsum
-        number_of_orbitalss = size(Becke_new, 2)
-        nAtoms = size(Becke_new, 4)
-        allocate(QchargeVec_new(3, nAtoms))
+        number_of_orbitals = size(BeckeMatrix, 2)
+        nAtoms = size(BeckeMatrix, 4)
+        allocate(QchargeVec(3, nAtoms))
 
-        QchargeVec_new = 0.d0
+        QchargeVec = 0.d0
         do iPol = 1, 3
             do iAtom = 1, nAtoms
-                do jOrb = 1, number_of_orbitalss
-                    do iOrb = 1, number_of_orbitalss
-                        QchargeVec_new(iPol, iAtom) = QchargeVec_new(iPol, iAtom) + OrbitalDensity(iOrb, jOrb) &
-                                * Becke_new(iPol, iOrb, jOrb, iAtom)
+                do jOrb = 1, number_of_orbitals
+                    do iOrb = 1, number_of_orbitals
+                        QchargeVec(iPol, iAtom) = QchargeVec(iPol, iAtom) + OrbitalDensity(iOrb, jOrb) &
+                                * BeckeMatrix(iPol, iOrb, jOrb, iAtom)
                     end do
                 end do
             enddo
         end do
-    end subroutine ComputeNewAtomicCharges
+    end subroutine ComputeAtomicCharges
     subroutine ComputeOrbitalDensity(zStatRho, TDM, Amat)
         complex(kind(1d0)), intent(in) :: zStatRho(:, :)
         real   (kind(1d0)), intent(in) :: TDM(:, :, :, :)
@@ -966,13 +960,13 @@ contains
         enddo
         !$OMP END PARALLEL DO
     end subroutine TabulateChargeDensity
-    subroutine ComputeNewBeckeMatrix(WeightV, OrbTab, Becke_new, Bary_center)
+    subroutine ComputeBeckeMatrix(WeightV, OrbTab, BeckeMatrix, Bary_center)
         real(kind(1d0)), intent(in) :: WeightV(:, :)
         real(kind(1d0)), intent(in) :: OrbTab (:, :)
-        real(kind(1d0)), allocatable, intent(out) :: Becke_new(:, :, :, :)
+        real(kind(1d0)), allocatable, intent(out) :: BeckeMatrix(:, :, :, :)
         real(kind(1d0)), intent(in) :: Bary_center(:, :)
 
-        integer :: nPts, number_of_orbitalss, nAtoms
+        integer :: nPts, number_of_orbitals, nAtoms
         integer :: iPts, iOrb1, iOrb2, iAtom, iPol
         real(kind(1d0)) :: dsum
 
@@ -981,20 +975,19 @@ contains
         !
         nAtoms = size(WeightV, 2)
         nPts = size(WeightV, 1)
-        number_of_orbitalss = size(OrbTab, 2)
+        number_of_orbitals = size(OrbTab, 2)
 
-        !        if(allocated(Becke_new))deallocate(Becke_new)
-        allocate(Becke_new(3, number_of_orbitalss, number_of_orbitalss, nAtoms))
-        Becke_new = 0.d0
-        !$omp parallel do private(iOrb2, iOrb1, iPts) shared(Becke_new, WeightV, OrbTab, Bary_center)
+        allocate(BeckeMatrix(3, number_of_orbitals, number_of_orbitals, nAtoms))
+        BeckeMatrix = 0.d0
+        !$omp parallel do private(iOrb2, iOrb1, iPts) shared(BeckeMatrix, WeightV, OrbTab, Bary_center)
         do iPol = 1, 3
             do iAtom = 1, nAtoms
-                do iOrb2 = 1, number_of_orbitalss
-                    do iOrb1 = 1, number_of_orbitalss
+                do iOrb2 = 1, number_of_orbitals
+                    do iOrb1 = 1, number_of_orbitals
                         do iPts = 1, nPts
-                            Becke_new(iPol, iOrb1, iOrb2, iAtom) = Becke_new(iPol, iOrb1, iOrb2, iAtom) + &
+                            BeckeMatrix(iPol, iOrb1, iOrb2, iAtom) = BeckeMatrix(iPol, iOrb1, iOrb2, iAtom) + &
                                     WeightV(iPts, iAtom) * OrbTab(iPts, iOrb1) * OrbTab(iPts, iOrb2) * &
-                                            Bary_center(iPol, iAtom)
+                                            Bary_center(iPol, iAtom) ! fixme????
                         end do
                     end do
                 end do
@@ -1002,51 +995,13 @@ contains
         end do
         !$omp end parallel do
 
-    end subroutine ComputeNewBeckeMatrix
+    end subroutine ComputeBeckeMatrix
     ! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
     ! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     ! Not used in the code ...?
     ! ----------------------------------------------------
-    subroutine ComputeAtomicCharges(OrbitalDensity, BeckeMatrix, QchargeVec)
-        real(kind(1d0)), intent(in) :: OrbitalDensity(:, :)
-        real(kind(1d0)), intent(in) :: BeckeMatrix   (:, :, :)
-        real(kind(1d0)), allocatable, intent(out) :: QchargeVec    (:)
-        integer :: iAtom, nAtoms, number_of_orbitalss, jOrb, iOrb
-        real(kind(1d0)), external :: DDOT
-        number_of_orbitalss = size(BeckeMatrix, 1)
-        nAtoms = size(BeckeMatrix, 3)
-        if(.not.allocated(QchargeVec))allocate(QchargeVec(nAtoms))
-        QchargeVec = 0.d0
-        do iAtom = 1, nAtoms
-            QchargeVec(iAtom) = ddot(number_of_orbitalss * number_of_orbitalss, OrbitalDensity, 1, BeckeMatrix(1, 1, iAtom), 1)
-        enddo
-    end subroutine ComputeAtomicCharges
-    subroutine ComputeDipole_new(Amat, OrbTab, Dipole_new_, gridv)
-        real(kind(1d0)), intent(in) :: Amat(:, :)
-        real(kind(1d0)), intent(in) :: OrbTab (:, :)
-        real(kind(1d0)), intent(in) :: gridv(:, :)
-        real(kind(1d0)), allocatable, intent(out) :: Dipole_new_(:)
-        integer :: nPts, number_of_orbitalss
-        integer :: iPts, iOrb, jOr
-
-        nPts = size(OrbTab, 1)
-        number_of_orbitalss = size(OrbTab, 2)
-
-        if (.not.allocated(Dipole_new_))allocate(Dipole_new_(3))
-        Dipole_new_ = 1
-        do iPol = 1, 3
-            do iOrb = 1, number_of_orbitals
-                do jOrb = 1, number_of_orbitals
-                    do iPts = 1, nPts
-                        Dipole_new_(iPol) = Dipole_new_(iPol) + OrbTab(iPts, iOrb) * OrbTab(iPts, jOrb) * Amat(iOrb, jOrb) * gridv(iPol, iPts)
-                    enddo
-                enddo
-            enddo
-        end do
-
-    end subroutine ComputeDipole_new
     complex(kind(1d0)) function zTraceFunction(zA) result(zTrace)
         integer :: i
         complex(kind(1d0)), intent(in) :: zA(:, :)
