@@ -368,7 +368,8 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
             #
             Call_Spectrum_Reconstruction_n_Difference(DEFAULT_BIN_FILE_PATH, molcas_output_directory,
                                                       experiment_directory,
-                                                      f"{molcas_output_directory}/{xyz_geometry_path}", number_of_omegas,
+                                                      f"{molcas_output_directory}/{xyz_geometry_path}",
+                                                      number_of_omegas,
                                                       min_omegas, max_omegas,
                                                       number_of_tau_omegas, min_tau_omega, max_tau_omega, debug_mode)
             # logger.info("Creating difference_" + experiment_directory + " to compare the Dipole and Charge Spectra")
@@ -377,11 +378,11 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
 
         if plot:
             # Becke Weights
-            plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path, weights_file)
+            # plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path, weights_file)
 
             # Lets plot the Pulses
-            plot_pulses(study_directory, experiment_directory, time_delay_range, min_time, max_time, plot_all=False)
-            plot_ft_pulses(study_directory, experiment_directory, time_delay_range, plot_all=False)
+            # plot_pulses(study_directory, experiment_directory, time_delay_range, min_time, max_time, plot_all=False)
+            # plot_ft_pulses(study_directory, experiment_directory, time_delay_range, plot_all=False)
 
             # Lets plot the Dipolar Reponse vs Time (t)
             plot_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
@@ -392,10 +393,11 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
 
             # Lets plot the Dipolar Reponse vs Time (t) in the Frequency Domain (w)
             plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
-                                       pump_settings, probe_settings, charge_migration_ft_settings)
-            plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
-                                            pump_settings, probe_settings, charge_migration_ft_settings,
-                                          xyz_geometry_path)
+                                       pump_settings, probe_settings, charge_migration_ft_settings, try_color_maps=False)
+            plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dephasing_factor,
+                                              relaxation_factor,
+                                              pump_settings, probe_settings, charge_migration_ft_settings,
+                                              xyz_geometry_path, try_color_maps=False)
 
             # Lets plot the 2D Spectrum
             plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
