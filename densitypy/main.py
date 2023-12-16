@@ -6,9 +6,7 @@ from os import path, system
 
 from densitypy.Default_Settings.default_config import DEFAULT_BIN_FILE_PATH
 from densitypy.charge_migration.chargemigratonscripts import Write_FieldHelp, Write_Pulses, Call_Charge_Migration, \
-    Save_Previous_FT, Call_Charge_MigrationFT, Call_Spectrum_Reconstruction_n_Difference, \
-    Save_Previous_Spectrum_Difference, \
-    generate_time_delays
+    Call_Charge_MigrationFT, Call_Spectrum_Reconstruction_n_Difference,  generate_time_delays
 from densitypy.molcas.DipolesLogParser import DipolesLogParser
 from densitypy.molcas.molcasscripts import create_help_input_file, copy_and_parse_molcas_input_file_to_edit, \
     make_better_grid, \
@@ -19,10 +17,10 @@ from densitypy.post_processing.plotting_module import plot_dipoles_v_time, plot_
     plot_2d_spectrum, \
     plot_ft_all_dipoles_v_time, plot_2d_spectrum_peak_analysis, plot_2d_spectrum_interactive, \
     plot_atomic_dipoles_v_time, \
-    difference_between_dipole_and_atomic_charges_v_time, plot_ft_all_atomic_dipoles_v_time, plot_becke_weights
+    difference_between_dipole_and_atomic_charges_v_time, plot_ft_all_atomic_dipoles_v_time
 from densitypy.project_utils.configuration_parser import parse_configuration_file
-from densitypy.project_utils.def_functions import make_directory, file_lenth, copy_file_to, find, \
-    change_directory_manager
+from densitypy.project_utils.file_directory_ops import change_directory_manager, make_directory, copy_file_to, \
+    file_lenth, find
 from densitypy.project_utils.logger import setup_logger, DEFAULT_LOGGIN_VALUES
 
 logger = setup_logger(__name__.split('.')[-1])
@@ -32,12 +30,10 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                   run_charge_migration=False, run_charge_migration_ft=False,
                   run_spectrum_reconstruction=False,
                   field_file_help=False, molcas_input_help=False,
-                  lus=False, gridflag: bool or str = True, write_charge_migration=None,
+                  lus=False, gridit: bool or str = True, write_charge_migration=None,
                   debug_mode=False, justh5=False, justgetdipoles=False, justgetdensity=False,
                   weights_file=None, givenfieldfile=None,
-
-                  old_main=False, parallel=False,
-                  save_previous=False, make_fortran=False, make_fortran_config=None,
+                   make_fortran=False, make_fortran_config=None,
 
                   plot=True  # todo usage to be changed, here for testing
 
@@ -51,11 +47,9 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
 
             if compiler_output_df is not None:
                 logger.error(f"Compilation failed with return code {return_code}.")
-                # sort by error type
-                compiler_output_df = compiler_output_df.sort_values(by='Type',
-                                                                    key=lambda x: x.map(DEFAULT_LOGGIN_VALUES))
-                # logger.error(f'\n'
-                #              f'{compiler_output_df}')
+                # compiler_output_df = compiler_output_df.sort_values(by='Type',
+                #                                                     key=lambda x: x.map(DEFAULT_LOGGIN_VALUES))
+                # logger.(f'\n{compiler_output_df}')
             exit(return_code)
 
     # TODO too explicit, does not allow for new args to be added easily
@@ -155,11 +149,6 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
         time_delay_range = generate_time_delays(number_of_pp, time_delay_start, 0.0, time_delay_stop,
                                                 time_Delay_weight_factor)
 
-        logger.debug(f"number_of_pp =  {number_of_pp}")
-        logger.debug(f"time_delay_start =  {time_delay_start}")
-        logger.debug(f"time_delay_stop =  {time_delay_stop}")
-        logger.debug(f"time_delay_range = {time_delay_range}")
-
         # Useful Flags for e.g. debugging
         if justh5:
             load_project_rasscf_h5_file(project_name, molcas_output_directory, molcas_output_directory)
@@ -193,28 +182,28 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
 
             copy_file_to(xyz_geometry_path, molcas_output_directory)
 
-            # gridflag can be
+            # gridit can be fixme deprecated until updated to use new grid algorithm
             #   True = use gridit on molcas with with uniform grid points
             #   False = Do not use or create any grid or add gridit to input file
-            #   'smart' =  Use our smart grid algorithm to create a grid based on the molecule and step size # todo
+            #   'smart' =  Use our smart grid algorithm to create a grid based on the molecule and step size
             #   'limited' = Use our truncated grid algorithm to create a grid based on the molecule and config settings
             #   'manual' = Use a grid file to create a grid, this is the only option that requires a grid file to be specified in the config file
-            if gridflag in ['smart', 'limited']:
-                limitedgrid = True if gridflag == 'limited' else False
+            if gridit in ['smart', 'limited']:
+                limitedgrid = True if gridit == 'limited' else False
                 n_points = make_better_grid(molcas_output_directory, xyz_geometry_path, step_size, boundary,
                                             limitedgrid)
-            elif gridflag == 'manual':
+            elif gridit == 'manual':
                 gridfile = json_config['grid_settings']['default_grid_file']
                 system(f"cp {gridfile} {molcas_output_directory}/gridcoord")
                 n_points = file_lenth(f'{molcas_output_directory}/gridcoord')
                 logger.info(f"Number of Points = {n_points}")
-            elif gridflag:
+            elif gridit:
                 n_points = make_grid_coordinates(molcas_output_directory, nx, ny, nz, xmin, xmax, ymin, ymax, zmin,
                                                  zmax)
             else:
-                assert gridflag is False, f"gridflag is {gridflag} but should be False, True, 'smart', 'limited', or 'manual'"
+                assert gridit is False, f"gridit is {gridit} but should be False, True, 'smart', 'limited', or 'manual'"
 
-            if gridflag:
+            if gridit:
                 add_grid_it_to_manual_input_file(molcas_input, project_name, molcas_output_directory, list_of_orbitals,
                                                  n_points)
             # >Run Open Molcas
@@ -231,14 +220,14 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                 fig = project.get_mu_heatmaps()
                 fig.savefig(f'{molcas_output_directory}/dipole-heatmap.png')
 
-            if gridflag:
+            if gridit:
                 grid_file_data_dict = parse_project_grid_file(project_name, molcas_output_directory)
                 write_grid_density_file(grid_file_data_dict, molcas_output_directory)
 
             if "RASSCF" in keywords_needed_found:
                 load_project_rasscf_h5_file(project_name, molcas_output_directory, molcas_output_directory)
 
-        # >ChargeMigration
+        # >ChargeMigration TODO(Subject to Change based on C_i reconstruction implementation)
         if run_charge_migration:
             if not path.exists(molcas_output_directory):
                 logger.error(f"Could not find {molcas_output_directory}")
@@ -254,64 +243,17 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                              type_of_pulse_probe, time_delay_range, probe_central_frequency,
                              probe_periods, probe_phase, probe_intensity, probe_polarization, write_charge_migration)
 
-            # Run Charge Migration
-            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            #
-            i_excitation = -1  # Just Ground and Prepare
-            i_epsilon = -1  # Just Ground and Prepare
+            # Run Charge Migration TODO(Subject to Change based on C_i reconstruction implementation)
             Call_Charge_Migration(DEFAULT_BIN_FILE_PATH, molcas_output_directory, experiment_directory, number_of_times,
                                   min_time, max_time, f"{experiment_directory}/{field_file}", ft_time_step,
                                   ft_width_step, f"{molcas_output_directory}/{xyz_geometry_path}", list_of_orbitals,
                                   write_charge_migration, Volume, debug_mode, weights_file, dephasing_factor,
-                                  relaxation_factor, bath_temperature, i_excitation, i_epsilon)
+                                  relaxation_factor, bath_temperature)
 
-            if old_main:
-                pass
-            #
-            elif parallel:
-                #
-                INDEX_MAT = []
-                #
-                for i_excitation in range(1, number_of_states + 1):  # begin iteration
-                    for i_epsilon in range(1, 3):  # begin iteration
-                        #
-                        INDEX_MAT.append((i_excitation, i_epsilon))
-                        #
-                Number_CPU = min(((number_of_states) * 2), os.cpu_count())
-                logger.info(f'\nRunning in Parallel')
-                logger.info(f'Using {Number_CPU} CPU\'s out of {os.cpu_count()} available\n')
-                pool = Pool(Number_CPU)
-                pool.starmap_async(Call_Charge_Migration,
-                                   [(molcas_output_directory, experiment_directory, number_of_times,
-                                     min_time, max_time, f"{experiment_directory}/{field_file}", ft_time_step,
-                                     ft_width_step, f"{molcas_output_directory}/{xyz_geometry_path}",
-                                     list_of_orbitals, write_charge_migration, Volume, debug_mode, weights_file,
-                                     dephasing_factor,
-                                     relaxation_factor, bath_temperature, i_excitation, i_epsilon) for
-                                    i_excitation, i_epsilon
-                                    in
-                                    INDEX_MAT]).get()
-                pool.close()
-                # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            else:
-                i_excitation = 0
-                i_epsilon = 0
-                Call_Charge_Migration(DEFAULT_BIN_FILE_PATH, molcas_output_directory, experiment_directory,
-                                      number_of_times, min_time, max_time, f"{experiment_directory}/{field_file}",
-                                      ft_time_step, ft_width_step, f"{molcas_output_directory}/{xyz_geometry_path}",
-                                      list_of_orbitals, write_charge_migration, Volume, debug_mode, weights_file,
-                                      dephasing_factor, relaxation_factor, bath_temperature, i_excitation, i_epsilon)
             copy_file_to(json_config_path, f"{experiment_directory}")
 
         # >ChargeMigrationFT
         if run_charge_migration_ft:
-            if save_previous:
-                Save_Previous_FT(experiment_directory, dephasing_factor, relaxation_factor, time_delay_start,
-                                 time_delay_stop,
-                                 min_omegas, max_omegas, pump_periods, probe_periods, pump_intensity,
-                                 probe_intensity, number_of_pp, pump_phase, probe_phase, ft_time_step, ft_width_step,
-                                 pump_polarization, probe_polarization, number_of_omegas, min_tau_omega,
-                                 max_tau_omega)
             if givenfieldfile:
                 field_file = givenfieldfile
             else:
@@ -322,78 +264,41 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
                              type_of_pulse_probe, time_delay_range, probe_central_frequency,
                              probe_periods, probe_phase, probe_intensity, probe_polarization, write_charge_migration)
             # Run Charge Migration FT
-            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            if parallel:
-                #
-                INDEX_MAT = []
-                #
-                for i_excitation in range(1, number_of_states + 1):  # begin iteration
-                    for i_epsilon in range(1, 3):  # begin iteration
-                        #
-                        INDEX_MAT.append((i_excitation, i_epsilon))
-                        #
-                Number_CPU = min(((number_of_states) * 2), (cpu_count()) / 2)
-                logger.info(f'\nRunning in Parallel')
-                logger.info(f'Using {Number_CPU} CPU\'s out of {cpu_count()} available\n')
-                pool = Pool(Number_CPU)
-                pool.starmap_async(Call_Charge_MigrationFT,
-                                   [(molcas_output_directory, experiment_directory,
-                                     f"{molcas_output_directory}/{xyz_geometry_path}", number_of_omegas,
-                                     min_omegas, max_omegas, number_of_tau_omegas, min_tau_omega, max_tau_omega,
-                                     ft_time_step, ft_width_step, f"{experiment_directory}/{field_file}", debug_mode,
-                                     i_excitation, i_epsilon) for
-                                    i_excitation, i_epsilon in INDEX_MAT]).get()
-                pool.close()
-                # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            else:
-                i_excitation = 0
-                i_epsilon = 0
-                Call_Charge_MigrationFT(DEFAULT_BIN_FILE_PATH, molcas_output_directory, experiment_directory,
-                                        f"{molcas_output_directory}/{xyz_geometry_path}",
-                                        number_of_omegas,
-                                        min_omegas, max_omegas, number_of_tau_omegas, min_tau_omega, max_tau_omega,
-                                        ft_time_step, ft_width_step, f"{experiment_directory}/{field_file}", debug_mode,
-                                        i_excitation, i_epsilon)
+            Call_Charge_MigrationFT(DEFAULT_BIN_FILE_PATH, molcas_output_directory, experiment_directory,
+                                    f"{molcas_output_directory}/{xyz_geometry_path}",
+                                    number_of_omegas,
+                                    min_omegas, max_omegas, number_of_tau_omegas, min_tau_omega, max_tau_omega,
+                                    ft_time_step, ft_width_step, f"{experiment_directory}/{field_file}",
+                                    debug_mode)
         # >SpectrumReconstruction
         if run_spectrum_reconstruction:
-            if save_previous:
-                Save_Previous_Spectrum_Difference(DEFAULT_BIN_FILE_PATH, experiment_directory,
-                                                  'difference_' + experiment_directory, dephasing_factor,
-                                                  relaxation_factor, time_delay_start, time_delay_stop, min_omegas,
-                                                  max_omegas, pump_periods, probe_periods, pump_intensity,
-                                                  probe_intensity, number_of_pp, pump_phase, probe_phase, ft_time_step,
-                                                  ft_width_step, pump_polarization, probe_polarization,
-                                                  number_of_omegas, min_tau_omega, max_tau_omega)
-
-            #
             Call_Spectrum_Reconstruction_n_Difference(DEFAULT_BIN_FILE_PATH, molcas_output_directory,
                                                       experiment_directory,
                                                       f"{molcas_output_directory}/{xyz_geometry_path}",
                                                       number_of_omegas,
                                                       min_omegas, max_omegas,
                                                       number_of_tau_omegas, min_tau_omega, max_tau_omega, debug_mode)
-            # logger.info("Creating difference_" + experiment_directory + " to compare the Dipole and Charge Spectra")
-            # Dipole_Charge_Comparison(experiment_directory + '/Dipole/DipoleFT_ww.csv', experiment_directory +
-            #                          '/Dipole/DipoleFT_ww_reconstructed.csv', 'difference_' + experiment_directory)
 
         if plot:
             # Becke Weights
             # plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path, weights_file)
 
             # Lets plot the Pulses
-            # plot_pulses(study_directory, experiment_directory, time_delay_range, min_time, max_time, plot_all=False)
-            # plot_ft_pulses(study_directory, experiment_directory, time_delay_range, plot_all=False)
+            plot_pulses(study_directory, experiment_directory, time_delay_range, min_time, max_time, plot_all=False)
+            plot_ft_pulses(study_directory, experiment_directory, time_delay_range, plot_all=False)
 
             # Lets plot the Dipolar Reponse vs Time (t)
             plot_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
                                 plot_all=False)
             plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
-                                       xyz_geometry_path,plot_all=False)
-            difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time, xyz_geometry_path)
+                                       xyz_geometry_path, plot_all=False)
+            difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delay_range,
+                                                                min_time, max_time, xyz_geometry_path)
 
             # Lets plot the Dipolar Reponse vs Time (t) in the Frequency Domain (w)
             plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
-                                       pump_settings, probe_settings, charge_migration_ft_settings, try_color_maps=False)
+                                       pump_settings, probe_settings, charge_migration_ft_settings,
+                                       try_color_maps=False)
             plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dephasing_factor,
                                               relaxation_factor,
                                               pump_settings, probe_settings, charge_migration_ft_settings,
@@ -403,50 +308,35 @@ def run_densitypy(json_config_path, study_directory, molcas_input,
             plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
                              pump_settings, probe_settings, charge_migration_ft_settings)
             plot_2d_spectrum_peak_analysis(study_directory, experiment_directory)
-            plot_2d_spectrum_interactive(study_directory, experiment_directory)
+            plot_2d_spectrum_interactive(study_directory, experiment_directory) # not working, shifts the axis
 
 
 if __name__ == "__main__":
     make_fortran_config = dict(directory='/home/ruben/PycharmProjects/DensityPy/densityfort',
                                make_flags='all DEB_FLAG=d',
-                               # ... pther settings but this is mvp
+                               # ... other settings but this is mvp
                                )
 
-    run_densitypy(json_config_path="configuration_help.json",
-                  study_directory="/home/ruben/PycharmProjects/DensityPy/Studies/cluttertest",
-                  molcas_input=False,  # 'molcas_input_help.input',
-                  # molcas_input='molcas_input_help.input',
+    run_densitypy(json_config_path="xy_polarized_config.json",
+                  study_directory="/home/ruben/PycharmProjects/DensityPy/Studies/ExampleStudy",
+                  molcas_input=False,  # 'molcas_input_help.input', # False just means not running molcas
                   run_charge_migration=False,
                   run_charge_migration_ft=False,
                   run_spectrum_reconstruction=False,
                   plot=True,
                   #
                   field_file_help=False, molcas_input_help=False,
-                  lus=False, gridflag=True, write_charge_migration=None, debug_mode=False,
+                  lus=False, gridit=True, write_charge_migration=None, debug_mode=False,
                   justh5=False, justgetdipoles=False, justgetdensity=False, weights_file=None, givenfieldfile=None,
-                  old_main=True, parallel=False, save_previous=False,
                   make_fortran=False, make_fortran_config=make_fortran_config
                   )
-#
-# fixme most of the data is gotten from RASSCF H5 file only but some from only i beleive we are looking for the integrals, RASSI?
-# Todo:
-#     refactor the code to avoid using os.chdir entirely, since it changes the state of the Python process and can potentially lead to confusing bugs. This can be achieved by using absolute paths in the shell commands instead of changing the working directory. However, the feasibility of this refactoring depends on the specific codebase and build system.
-# todo
+
+# counting them down
+# fixme most of the data is gotten from RASSCF H5 file only, but I believe we are looking for the integrals, RASSI?
+#   -fix manipulation of Atomic Charges as they require a flipped sign or rotation of matrix e.g. [::-1] to correctly
+#       match the dipole
+#   -implement more  validation checks of settings between runs, between modules, and between configurations of
+#       different programs like molcas etc...
 #   -update documentation
-#   -analytics module (feature-detection, spectrum reconstruction, etc...)
-#       - completely redo the parallelization of the code, this goes hand in hadn with the C_i coefficients reconstruction module (see documentation)
-#   -refactor from execute_command to f2py calls for fotran code
-#       -does not compile all the dependencies, need to write a script to do so
-#   -automate f2py compilation
-#   -name args when passing to functions
-#   -modularize fortran code
-#       -clean output files and directories (molcas,chargemigration (ft) done, rest ... to-do)
-#   -change functions to lower case, change all variables to lower case, classes to upper case, etc... I followed
-#   -update cli_v1.py with new changes to main.py
-#   -make/generate tests
-#   -main.run(...)-->GUI (Streamlit/Wave)
-#   -implement more cross validation checks of settings between runs, between modules, and between configurations of different programs like molcas etc...
-#   -make sure inputs are valid and available (check for existence of files, etc...) before running anything if their appropriate flags are set
-#       - very important specifically is dealing with orbitals, stats, CI roots etc... e.g. only 4 active orbitals with 6 electrons, 3 filled and one excited should limit the max CIroots depending on number of configurations available
-#   reduce code to main__
-# Document my subroutine, keep in mind that the current comments might not actually represent the subroutine, so use them as context but the code is the final word when it comes to documentation:
+#   -add more tests
+#   -update gridit to use the new grid algorithm

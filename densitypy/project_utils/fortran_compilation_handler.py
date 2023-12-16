@@ -38,7 +38,7 @@ from subprocess import CalledProcessError
 
 import pandas as pd
 
-from densitypy.project_utils.def_functions import execute_command
+from densitypy.project_utils.command_execution import execute_command
 from densitypy.project_utils.logger import setup_logger
 
 logger = setup_logger("compiler")

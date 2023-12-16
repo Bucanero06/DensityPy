@@ -1,4 +1,4 @@
-#! /usr/bin/env python3.6
+#! /usr/bin/env python3.9
 from os import system
 import argparse
 
@@ -21,7 +21,7 @@ def run(args):
     system('rm temp_charge temp_dipole temp_difference')
 
 
-def main():
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="subtract charge from dipole")
     parser.add_argument("-d", help="dipoleft_ww input file.",
                         dest="dipole", type=str, action='store')
@@ -34,8 +34,3 @@ def main():
     args = parser.parse_args()
     args.func(args)
 
-
-if __name__ == "__main__":
-    main()
-###
-# ')

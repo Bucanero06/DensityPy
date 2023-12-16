@@ -4,11 +4,13 @@ import argparse
 import glob
 import os
 
-from densitypy.project_utils.def_functions import execute_command, natural_sort
+from densitypy.project_utils.command_execution import execute_command
+from densitypy.project_utils.data_processing_utils import natural_sort
 
 
 # Main
 def run(args):
+    """DEPRECATED, NEEDS TO BE UPDATED TO WORK WITH NEW FILE STRUCTURES"""
     # Gets Run_Time_Parameters
     inputdirectory = args.inputdirectory
     gnuplotscript = args.gnuplotscript

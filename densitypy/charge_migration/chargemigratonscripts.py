@@ -2,7 +2,8 @@
 # >import chargemigratonscripts as rcms
 from os import path, system
 
-from densitypy.project_utils.def_functions import uniquify, execute_command, delete_files_or_directories
+from densitypy.project_utils.command_execution import execute_command
+from densitypy.project_utils.file_directory_ops import uniquify
 from densitypy.project_utils.logger import setup_logger
 
 logger = setup_logger(__name__.split('.')[-1])
@@ -40,7 +41,6 @@ def generate_time_delays(number_of_pp, start, mid, stop, weight_factor=0.5):
 
     if start >= mid or mid >= stop:
         raise ValueError('Start, mid and stop must be in ascending order')
-
 
     # Ensure the weight factor is between 0 and 1
     weight_factor = max(0, min(1, weight_factor))
@@ -81,18 +81,13 @@ def Write_Pulses(field_file, type_of_pulse_pump, start_time, pump_central_freque
                    str(pump_phase) + "  " +
                    str(pump_intensity) + " " +
                    str(pump_polarization) + " );}")
-        for Time_Delay in time_delay_range:
-            # split probe_polarization from list to string of the form "theta phi"
 
-            # >Writes Probe Pulse
-            # fout.write("\n[PP" + str(Time_Delay) + "]{ XUV; ( " + str(type_of_pulse_probe) + " " +
-            #            str(Time_Delay) + " " +
-            #            str(probe_central_frequency) + " " +
-            #            str(probe_periods) + " " + str(probe_phase) + " " +
-            #            str(probe_intensity) + " " + " " + probe_polarization + " );}")
+        # >Writes Probe Pulse
+        for Time_Delay in time_delay_range:
             fout.write(f"\n[PP{Time_Delay}]{{ XUV; ( {type_of_pulse_probe} {Time_Delay} {probe_central_frequency} "
                        f"{probe_periods} {probe_phase} {probe_intensity} {probe_polarization} );}}")
 
+        # >Writes Execute Command
         fout.write("\nEXECUTE{")
         for Time_Delay in time_delay_range:
             fout.write("PP" + str(Time_Delay) + "; ")
@@ -102,32 +97,12 @@ def Write_Pulses(field_file, type_of_pulse_pump, start_time, pump_central_freque
             fout.write("XUV;}")
 
 
-# # >THIS IS AN EDIT IN PROGRESS DO NOT USE< USE THE ABOVE
-# def Write_Pulses(field_file, type_of_pulse_pump, start_time, pump_central_frequency,
-#                  pump_periods, pump_phase, pump_intensity, pump_polarization,
-#                  type_of_pulse_probe, time_delay_range, probe_central_frequency,
-#                  probe_periods, probe_phase, probe_intensity, probe_polarization, write_charge_migration):
-#     with open(field_file, 'w') as fout:
-#         for Time_Delay in time_delay_range:
-#             # >Writes Probe Pulse
-#             fout.write("\n[PP" + str(Time_Delay) + "]{( " + str(type_of_pulse_probe) + " " +
-#                        str(Time_Delay) + " " +
-#                        str(probe_central_frequency) + " " +
-#                        str(probe_periods) + " " + str(probe_phase) + " " +
-#                        str(probe_intensity) + " " + " " + probe_polarization + " );}")
-#         fout.write("\nEXECUTE{")
-#         for Time_Delay in time_delay_range:
-#             fout.write("PP" + str(Time_Delay) + "; ")
-#         else:
-#             fout.write("}")
-
-
 # >Calls Charge Migration Code and gives command line arguements (1)
 def Call_Charge_Migration(Bin_Directory, input_directory, experiment_directory, number_of_times,
                           min_time, max_time, field_file, stept, stepw,
                           geometry_file, orbital_list, write_charge_migrationflag, Volume, debug_mode, weights_file,
                           dephasing_factor,
-                          relaxation_factor, bath_temp, i_excitation, i_epsilon):
+                          relaxation_factor, bath_temp):
     weights_file_decoy = ""
     if weights_file:
         weights_file_decoy = "-w " + weights_file
@@ -153,7 +128,7 @@ def Call_Charge_Migration(Bin_Directory, input_directory, experiment_directory, 
         f"-t_min {str(min_time)} -t_max {str(max_time)} -field {field_file} -vol {str(Volume)} -stept {str(stept)} "
         f"-stepw {str(stepw)} -xyz {str(geometry_file)} {weights_file_decoy} {write_charge_migrationflag_decoy} -iorb "
         f"{','.join(map(str, orbital_list))} -rf {str(relaxation_factor)} -bath {str(bath_temp)} -df "
-        f"{str(dephasing_factor)} -s {i_excitation} -e {i_epsilon}"
+        f"{str(dephasing_factor)}"
         , _logger=_logger)
 
     logger.info("Finished Executing ChargeMigration")
@@ -161,7 +136,7 @@ def Call_Charge_Migration(Bin_Directory, input_directory, experiment_directory, 
 
 def Call_Charge_MigrationFT(Bin_Directory, input_directory, experiment_directory, geometry, Number_of_Omegas,
                             min_omegas, max_omegas, number_of_tau_omega, min_tau_omega, max_tau_omega,
-                            ft_time_step, ft_width_step, field_file, debug_mode, i_excitation, i_epsilon):
+                            ft_time_step, ft_width_step, field_file, debug_mode):
     screen_print = "Running ChargeMigrationFT"
     debug_mode_decoy = ""
     if debug_mode:
@@ -179,22 +154,10 @@ def Call_Charge_MigrationFT(Bin_Directory, input_directory, experiment_directory
         f'{debug_mode_decoy}ChargeMigrationFT -i {str(input_directory)} -o {str(experiment_directory)} -xyz '
         f'{str(geometry)} -stept {str(ft_time_step)} -stepw {str(ft_width_step)} -field {str(field_file)} -nw '
         f'{str(Number_of_Omegas)} -wmax {str(min_omegas)} -wmin {str(max_omegas)} -ntw {str(number_of_tau_omega)} '
-        f'-twmax {str(min_tau_omega)} -twmin {str(max_tau_omega)} -s {i_excitation} -e {i_epsilon}'
+        f'-twmax {str(min_tau_omega)} -twmin {str(max_tau_omega)}'
         , _logger=_logger)
 
     logger.info("Finished Executing ChargeMigrationFT")
-
-
-def Dipole_Charge_Comparison(dipole_file, charge_file, output_file):
-    delete_files_or_directories()
-    system('cat ' + str(
-        dipole_file) + ' | awk \'{print $1\" \"$2\" \"$3**2+$4**2\" \"$5**2+$6**2\" \"$7**2+$8**2}\' > temp_dipole')
-    system('cat ' + str(charge_file) + ' | awk \'{print $3**2+$4**2\" \"$5**2+$6**2\" \"$7**2+$8**2}\' > temp_charge')
-    system(
-        'paste temp_dipole temp_charge| awk \'{print $1\" \"$2\" \"$3\" \"$4\" \"$5\" \"$6\" \"$7\" \"$8\" \"$3-$6\" \"$4-$7\" \"$5-$8}\' > temp_difference')
-
-    system("perl -pe \"s/0 0 0 0 0 0   0 0 0/ /g\" temp_difference>" + str(output_file))
-    system('rm temp_charge temp_dipole temp_difference')
 
 
 def Call_Spectrum_Reconstruction_n_Difference(Bin_Directory, molcas_output_directory, experiment_directory,

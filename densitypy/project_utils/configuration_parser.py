@@ -2,9 +2,10 @@
 import json
 from os import path
 
+from densitypy.Default_Settings.default_config import DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_CONTENT
 from densitypy.project_utils.logger import setup_logger
-from .def_functions import load_json_file, recursively_normalize_dict_keys, validate_and_correct_dictionary
-from ..Default_Settings.default_config import DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_CONTENT
+from densitypy.project_utils.string_dict_utils import load_json_file, recursively_normalize_dict_keys, \
+    validate_and_correct_dictionary
 
 logger = setup_logger(__name__.split('.')[-1])
 

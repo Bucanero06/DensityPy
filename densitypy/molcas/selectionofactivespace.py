@@ -1,13 +1,21 @@
 #! /usr/bin/env python
+## THIS FILE SHOULD BE CONSIDERED DEPRECATED
 # >import selectionofactivespace as sas
 from configparser import ConfigParser
 from os import path
 import sys
 
-from densitypy.project_utils.def_functions import execute_pymolcas_with_error_print, find
+from densitypy.project_utils.command_execution import execute_command, print_molcas_log_errors
+from densitypy.project_utils.file_directory_ops import find
 
 
 def SelectionOfActiveSpace(ini_file):
+    """
+    (DEPRECATED) This function is used to select the active space using Luscus GUI (DEPRECATED)
+
+    :param ini_file:
+    :return:
+    """
     # Read Project settings from the configuration file
     parser = ConfigParser()
 
@@ -33,8 +41,12 @@ def SelectionOfActiveSpace(ini_file):
 
     # Run Pymolcas using the input file previously created
     print("Wait while Molcas runs a SCF calculations and creates a Luscus file you can use to analyze the Orbitals")
-    execute_pymolcas_with_error_print("pymolcas " + project_name + ".input -f", project_name)
-
+    # execute_pymolcas_with_error_print("pymolcas " + project_name + ".input -f", project_name)
+    try:
+        execute_command("pymolcas " + project_name + ".input -f", write_stream=True)
+    except Exception as e:
+        print(e)
+        print_molcas_log_errors(project_name + ".log", "Timing")
     # Look for <ProjectName>.lus file to be used by LUSCUS GUI
     pathtomolcasrc = path.expanduser("~/.Molcas/molcasrc")
     # molcas_workdir = GetValueOfAsString(pathtomolcasrc, "MOLCAS_WORKDIR", "=")
@@ -44,11 +56,10 @@ def SelectionOfActiveSpace(ini_file):
     # Call luscus to allow selection of Active Space
     print("Opening Molcas GUI Luscus")
 
-    ExecuteNoWrite("luscus " + luscusfiledirectory + "/" + project_name + ".lus")
+    execute_command(f"luscus {luscusfiledirectory}/{project_name}.lus", write_stream=True)
 
     # Remove unnessesary created files just created
-    ExecuteNoWrite("rm "
-                   + project_name + ".input ")
+    execute_command("rm " + project_name + ".input ", write_stream=True)
 
     # Simply a reminder to the user to check input file
     # this of course could be done automatically,

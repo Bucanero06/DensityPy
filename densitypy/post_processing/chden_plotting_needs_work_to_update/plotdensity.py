@@ -1,25 +1,19 @@
-import matplotlib.pyplot as plt
-import pandas as pd
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib as mpl
-import csv
+import argparse
 import fnmatch
 import os
+import sys
 from os import path
 
-import subprocess
-import shutil
-import configparser
-from configparser import ConfigParser
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
-import sys
-import argparse
+import pandas as pd
 
- 
+
 def run(
         # args
 ):
-    import plotly.graph_objects as go
+    """DEPRECATED, NEEDS TO BE UPDATED TO WORK WITH NEW FILE STRUCTURES"""
     import moviepy.video.io.ImageSequenceClip
     ###Variables
 
@@ -50,7 +44,6 @@ def run(
     print('Done extracting Density Data \nNow Plotting')
     for file_name in sorted(file_list, key=last_8chars):
         if fnmatch.fnmatch(file_name, 'ChDen*'):
-
             df = pd.read_csv(ChDen_timestepsdir + '/' + file_name, sep=',').replace('D', 'E')
 
             print('Plotting: ' + file_name)
@@ -62,7 +55,6 @@ def run(
             y = df['y'].tolist()
             z = df['z'].tolist()
             d = df['ChargeDensity'].tolist()
-
 
             # ###Appends rows in time files
             # with open(tempfiles + '/temp' + file_name, 'r') as fin:
@@ -165,7 +157,6 @@ def run(
 
         #####End of Scatter Plot
 
-
     ###End of plot
 
     #
@@ -193,34 +184,19 @@ def run(
     ##
 
 
-
 def main():
     parser = argparse.ArgumentParser(description="Help for density.py")
     parser.add_argument("-i", "--input", help="Directories with time step files",
-                        dest="input", type=str,required=True)
-    #parser.add_argument("-", help="", dest="", type=)
-    #parser.add_argument("-", help="", dest="", type=)
-    #parser.add_argument("-", help="", dest="", type=)
+                        dest="input", type=str, required=True)
+    # parser.add_argument("-", help="", dest="", type=)
+    # parser.add_argument("-", help="", dest="", type=)
+    # parser.add_argument("-", help="", dest="", type=)
     parser.set_defaults(func=run)
     args = parser.parse_args()
     args.func(args)
+
 
 if __name__ == "__main__":
     # main()
 
     run()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

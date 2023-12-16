@@ -8,9 +8,9 @@ import re
 import numpy as np
 import pandas as pd
 
-from densitypy.project_utils.def_functions import find, \
-    execute_command, print_molcas_log_errors, change_directory, \
-    extract_datasets_from_h5_to_csv
+from densitypy.project_utils.command_execution import execute_command, print_molcas_log_errors
+from densitypy.project_utils.data_processing_utils import extract_datasets_from_h5_to_csv
+from densitypy.project_utils.file_directory_ops import change_directory, find
 from densitypy.project_utils.logger import setup_logger
 
 logger = setup_logger(__name__.split('.')[-1])

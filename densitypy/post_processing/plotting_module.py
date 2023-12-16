@@ -83,7 +83,7 @@ def plot_pulses(study_directory, experiment_directory, time_delays, min_time, ma
         output_file = output_file if output_file != file_path else f'{file_path}.png'
         plt.savefig(output_file)
 
-    plt.clf()
+    # plt.clf()
 
 
 def plot_ft_pulses(study_directory, experiment_directory, time_delays, plot_all=False):
@@ -171,7 +171,7 @@ def plot_ft_pulses(study_directory, experiment_directory, time_delays, plot_all=
         plt.savefig(output_file)
 
     # Clear the plot
-    plt.clf()
+    # plt.clf()
 
 
 '''Dipoles VS Time'''
@@ -303,7 +303,7 @@ def plot_dipoles_v_time(study_directory, experiment_directory, time_delays, min_
         output_file = output_file if output_file != file_path else f'{file_path}.png'
         plt.savefig(output_file)
 
-        plt.clf()
+        # plt.clf()
 
 
 def plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delays, min_time, max_time,
@@ -415,8 +415,7 @@ def plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delay
         output_file = output_file if output_file != file_path else f'{file_path}.png'
         plt.savefig(output_file)
 
-        plt.clf()
-
+        # plt.clf()
 
 
 def difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delays, min_time,
@@ -488,7 +487,7 @@ def difference_between_dipole_and_atomic_charges_v_time(study_directory, experim
     output_file = f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeXUV_vs_DipoleXUV.png'
     plt.savefig(output_file)
 
-    plt.clf()
+    # plt.clf()
 
 
 '''Dipoles(FT) VS Time & Frequency'''
@@ -563,7 +562,7 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
     plt.tight_layout()
     # plt.show()
     plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL_Components_vs_central_time_2.png')
-    plt.clf()
+    # plt.clf()
 
     """
     Average FT Dipole Magnitude: 
@@ -624,7 +623,7 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
     plt.tight_layout()
     # plt.show()
     plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_vs_OmegaVec.png')
-    plt.clf()
+    # plt.clf()
 
     if try_color_maps:
         color_maps = ['viridis', 'seismic', 'inferno', 'twilight_shifted']
@@ -712,7 +711,7 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
         plt.tight_layout()
         # plt.show()
         plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL_Alternative_{color_map}_Plots.png')
-        plt.clf()
+        # plt.clf()
 
 
 def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
@@ -791,7 +790,7 @@ def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dep
     # plt.show()
     plt.savefig(
         f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFT_ALL_Components_vs_central_time_2.png')
-    plt.clf()
+    # plt.clf()
 
     # Calculating the average of the squared magnitudes of the FT dipole components
     sum_of_squares = 0
@@ -860,7 +859,7 @@ def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dep
     plt.tight_layout()
     # plt.show()
     plt.savefig(f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFT_vs_OmegaVec.png')
-    plt.clf()
+    # plt.clf()
 
     ############
     """
@@ -961,7 +960,7 @@ def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dep
             # plt.show()
             plt.savefig(
                 f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFT_ALL_Alternative_{color_map}_Plots_{_atom_name}.png')
-            plt.clf()
+            # plt.clf()
 
 
 '''Dipolar 2D Spectra'''
@@ -1014,6 +1013,7 @@ def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, re
     for file_path in OMEGA_TAUOMEGA_FILE_PATHS:
         # Load the CSV file
         logger.info(f'Plotting {file_path}')
+
         data = pd.read_csv(file_path)
 
         if length_of_data_to_match is None:
@@ -1083,8 +1083,8 @@ def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, re
         output_file = file_path.replace('.csv', '.png')
         output_file = output_file if output_file != file_path else f'{file_path}.png'
         plt.savefig(output_file)
-        plt.show()
-        plt.clf()
+        # plt.show()
+        # plt.clf()
 
 
 def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
@@ -1096,7 +1096,6 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
                                  OMEGA_TAUOMEGA_FILE_NAMES]
 
     length_of_data_to_match = None
-    INDECES_COL_NAMES = ['OmegaVec', 'TauOmegaVec']
     FEATURES_COL_NAMES = [
         '2DDipoleX_Re',
         '2DDipoleX_Im',
@@ -1124,7 +1123,8 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
         logger.debug(f'Length of data: {len(data)}')
 
         # Calculating the average of all polarizations
-        data['AveragedDensity'] = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
+        data['AveragedDensity'] = sum(data[col] ** 2 for col in FEATURES_COL_NAMES) ** 0.5
+        # data['AveragedDensity'] = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
 
         if 'DipoleFT_ww_reconstructed' in file_path:
             # FIXME Flip accross the frequency axis but keep the same index (idk why this bug exists)
@@ -1188,7 +1188,7 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
         # Adjusted First Derivative
         # axes[1, 0].contourf(omega_grid + tauomega_grid, omega_grid, first_derivative, levels=100, cmap='seismic',
         #                     vmin=-derivative_abs_max, vmax=derivative_abs_max)
-        plt.colorbar(axes[1, 0].contourf(omega_grid + tauomega_grid, omega_grid,first_derivative,
+        plt.colorbar(axes[1, 0].contourf(omega_grid + tauomega_grid, omega_grid, first_derivative,
                                          levels=100,
                                          cmap='viridis'), ax=axes[1, 0])
         axes[1, 0].set_title("Adjusted First Derivative")
@@ -1204,7 +1204,7 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
         plt.tight_layout()
         output_file = file_path.replace('.csv', '.png')
         output_file = output_file if output_file != file_path else f'{file_path}.png'
-        output_file = output_file.replace('.png', f'_1.png')
+        output_file = output_file.replace('.png', f'_Alternative_Plots.png')
         plt.savefig(output_file)
         # plt.show()
 
@@ -1218,7 +1218,6 @@ def plot_2d_spectrum_interactive(study_directory, experiment_directory):
                                  OMEGA_TAUOMEGA_FILE_NAMES]
 
     length_of_data_to_match = None
-    INDECES_COL_NAMES = ['OmegaVec', 'TauOmegaVec']
     FEATURES_COL_NAMES = [
         '2DDipoleX_Re',
         '2DDipoleX_Im',
@@ -1227,7 +1226,7 @@ def plot_2d_spectrum_interactive(study_directory, experiment_directory):
         '2DDipoleZ_Re',
         '2DDipoleZ_Im'
     ]
-
+    _zmax = None
     for file_path in OMEGA_TAUOMEGA_FILE_PATHS:
         # Load the CSV file
         logger.info(f'Plotting {file_path}')
@@ -1235,11 +1234,9 @@ def plot_2d_spectrum_interactive(study_directory, experiment_directory):
 
         if length_of_data_to_match is None:
             length_of_data_to_match = len(data)
-            # assert data.columns.tolist() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
         else:
             assert length_of_data_to_match == len(
                 data), f'Length of {file_path} is not the same as the previous file'
-            # assert data.columns.tolist() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
 
         # Displaying the first few rows of the file to understand its structure
         logger.debug(data.head())
@@ -1247,36 +1244,36 @@ def plot_2d_spectrum_interactive(study_directory, experiment_directory):
 
         # Calculating the average of all polarizations
         data['AveragedDensity'] = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
-        # averaged_density = (data["2DDipoleY_Re"] ** 2 + data["2DDipoleY_Im"] ** 2) ** 0.5
 
         # Adding the averaged density to the DataFrame
         if 'DipoleFT_ww_reconstructed' in file_path:
             # FIXME Flip accross the frequency axis but keep the same index (idk why this bug exists)
             data['AveragedDensity'] = pd.Series(data['AveragedDensity'].values[::-1],
                                                 index=data['AveragedDensity'].index)
-        import numpy as np
-
-        # Preparing the data for plotting
-        omega_values = data['OmegaVec'].unique()
-        tauomega_values = data['TauOmegaVec'].unique()
-
-        # Creating a meshgrid for plotting
-        omega_grid, tauomega_grid = np.meshgrid(omega_values, tauomega_values, indexing='ij')
-
-        # Reshaping 'AveragedDensity' to match the shape of the meshgrid
-        averaged_density_grid = data['AveragedDensity'].values.reshape(omega_grid.shape)
 
         # Plotting the contour map
         import plotly.graph_objects as go
+        #Calculate the zmax that is going to be used for Dipole and Reconstruct Atomic Dipole
+        if _zmax is None:
+            # _zmax = data['AveragedDensity'].max()
+            # use the percentile to set the zmax
+            _zmax = np.percentile(data['AveragedDensity'], 99)
 
         # Creating a meshgrid for plotting
         fig = go.Figure(data=
         go.Contour(
-            z=averaged_density_grid,
-            x=omega_values + tauomega_values,  # X-axis values
-            y=omega_values,  # Y-axis values
+            z=data['AveragedDensity'],
+            x= data['TauOmegaVec']+data['OmegaVec'],
+            y= data['OmegaVec'],
             colorscale='Viridis',  # Can be dynamically changed
             contours_coloring='heatmap',
+            # Remove the black lines of the controur
+            # line_width=0,
+            # Fix the color scale to be the same for all plots
+            zmin=0,
+            zmax=_zmax,
+
+
         )
         )
 
@@ -1286,12 +1283,12 @@ def plot_2d_spectrum_interactive(study_directory, experiment_directory):
             xaxis_title='OmegaVec + TauOmegaVec',
             yaxis_title='OmegaVec'
         )
-
-        # Save the plot as an interactive HTML file
+        #
+        # # Save the plot as an interactive HTML file
         output_file = file_path.replace('.csv', '.html')
         fig.write_html(output_file)
         fig.show()
-        break
+
 
 '''Becke Plots'''
 
@@ -1499,3 +1496,17 @@ def __generate_becke_atomic_weghts_column_names(xyz_geometry_path):
         atom_name_counts[_name] += 1
 
     return column_names
+
+# def Dipole_Charge_Comparison(dipole_file, charge_file, output_file):
+#     """DEPRECATED - NEEDS TO BE UPDATED TO WORK WITH NEW FORMAT"""
+#     from densitypy.project_utils.file_directory_ops import delete_files_or_directories
+#     from os import system
+#     delete_files_or_directories(output_file, ignore_errors=True)
+#     system('cat ' + str(
+#         dipole_file) + ' | awk \'{print $1\" \"$2\" \"$3**2+$4**2\" \"$5**2+$6**2\" \"$7**2+$8**2}\' > temp_dipole')
+#     system('cat ' + str(charge_file) + ' | awk \'{print $3**2+$4**2\" \"$5**2+$6**2\" \"$7**2+$8**2}\' > temp_charge')
+#     system(
+#         'paste temp_dipole temp_charge| awk \'{print $1\" \"$2\" \"$3\" \"$4\" \"$5\" \"$6\" \"$7\" \"$8\" \"$3-$6\" \"$4-$7\" \"$5-$8}\' > temp_difference')
+#
+#     system("perl -pe \"s/0 0 0 0 0 0   0 0 0/ /g\" temp_difference>" + str(output_file))
+#     system('rm temp_charge temp_dipole temp_difference')
