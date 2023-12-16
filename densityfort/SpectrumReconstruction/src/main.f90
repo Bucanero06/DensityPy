@@ -19,7 +19,7 @@
 !!
 !!
 ! }}}
-program ChargeMigration
+program SpectrumReconstruction
 
     use, intrinsic :: ISO_FORTRAN_ENV
     use ModuleErrorHandling
@@ -31,8 +31,8 @@ program ChargeMigration
     use ModulePulses_3D
     !
     !.. Local modules
-    use ModuleRTP
-    use Module_CD_IO
+    use Module_SR_RTP
+    use Module_SR_CD_IO
 
     implicit none
 
@@ -140,5 +140,5 @@ contains
     end subroutine ReconstructDipole_from_AtomicCharge_times_XYZ
 
 
-end program ChargeMigration
+end program SpectrumReconstruction
 

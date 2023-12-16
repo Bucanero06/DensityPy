@@ -1,4 +1,4 @@
-module ModuleRTP
+module Module_SR_RTP
 
   implicit none
 
@@ -86,7 +86,7 @@ contains
   end subroutine GetRunTimeParameters
 
  
-end module ModuleRTP
+end module Module_SR_RTP
 
 
 

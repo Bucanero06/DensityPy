@@ -1,4 +1,4 @@
-Module Module_CD_IO
+Module Module_SR_CD_IO
 
     use, intrinsic :: ISO_FORTRAN_ENV
     use ModulePulses_3D
@@ -234,4 +234,4 @@ contains
     end subroutine Load_BidimentionalChargeFTww2
 
 
-end Module Module_CD_IO
+end Module Module_SR_CD_IO
