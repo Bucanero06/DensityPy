@@ -1,4 +1,4 @@
-module ModuleRTP
+module Module_CM_RTP
 
     implicit none
     private
@@ -10,7 +10,8 @@ contains
     !> Reads the run time parameters specified in the command line.
     subroutine GetRunTimeParameters(input_directory, output_directory, molecular_geometry_file, &
             n_times, t_min, t_max, FieldFile, Verbous, Weight_File, read_precomputed_weights_flag, &
-            save_charge_migration_flag, ivorb, counted_number_of_orbitals, volume, dephasing_factor, relaxation_factor, bath_temperature)
+            save_charge_migration_flag, ivorb, counted_number_of_orbitals,  dephasing_factor, relaxation_factor, bath_temperature)
+        !! Reads the run time parameters specified in the command line.
         !
         use ModuleErrorHandling
         use ModuleCommandLineParameterList
@@ -30,7 +31,6 @@ contains
         logical, intent(out) :: Verbous
         logical, intent(out) :: save_charge_migration_flag
         integer, allocatable, intent(out) :: ivorb(:)
-        real(kind(1d0)), intent(out) :: volume
         real(kind(1d0)), intent(out) :: dephasing_factor
         real(kind(1d0)), intent(out) :: relaxation_factor
         real(kind(1d0)), intent(out) :: bath_temperature
@@ -58,7 +58,6 @@ contains
         call List%Add("-v", "verbous")
         call List%Add("-sden", "Save Charge Density to file (time consuming!)")
         call List%Add("-iorb", "absolute index active orbitals ", "7,8,9,10,11,12,13", "optional")
-        call List%Add("-vol", "volume of unit for grid", 1.d-3, "optional")
         call List%Add("-bath", "BATH TEMPERATURE", 327175.d-2, "optional")
         call List%Add("-rf", "RELAXATION FACTOR", 1.d-3, "optional")
         call List%Add("-df", "DEPHASING FACTOR", 1.d-3, "optional")
@@ -78,7 +77,6 @@ contains
         call List%Get("-nt", n_times)
         call List%Get("-t_min", t_min)
         call List%Get("-t_max", t_max)
-        call List%Get("-vol", volume)
         call List%Get("-rf", relaxation_factor)
         call List%Get("-df", dephasing_factor)
         call List%Get("-bath", bath_temperature)
@@ -125,7 +123,7 @@ contains
     end subroutine GetRunTimeParameters
 
 
-end module ModuleRTP
+end module Module_CM_RTP
 
 
 

@@ -1,4 +1,4 @@
-Module Module_CD_IO
+Module Module_CM_CD_IO
 
     use, intrinsic :: ISO_FORTRAN_ENV
     use ModuleErrorHandling
@@ -144,7 +144,7 @@ contains
         ! determine the number of atoms
         read(uid, *) nAtoms
 
-        !*** Skip to the line where the coordinates start to be listed
+        ! Skip to the line where the coordinates start to be listed
         !allocate the matrix of coordinates
         read(uid, *)
         allocate(AtCoord(3, nAtoms))
@@ -576,7 +576,7 @@ contains
     end subroutine LoadTDMs
     !
     !> Loads Dipole Matrix Elements between molecular orbitals
-    subroutine LoadDipoleMO(input_directory, number_of_orbitals, ivOrb, MuOrb) !*** IDEALLY, SHOULD COMPUTE THE DIPOLE FROM THE AO - AO DIPOLES.
+    subroutine LoadDipoleMO(input_directory, number_of_orbitals, ivOrb, MuOrb) !! IDEALLY, SHOULD COMPUTE THE DIPOLE FROM THE AO - AO DIPOLES.
         !
         use ModuleErrorHandling
         use ModuleString
@@ -917,4 +917,4 @@ contains
     end subroutine Read_Weights
 
 
-end Module Module_CD_IO
+end Module Module_CM_CD_IO

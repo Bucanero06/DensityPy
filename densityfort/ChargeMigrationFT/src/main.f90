@@ -31,8 +31,8 @@ program ChargeMigrationFT
     use ModulePulses_3D
     !
     !.. Local modules
-    use ModuleRTP
-    use Module_CD_IO
+    use Module_CMFT_RTP
+    use Module_CMFT_CD_IO
 
     implicit none
 
