@@ -182,8 +182,8 @@ def Read_xyz(xyz_file):
 
     return atomic_coordinates
 
-
-xyz_file = "MgP_.xyz"
-coords, atoms = Read_xyz(xyz_file)
-for i in coords:
-    print(i)
+#
+# xyz_file = "MgP_.xyz"
+# coords, atoms = Read_xyz(xyz_file)
+# for i in coords:
+#     print(i)

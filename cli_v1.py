@@ -19,30 +19,33 @@ import click
 @click.option("--justgetdensity", is_flag=True, help="Enable just get density", default=False)
 @click.option("--weights_file", help="Path to the weights file")
 @click.option("--givenfieldfile", help="Path to the given field file")
-@click.option("--old_main", is_flag=True, help="Enable old main")
-@click.option("--parallel", is_flag=True, help="Enable parallel execution")
-@click.option("--save_previous", is_flag=True, help="Enable saving previous results")
 @click.option("--make", is_flag=True, help="Enable Fortran compilation", default=False)
 @click.option("--make_directory", help="Path to the Fortran compilation directory", required=False, default="")
-@click.option("--make_flags", help="Path to the Fortran compilation make flags", required=False, default="all DEB_FLAG=d")
+@click.option("--make_flags", help="Path to the Fortran compilation make flags", required=False,
+              default="all DEB_FLAG=d")
 @click.option("--plot", is_flag=True, help="Enable plotting", default=False)
 def cli_run(json_config_path, study_directory, molcas_input, run_charge_migration,
             run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, lus, gridit,
             write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file, givenfieldfile,
-            old_main, parallel, save_previous,
             make, make_directory, make_flags, plot):
-    # Modify the run function to include your desired functionality
-
     from densitypy.main import run_densitypy
-    run_densitypy(json_config_path, study_directory, molcas_input, run_charge_migration,
-                  run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, lus,
-                  gridit, write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file,
-                  givenfieldfile, old_main, parallel, save_previous,
-                  make_fortran=make,
-                  make_fortran_config=dict(directory=make_directory, make_flags=make_flags),
-                  plot=plot
+    run_densitypy(
+        json_config_path=json_config_path,
+        study_directory=study_directory,
+        molcas_input=molcas_input,  # False just means not running molcas
+        run_charge_migration=run_charge_migration,
+        run_charge_migration_ft=run_charge_migration_ft,
+        run_spectrum_reconstruction=run_spectrum_reconstruction,
+        plot=plot,
+        #
+        field_file_help=field_file_help, molcas_input_help=molcas_input_help,
+        lus=lus, gridit=gridit, write_charge_migration=write_charge_migration, debug_mode=debug_mode,
+        justh5=justh5, justgetdipoles=justgetdipoles, justgetdensity=justgetdensity, weights_file=weights_file,
+        givenfieldfile=givenfieldfile,
+        make_fortran=make,
+        make_fortran_config=dict(directory=make_directory, make_flags=make_flags),
 
-                  )
+    )
 
 
 if __name__ == "__main__":

@@ -1,4 +1,18 @@
+# Quick Start Documentation
+
+
+There are two methods of interacting with the program, through the cli or a python library. The cli is the
+recommended way to interact with the program.
+
+Requirements: 
+- Python 3.9 or later
+- OpenMolcas
+- hdf5 and hdf5-devel 
+- Luscus (optional) (outdated)
+- ...
+- 
 # TODO: Update this file, make sure to also update auto example/template in main.py
+Programs used for documentation: FORtran Documenter(FORD) and Sphinx
 
 This document describes the steps to prepare the input files for a complete calculation of the charge migration in the
 NMA molecule, subject to external pulses. This case study can be used as a reference for other systems as well, since
