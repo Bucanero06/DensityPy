@@ -21,7 +21,7 @@ ModuleDiagonalize
 
 #.. Local files
 #..
-loc_ff90=main ModuleRTP Module_CD_IO
+loc_ff90=main Module_RTP Module_CD_IO
 loc_fc  =
 
 #.. Local dependencies
@@ -36,10 +36,10 @@ $(OBJ)/main.o: \
                     $(SHARE)/$(OBJ)/ModuleConstants.o \
                     $(SHARE)/$(OBJ)/ModulePulses_3D.o \
                     $(SHARE)/$(OBJ)/ModuleDiagonalize.o \
-                    $(OBJ)/ModuleRTP.o \
+                    $(OBJ)/Module_RTP.o \
                     $(OBJ)/Module_CD_IO.o
 
-$(OBJ)/ModuleRTP.o: \
+$(OBJ)/Module_RTP.o: \
                     $(SHARE)/$(OBJ)/ModuleErrorHandling.o \
                     $(SHARE)/$(OBJ)/ModuleString.o \
                     $(SHARE)/$(OBJ)/ModuleCommandLineParameterList.o
