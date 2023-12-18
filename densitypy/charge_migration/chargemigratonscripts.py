@@ -97,6 +97,7 @@ def Write_Pulses(field_file, type_of_pulse_pump, start_time, pump_central_freque
             fout.write("XUV;}")
 
 
+
 # >Calls Charge Migration Code and gives command line arguements (1)
 def Call_Charge_Migration(Bin_Directory, input_directory, experiment_directory, number_of_times,
                           min_time, max_time, field_file, stept, stepw,
