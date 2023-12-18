@@ -1,7 +1,0 @@
-molcas.pegamoid
-===============
-
-.. automodule:: molcas.pegamoid
-    :members:
-    :undoc-members:
-    :show-inheritance:

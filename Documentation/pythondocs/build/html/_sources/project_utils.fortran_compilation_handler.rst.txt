@@ -1,7 +1,0 @@
-project_utils.fortran_compilation_handler
-=========================================
-
-.. automodule:: project_utils.fortran_compilation_handler
-    :members:
-    :undoc-members:
-    :show-inheritance:

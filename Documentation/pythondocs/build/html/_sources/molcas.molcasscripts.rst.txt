@@ -1,7 +1,0 @@
-molcas.molcasscripts
-====================
-
-.. automodule:: molcas.molcasscripts
-    :members:
-    :undoc-members:
-    :show-inheritance:
