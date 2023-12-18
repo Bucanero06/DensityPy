@@ -137,3 +137,8 @@ Options:
   --plot                         Enable plotting
   --help                         Show this message and exit.
 ```
+
+
+## Documentation
+python -m Documentation.autodocumentation_fortran --project_name "Charge Migration" --project_description "Fortran code for the calculation of the charge migration in molecules. Interfaced with Python's DensityPy library." --source_dirs "densityfort/ChargeMigration,densityfort/ChargeMigrationFT,densityfort/SpectrumReconstruction" --documentation_dir "Documentation/fortrandocs" --exclude_dirs "densityfort/ChargeMigration/src/future_reconstruction_using_ci_work,densityfort/ChargeMigrationFT/src/future_reconstruction_using_ci_work" --graphs True --delete_old_files True
+python -m Documentation.autodocumentation_python -p DensityPy -a "Ruben Fernandez Carbon" -s densitypy -d Documentation/pythondocs -e venv,Studies,old_files,densityfort,densitypy/frontend_tbd,frontend_tbd,Documentation/pythondocs -r

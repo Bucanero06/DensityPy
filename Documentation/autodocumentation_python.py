@@ -132,11 +132,11 @@ def build_sphinx_docs(documentation_dir):
     subprocess.run(['make', 'html'], cwd=documentation_dir)
 
 
-def main(project_name, author_name, source_dir, documentation_dir, exclude_dirs=None, delete_old_files=False):
+def main(project_name, author_name, source_dir, documentation_dir, exclude_dirs=None, remove_old_files=False):
     if not exclude_dirs:
         exclude_dirs = []
 
-    if delete_old_files and os.path.exists(documentation_dir):
+    if remove_old_files and os.path.exists(documentation_dir):
         from densitypy.project_utils.file_directory_ops import delete_files_or_directories
         delete_files_or_directories(documentation_dir)
 
@@ -154,12 +154,17 @@ def main(project_name, author_name, source_dir, documentation_dir, exclude_dirs=
 
 
 if __name__ == '__main__':
-    main(
-        project_name='DensityPy',
-        author_name='Ruben Fernandez Carbon',
-        source_dir='/home/ruben/PycharmProjects/DensityPy/densitypy',
-        documentation_dir='/home/ruben/PycharmProjects/DensityPy/Documentation/pythondocs',
-        exclude_dirs=['venv', 'Studies', 'old_files', 'densityfort',
-                      'densitypy/frontend_tbd','frontend_tbd',
-                      'Documentation/pythondocs'],
-        delete_old_files=True)
+    import click
+
+    @click.command()
+    @click.option('--project_name', '-p', help='Name of the project', required=True)
+    @click.option('--author_name', '-a', help='Name of the author', required=True)
+    @click.option('--source_dir', '-s', help='Source directory', required=True)
+    @click.option('--documentation_dir', '-d', help='Documentation directory', required=True)
+    @click.option('--exclude_dirs', '-e', help='Directories to exclude', default=None)
+    @click.option('--remove_old_files', '-r', is_flag=True, help='Remove old files', default=False)
+
+    def main_cli(project_name, author_name, source_dir, documentation_dir, exclude_dirs, remove_old_files):
+        main(project_name, author_name, source_dir, documentation_dir, exclude_dirs, remove_old_files)
+
+    main_cli()
