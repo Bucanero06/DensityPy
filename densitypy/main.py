@@ -97,13 +97,13 @@ def run_densitypy(study_directory,json_config_path, molcas_input,
             logger.warning(
                 f'Found {json_config_path} but nothing was ran. No command line action arguments used. Use -h for help.')
 
-        if molcas_input_help or (molcas_input and not path.exists(molcas_input)):
+        # Determine if Help Inputs are Needed
+        need_molcas_input = molcas_input_help or (molcas_input and not path.exists(molcas_input))
+        if need_molcas_input:
             create_help_input_file()
-
         if field_file_help:
             Write_FieldHelp()
-
-        if molcas_input_help or (molcas_input and not path.exists(molcas_input)) or field_file_help:
+        if need_molcas_input or field_file_help:
             exit()
 
         if scforbs:
