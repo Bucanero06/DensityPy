@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="Documentation for Charge Migration">
+    <meta name="author" content="" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>LiouvillianPropagator &ndash; Charge Migration</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+      <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">Charge Migration </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../program/chargemigration.html">Program</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>LiouvillianPropagator
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip"
+                 data-bs-placement="bottom" data-html="true"
+                 title=" 7.6% of total for procedures.">84 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/main.f90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/main.f90.html'>main.f90</a></li>
+                <li class="breadcrumb-item"><a href='../program/chargemigration.html'>ChargeMigration</a></li>
+            <li class="breadcrumb-item active" aria-current="page">LiouvillianPropagator</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    $(function () {
+    $('[data-bs-toggle="tooltip"]').tooltip()
+    })
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2> subroutine LiouvillianPropagator(L0_Eval, L0_LEvec, L0_REvec, zStatRho)  
+</h2>
+    
+
+    <p>The central routine in simulating the dynamics of a quantum system subject to an external field, describing the time evolution of the system in Liouville space.
+ Build the time-independent Lindblad superoperator
+ <script type="math/tex; mode=display">\begin{equation}
+\dot{\rho}(t) = -i[H, \rho(t)] + \sum_{mn} \Bigl( L_{mn} \rho(t) L_{mn}^\dagger - \frac{1}{2} L_{mn}^\dagger L_{mn} \rho(t) - \frac{1}{2} \rho(t) L_{mn}^\dagger L_{mn} \Bigr)
+\end{equation}</script>
+</p>
+<p>Where:</p>
+<ul>
+<li>
+<script type="math/tex"> \dot{\rho}(t) </script> is the time derivative of the density matrix.</li>
+<li>
+<script type="math/tex"> [H, \rho(t)] </script> represents the commutator of the Hamiltonian <script type="math/tex">H</script> and the density matrix <script type="math/tex">\rho(t)</script>, which is the standard von Neumann equation describing the unitary evolution of the system, the Liouvillian.</li>
+<li>(L_{mn}) are the Lindblad (or jump) operators. These represent the different ways the environment can affect the system, leading to decoherence and relaxation.</li>
+<li>The terms with <script type="math/tex">L_{mn} \rho(t) L_{mn}^\dagger</script> describe the action of the environment on the system, and thus are responsible for transitions induced by the bath.</li>
+<li>The terms with <script type="math/tex">L_{mn}^\dagger L_{mn} \rho(t)</script> and <script type="math/tex">\rho(t) L_{mn}^\dagger L_{mn}</script> subtract off double-counted terms and ensure the trace of the density matrix remains equal to 1. Behaving as "decoherence" processes where the system's off-diagonal elements (coherences) are diminished due to interactions with the environment.</li>
+<li>
+<script type="math/tex"> H = H_0 + (\hat{\epsilon}\cdot\vec{\mu}) E(t)</script>
+</li>
+</ul>
+<p>For pure dephasing without relaxation:
+   <script type="math/tex; mode=display">L_{nm} = \delta_{mn} \sqrt{\gamma_m/2} | m \rangle \langle m |</script>
+</p>
+<p>For relaxation without pure dephasing:
+   <script type="math/tex; mode=display">L_{mn} = (1-\delta_{nm}) \sqrt{\gamma_{mn}} |m\rangle \langle n|</script>
+   subject to the constraint <script type="math/tex">\gamma_{mn} = e^{-\beta \omega_{mn}} \gamma_{nm}</script>
+   where <script type="math/tex">\beta = 1/(k_B T)</script>
+</p>
+<p>Key steps in the subroutine:</p>
+<ul>
+<li>Transform the initial density matrix zStatRho into Liouville space.</li>
+<li>Propagate the transformed matrix in the absence of external fields for a time interval dt/2.</li>
+<li>Convert the propagated matrix back into Hilbert space.</li>
+<li>Consider the system's interaction with an external electric field by applying rotations in the Hilbert space.</li>
+<li>Diagonalize the density matrix to determine the pure states it comprises.</li>
+<li>Propagate each individual state under the influence of the external field.</li>
+<li>Re-form the density matrix from the propagated pure states.</li>
+<li>Repeat steps 1-3 for the re-formed density matrix to complete the propagation process over the time interval dt.</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>This subroutine heavily relies on various matrix operations and makes use of other subroutines such as HilbertToLiouvilleMatrix, ZGEMV, LiouvilleToHilbertMatrix, DiagonalizeDipole, ZGEMM, Short_ZHEEV, and ExternalElectricFieldCart, which are not defined within this subroutine and are expected to be defined elsewhere.</li>
+<li>Important to note is that certain variables used within this subroutine, such as dt, t, iSim, train, Z1, Zi, Z0, nStates, and Dmat, are not defined or passed as arguments, implying that they are either global variables or passed from a higher-level routine that calls this function.</li>
+<li>The FIRST_CALL logical variable is used to execute certain lines of code only during the first invocation of the subroutine, primarily for the allocation and initialization of arrays.</li>
+<li>This subroutine effectively encapsulates a single iteration or time step of the simulation. For a complete simulation over a given time period, this subroutine would typically be called repeatedly in a loop.</li>
+</ul>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-l0_eval"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>L0_Eval</strong>(:)</td>
+            <td>
+                <p>a complex array holding the eigenvalues of the Liouville operator.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-l0_levec"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>L0_LEvec</strong>(:,:)</td>
+            <td>
+                <p>a complex array holding the left eigenvectors of the Liouville operator.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-l0_revec"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>L0_REvec</strong>(:,:)</td>
+            <td>
+                <p>a complex array holding the right eigenvectors of the Liouville operator.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-zstatrho"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>zStatRho</strong>(:,:)</td>
+            <td>
+                <p>a complex array holding the initial state density matrix of the quantum system. The array is updated within the subroutine, and hence is an input/output parameter.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col"><p>Charge Migration was developed by <br>&copy; 2023 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+            </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>    
+
+    <!-- MathJax JavaScript
+             ================================================== -->
+             <!-- Placed at the end of the document so the pages load faster -->
+        <script type="text/x-mathjax-config">
+          MathJax.Hub.Config({
+          TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+          jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+          extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+          });
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+          <script src="../tipuesearch/tipuesearch_content.js"></script>
+          <script src="../tipuesearch/tipuesearch_set.js"></script>
+          <script src="../tipuesearch/tipuesearch.js"></script>
+
+  </body>
+</html>

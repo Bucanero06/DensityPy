@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>molcas.DipolesLogParser &mdash; DensityPy 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=f6245a2f"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            DensityPy
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Default_Settings.default_config.html">Default_Settings.default_config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charge_migration.chargemigratonscripts.html">charge_migration.chargemigratonscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charge_migration.difference_dipole_charge.html">charge_migration.difference_dipole_charge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../main.html">main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.DipolesLogParser.html">molcas.DipolesLogParser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.molcasscripts.html">molcas.molcasscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.pegamoid.html">molcas.pegamoid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.selectionofactivespace.html">molcas.selectionofactivespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.chden_plotting_needs_work_to_update.plotdensity.html">post_processing.chden_plotting_needs_work_to_update.plotdensity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.chden_plotting_needs_work_to_update.plottingscripts.html">post_processing.chden_plotting_needs_work_to_update.plottingscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.chden_plotting_needs_work_to_update.rpoints2vtk.html">post_processing.chden_plotting_needs_work_to_update.rpoints2vtk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.plotting_module.html">post_processing.plotting_module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.command_execution.html">project_utils.command_execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.configuration_parser.html">project_utils.configuration_parser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.data_processing_utils.html">project_utils.data_processing_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.file_directory_ops.html">project_utils.file_directory_ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.file_parsing.html">project_utils.file_parsing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.fortran_compilation_handler.html">project_utils.fortran_compilation_handler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.logger.html">project_utils.logger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.string_dict_utils.html">project_utils.string_dict_utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DensityPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">molcas.DipolesLogParser</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for molcas.DipolesLogParser</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib.axes</span> <span class="kn">import</span> <span class="n">Axes</span>
+<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">Colormap</span>
+<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="kn">import</span> <span class="n">Figure</span>
+
+<span class="kn">from</span> <span class="nn">densitypy.project_utils.logger</span> <span class="kn">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="Component"><a class="viewcode-back" href="../../molcas.DipolesLogParser.html#molcas.DipolesLogParser.Component">[docs]</a><span class="k">class</span> <span class="nc">Component</span><span class="p">:</span>
+    <span class="n">NAMES</span> <span class="o">=</span> <span class="s1">&#39;XYZ&#39;</span>
+    <span class="n">COLORMAP</span><span class="p">:</span> <span class="n">Colormap</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s1">&#39;coolwarm&#39;</span><span class="p">,</span> <span class="n">as_cmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">body</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">maxsplit</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NAMES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_component_data</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_parse_component_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="n">colsets</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_str_to_df</span><span class="p">(</span><span class="n">colset</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">colset</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_generate_colset_strings</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">colsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;STATE&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">colsets</span><span class="p">[</span><span class="mi">1</span><span class="p">:]],</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;STATE&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_generate_colset_strings</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">first_col</span> <span class="o">=</span> <span class="s1">&#39;STATE&#39;</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">first_col</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">start</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">first_col</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_col</span><span class="p">))</span>
+            <span class="k">yield</span> <span class="n">body</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">end</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_str_to_df</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">StringIO</span><span class="p">(</span><span class="n">body</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">without_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;STATE&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;STATE&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span>
+<div class="viewcode-block" id="Component.write_csv"><a class="viewcode-back" href="../../molcas.DipolesLogParser.html#molcas.DipolesLogParser.Component.write_csv">[docs]</a>    <span class="k">def</span> <span class="nf">write_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">bare</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">bare</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Writing </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">without_state</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Component.mu_heatmap"><a class="viewcode-back" href="../../molcas.DipolesLogParser.html#molcas.DipolesLogParser.Component.mu_heatmap">[docs]</a>    <span class="k">def</span> <span class="nf">mu_heatmap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">Axes</span><span class="p">,</span> <span class="n">vmax</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">vmin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">center</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Axes</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">without_state</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+            <span class="n">cmap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">COLORMAP</span><span class="p">,</span>
+            <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+            <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span>
+            <span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">,</span>
+            <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">linewidths</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span>
+            <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;shrink&#39;</span><span class="p">:</span> <span class="mf">.5</span><span class="p">},</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DipolesLogParser"><a class="viewcode-back" href="../../molcas.DipolesLogParser.html#molcas.DipolesLogParser.DipolesLogParser">[docs]</a><span class="k">class</span> <span class="nc">DipolesLogParser</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Component</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_log_file</span><span class="p">(</span><span class="n">log_path</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">fnf_error</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No such file or directory: </span><span class="si">{</span><span class="n">log_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">fnf_error</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_parse_log_file</span><span class="p">(</span><span class="n">log_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">body</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="n">start_i</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;PROPERTY: MLTPL  1 &#39;</span><span class="p">)</span>
+        <span class="n">end_i</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;PROPERTY: MLTPL  2 &#39;</span><span class="p">,</span> <span class="n">start_i</span><span class="p">)</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">body</span><span class="p">[</span><span class="n">start_i</span><span class="p">:</span> <span class="n">end_i</span><span class="p">]</span>
+        <span class="n">sections</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;PROPERTY: MLTPL&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">Component</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DipolesLogParser.write_csvs"><a class="viewcode-back" href="../../molcas.DipolesLogParser.html#molcas.DipolesLogParser.DipolesLogParser.write_csvs">[docs]</a>    <span class="k">def</span> <span class="nf">write_csvs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">directory</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span>
+        <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;_DIPOLE.csv&#39;</span><span class="p">,</span>
+        <span class="n">bare</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+            <span class="n">component</span><span class="o">.</span><span class="n">write_csv</span><span class="p">(</span><span class="n">directory</span> <span class="o">/</span> <span class="p">(</span><span class="n">component</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">),</span> <span class="n">bare</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DipolesLogParser.get_mu_heatmaps"><a class="viewcode-back" href="../../molcas.DipolesLogParser.html#molcas.DipolesLogParser.DipolesLogParser.get_mu_heatmaps">[docs]</a>    <span class="k">def</span> <span class="nf">get_mu_heatmaps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="p">((</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">unused</span><span class="p">))</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+            <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="s1">&#39;col&#39;</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="s1">&#39;row&#39;</span><span class="p">,</span>
+            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">unused</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">component</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">):</span>
+            <span class="n">component</span><span class="o">.</span><span class="n">mu_heatmap</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span></div></div>
+
+
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">parse_dipoles_test</span><span class="p">():</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;This is a test&quot;</span><span class="p">)</span>
+        <span class="n">working_dir</span> <span class="o">=</span> <span class="s1">&#39;/home/ruben/PycharmProjects/DensityPy/Studies/cluttertest/NMA_output&#39;</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="n">DipolesLogParser</span><span class="p">(</span><span class="s1">&#39;/home/ruben/PycharmProjects/DensityPy/Studies/cluttertest/NMA_output/NMA.log&#39;</span><span class="p">)</span>
+        <span class="n">project</span><span class="o">.</span><span class="n">write_csvs</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="n">working_dir</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="n">get_mu_heatmaps</span><span class="p">()</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">working_dir</span><span class="si">}</span><span class="s1">/dipole-heatmap.png&#39;</span><span class="p">)</span>
+
+
+    <span class="n">parse_dipoles_test</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ruben Fernandez Carbon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

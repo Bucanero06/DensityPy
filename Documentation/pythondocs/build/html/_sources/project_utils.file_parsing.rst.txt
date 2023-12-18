@@ -1,0 +1,7 @@
+project_utils.file_parsing
+==========================
+
+.. automodule:: project_utils.file_parsing
+    :members:
+    :undoc-members:
+    :show-inheritance:

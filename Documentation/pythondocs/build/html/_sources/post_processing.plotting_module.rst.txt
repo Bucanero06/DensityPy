@@ -1,0 +1,7 @@
+post_processing.plotting_module
+===============================
+
+.. automodule:: post_processing.plotting_module
+    :members:
+    :undoc-members:
+    :show-inheritance:

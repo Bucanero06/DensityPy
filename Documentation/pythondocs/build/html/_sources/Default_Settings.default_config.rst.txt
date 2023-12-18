@@ -1,0 +1,7 @@
+Default_Settings.default_config
+===============================
+
+.. automodule:: Default_Settings.default_config
+    :members:
+    :undoc-members:
+    :show-inheritance:

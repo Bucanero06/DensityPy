@@ -1,0 +1,7 @@
+molcas.DipolesLogParser
+=======================
+
+.. automodule:: molcas.DipolesLogParser
+    :members:
+    :undoc-members:
+    :show-inheritance:

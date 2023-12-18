@@ -1,0 +1,7 @@
+project_utils.file_directory_ops
+================================
+
+.. automodule:: project_utils.file_directory_ops
+    :members:
+    :undoc-members:
+    :show-inheritance:

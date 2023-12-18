@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>project_utils.file_directory_ops &mdash; DensityPy 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=f6245a2f"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            DensityPy
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Default_Settings.default_config.html">Default_Settings.default_config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charge_migration.chargemigratonscripts.html">charge_migration.chargemigratonscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charge_migration.difference_dipole_charge.html">charge_migration.difference_dipole_charge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../main.html">main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.DipolesLogParser.html">molcas.DipolesLogParser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.molcasscripts.html">molcas.molcasscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.pegamoid.html">molcas.pegamoid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.selectionofactivespace.html">molcas.selectionofactivespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.chden_plotting_needs_work_to_update.plotdensity.html">post_processing.chden_plotting_needs_work_to_update.plotdensity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.chden_plotting_needs_work_to_update.plottingscripts.html">post_processing.chden_plotting_needs_work_to_update.plottingscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.chden_plotting_needs_work_to_update.rpoints2vtk.html">post_processing.chden_plotting_needs_work_to_update.rpoints2vtk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.plotting_module.html">post_processing.plotting_module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.command_execution.html">project_utils.command_execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.configuration_parser.html">project_utils.configuration_parser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.data_processing_utils.html">project_utils.data_processing_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.file_directory_ops.html">project_utils.file_directory_ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.file_parsing.html">project_utils.file_parsing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.fortran_compilation_handler.html">project_utils.fortran_compilation_handler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.logger.html">project_utils.logger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.string_dict_utils.html">project_utils.string_dict_utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DensityPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">project_utils.file_directory_ops</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for project_utils.file_directory_ops</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python3.10</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span>
+
+<span class="kn">from</span> <span class="nn">densitypy.project_utils.command_execution</span> <span class="kn">import</span> <span class="n">execute_command</span>
+<span class="kn">from</span> <span class="nn">densitypy.project_utils.logger</span> <span class="kn">import</span> <span class="n">setup_logger</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="change_directory"><a class="viewcode-back" href="../../project_utils.file_directory_ops.html#project_utils.file_directory_ops.change_directory">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">change_directory</span><span class="p">(</span><span class="n">new_directory</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Context manager to change the working directory temporarily.&quot;&quot;&quot;</span>
+    <span class="n">current_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">new_directory</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">current_directory</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="change_directory_manager"><a class="viewcode-back" href="../../project_utils.file_directory_ops.html#project_utils.file_directory_ops.change_directory_manager">[docs]</a><span class="k">class</span> <span class="nc">change_directory_manager</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_dir</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_dir</span> <span class="o">=</span> <span class="n">new_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_dir</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_dir</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="copy_file_to"><a class="viewcode-back" href="../../project_utils.file_directory_ops.html#project_utils.file_directory_ops.copy_file_to">[docs]</a><span class="k">def</span> <span class="nf">copy_file_to</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Copies a file to a new location.</span>
+
+<span class="sd">    :param input: The path of the file to be copied.</span>
+<span class="sd">    :param output: The path to copy the file to.</span>
+<span class="sd">    :type input: str</span>
+<span class="sd">    :type output: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Copying file: </span><span class="si">{</span><span class="nb">input</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">execute_command</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;cp </span><span class="si">{</span><span class="nb">input</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Error copying file: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="delete_files_or_directories"><a class="viewcode-back" href="../../project_utils.file_directory_ops.html#project_utils.file_directory_ops.delete_files_or_directories">[docs]</a><span class="k">def</span> <span class="nf">delete_files_or_directories</span><span class="p">(</span><span class="o">*</span><span class="n">paths</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deletes the files or directories specified by the given paths.</span>
+
+<span class="sd">    :param paths: The paths of files or directories to be deleted.</span>
+<span class="sd">    :type paths: str</span>
+<span class="sd">    :raises FileNotFoundError: If the given path does not exist.</span>
+
+<span class="sd">    Usage::</span>
+
+<span class="sd">        delete_files_or_directories(&#39;/path/to/file&#39;, &#39;/path/to/directory&#39;)  # Deletes specified file and directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># for paths in paths:</span>
+    <span class="c1">#     if os.path.isfile(paths):</span>
+    <span class="c1">#         os.remove(paths)  # Delete the file</span>
+    <span class="c1">#     elif os.path.isdir(paths):</span>
+    <span class="c1">#         shutil.rmtree(paths)  # Delete the directory and its contents</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         raise FileNotFoundError(f&quot;Path &#39;{paths}&#39; does not exist.&quot;)</span>
+
+    <span class="k">for</span> <span class="n">paths</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>  <span class="c1"># Delete the file</span>
+            <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>  <span class="c1"># Delete the directory and its contents</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path &#39;</span><span class="si">{</span><span class="n">paths</span><span class="si">}</span><span class="s2">&#39; does not exist.&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ignore_errors</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error deleting file or directory: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error deleting file or directory: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">e</span></div>
+
+<div class="viewcode-block" id="find"><a class="viewcode-back" href="../../project_utils.file_directory_ops.html#project_utils.file_directory_ops.find">[docs]</a><span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Searches for a file in multiple directories.</span>
+
+<span class="sd">    :param filename: The name of the file to search for.</span>
+<span class="sd">    :param args: The directories to search in.</span>
+<span class="sd">    :type filename: str</span>
+<span class="sd">    :type args: str</span>
+<span class="sd">    :return: The first directory where the file was found.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">directories</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">args</span><span class="p">]</span>
+    <span class="n">foundfile</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">searchdirectory</span> <span class="ow">in</span> <span class="n">directories</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">searchdirectory</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">searchdirectory</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> inside the current directory&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> inside </span><span class="si">{</span><span class="n">searchdirectory</span><span class="si">}</span><span class="s2"> directory&quot;</span><span class="p">)</span>
+            <span class="n">foundfile</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="n">searchdirectory</span>
+    <span class="c1"># if not exited by now it means that the file was not found in any of the given directories thus rise error</span>
+    <span class="k">if</span> <span class="n">foundfile</span> <span class="o">!=</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1"> not found inside </span><span class="si">{</span><span class="n">directories</span><span class="si">}</span><span class="s1"> directories&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;exiting...&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="file_len"><a class="viewcode-back" href="../../project_utils.file_directory_ops.html#project_utils.file_directory_ops.file_len">[docs]</a><span class="k">def</span> <span class="nf">file_len</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the number of lines in a file.</span>
+
+<span class="sd">    :param file_path: The path to the file.</span>
+<span class="sd">    :type file_path: str</span>
+<span class="sd">    :return: The number of lines in the file.</span>
+<span class="sd">    :rtype: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+            <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="file_lenth"><a class="viewcode-back" href="../../project_utils.file_directory_ops.html#project_utils.file_directory_ops.file_lenth">[docs]</a><span class="k">def</span> <span class="nf">file_lenth</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the number of lines in a file.</span>
+
+<span class="sd">    :param filename: The path to the file.</span>
+<span class="sd">    :type filename: str</span>
+<span class="sd">    :return: The number of lines in the file.</span>
+<span class="sd">    :rtype: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fin</span><span class="p">):</span>
+            <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="get_all_files_in_directory"><a class="viewcode-back" href="../../project_utils.file_directory_ops.html#project_utils.file_directory_ops.get_all_files_in_directory">[docs]</a><span class="k">def</span> <span class="nf">get_all_files_in_directory</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns all files in a directory.</span>
+
+<span class="sd">    :param directory: The path to the directory.</span>
+<span class="sd">    :type directory: str</span>
+<span class="sd">    :return: All files in the directory.</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">f</span><span class="p">))]</span></div>
+
+
+<div class="viewcode-block" id="get_folders_in_directory"><a class="viewcode-back" href="../../project_utils.file_directory_ops.html#project_utils.file_directory_ops.get_folders_in_directory">[docs]</a><span class="k">def</span> <span class="nf">get_folders_in_directory</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the folders in a directory.</span>
+
+<span class="sd">    :param directory: The path to the directory.</span>
+<span class="sd">    :type directory: str</span>
+<span class="sd">    :return: The folders in the directory.</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">f</span><span class="p">))]</span></div>
+
+
+<div class="viewcode-block" id="make_directory"><a class="viewcode-back" href="../../project_utils.file_directory_ops.html#project_utils.file_directory_ops.make_directory">[docs]</a><span class="k">def</span> <span class="nf">make_directory</span><span class="p">(</span><span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">delete_if_exists</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a directory at the specified path. If the directory already exists and &#39;delete_if_exists&#39; is True,</span>
+<span class="sd">    it deletes the existing directory before creating a new one.</span>
+
+<span class="sd">    :param output_dir: The path where the directory is to be created.</span>
+<span class="sd">    :type output_dir: str</span>
+<span class="sd">    :param delete_if_exists: If True, deletes the directory at &#39;output_dir&#39; if it exists. Default is False.</span>
+<span class="sd">    :type delete_if_exists: bool</span>
+
+<span class="sd">    Usage::</span>
+
+<span class="sd">        make_directory(&#39;/path/to/directory&#39;, delete_if_exists=True)  # Creates directory, deleting existing one if necessary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">delete_if_exists</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>  <span class="n">delete_files_or_directories</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Create the directory</span></div>
+
+
+<div class="viewcode-block" id="uniquify"><a class="viewcode-back" href="../../project_utils.file_directory_ops.html#project_utils.file_directory_ops.uniquify">[docs]</a><span class="k">def</span> <span class="nf">uniquify</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Makes a file path unique by appending a counter to the file name.</span>
+
+<span class="sd">    :param filepath: The initial file path.</span>
+<span class="sd">    :type filepath: str</span>
+<span class="sd">    :return: A unique file path.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filename</span><span class="p">,</span> <span class="n">extension</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">while</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">counter</span><span class="si">}{</span><span class="n">extension</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span>
+        <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">filepath</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ruben Fernandez Carbon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

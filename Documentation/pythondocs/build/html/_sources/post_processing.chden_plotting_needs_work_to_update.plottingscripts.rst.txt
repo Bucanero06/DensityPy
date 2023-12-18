@@ -1,0 +1,7 @@
+post_processing.chden_plotting_needs_work_to_update.plottingscripts
+===================================================================
+
+.. automodule:: post_processing.chden_plotting_needs_work_to_update.plottingscripts
+    :members:
+    :undoc-members:
+    :show-inheritance:

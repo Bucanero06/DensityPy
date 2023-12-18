@@ -1,0 +1,7 @@
+project_utils.configuration_parser
+==================================
+
+.. automodule:: project_utils.configuration_parser
+    :members:
+    :undoc-members:
+    :show-inheritance:

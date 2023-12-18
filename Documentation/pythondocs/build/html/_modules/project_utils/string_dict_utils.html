@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>project_utils.string_dict_utils &mdash; DensityPy 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=f6245a2f"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            DensityPy
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Default_Settings.default_config.html">Default_Settings.default_config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charge_migration.chargemigratonscripts.html">charge_migration.chargemigratonscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charge_migration.difference_dipole_charge.html">charge_migration.difference_dipole_charge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../main.html">main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.DipolesLogParser.html">molcas.DipolesLogParser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.molcasscripts.html">molcas.molcasscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.pegamoid.html">molcas.pegamoid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.selectionofactivespace.html">molcas.selectionofactivespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.chden_plotting_needs_work_to_update.plotdensity.html">post_processing.chden_plotting_needs_work_to_update.plotdensity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.chden_plotting_needs_work_to_update.plottingscripts.html">post_processing.chden_plotting_needs_work_to_update.plottingscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.chden_plotting_needs_work_to_update.rpoints2vtk.html">post_processing.chden_plotting_needs_work_to_update.rpoints2vtk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.plotting_module.html">post_processing.plotting_module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.command_execution.html">project_utils.command_execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.configuration_parser.html">project_utils.configuration_parser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.data_processing_utils.html">project_utils.data_processing_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.file_directory_ops.html">project_utils.file_directory_ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.file_parsing.html">project_utils.file_parsing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.fortran_compilation_handler.html">project_utils.fortran_compilation_handler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.logger.html">project_utils.logger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.string_dict_utils.html">project_utils.string_dict_utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DensityPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">project_utils.string_dict_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for project_utils.string_dict_utils</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python3.10</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">from</span> <span class="nn">densitypy.project_utils.logger</span> <span class="kn">import</span> <span class="n">setup_logger</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="remove_spaces_and_set_case"><a class="viewcode-back" href="../../project_utils.string_dict_utils.html#project_utils.string_dict_utils.remove_spaces_and_set_case">[docs]</a><span class="k">def</span> <span class="nf">remove_spaces_and_set_case</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalize a string key by converting all characters to lowercase</span>
+<span class="sd">    and removing all spaces and underscores.</span>
+
+<span class="sd">    :param key: The string key to be normalized.</span>
+<span class="sd">    :type key: str</span>
+<span class="sd">    :return: The normalized key.</span>
+<span class="sd">    :rtype: str</span>
+
+<span class="sd">    Usage::</span>
+
+<span class="sd">        normalized_key = normalize_key(&#39;Hello_World&#39;)</span>
+<span class="sd">        print(normalized_key)  # Output: &#39;helloworld&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">case</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;upper&#39;</span><span class="p">],</span> <span class="s2">&quot;Case must be either &#39;lower&#39; or &#39;upper&#39;&quot;</span>
+
+    <span class="n">translation_table</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">maketrans</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39; _&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">case</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">translation_table</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">translation_table</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="recursively_normalize_dict_keys"><a class="viewcode-back" href="../../project_utils.string_dict_utils.html#project_utils.string_dict_utils.recursively_normalize_dict_keys">[docs]</a><span class="k">def</span> <span class="nf">recursively_normalize_dict_keys</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalize all keys in a dictionary. If a value is a dictionary,</span>
+<span class="sd">    normalize its keys recursively.</span>
+
+<span class="sd">    :param d: The dictionary whose keys are to be normalized.</span>
+<span class="sd">    :type d: dict</span>
+<span class="sd">    :return: A new dictionary with normalized keys.</span>
+<span class="sd">    :rtype: dict</span>
+
+<span class="sd">    Usage::</span>
+
+<span class="sd">        data = {</span>
+<span class="sd">            &#39;Hello World&#39;: 1,</span>
+<span class="sd">            &#39;Good_Day&#39;: {</span>
+<span class="sd">                &#39;Inner_Key&#39;: 2</span>
+<span class="sd">            }</span>
+<span class="sd">        }</span>
+<span class="sd">        normalized_data = normalize_dict(data)</span>
+<span class="sd">        print(normalized_data)  # Output: {&#39;helloworld&#39;: 1, &#39;goodday&#39;: {&#39;innerkey&#39;: 2}}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">remove_spaces_and_set_case</span><span class="p">(</span><span class="n">key</span><span class="p">):</span> <span class="n">recursively_normalize_dict_keys</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span>
+                                                                                              <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">value</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="validate_and_correct_dictionary"><a class="viewcode-back" href="../../project_utils.string_dict_utils.html#project_utils.string_dict_utils.validate_and_correct_dictionary">[docs]</a><span class="k">def</span> <span class="nf">validate_and_correct_dictionary</span><span class="p">(</span><span class="n">dict_to_verify</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">default_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Verifies that the given JSON config contains all the required keys as per the default config.</span>
+<span class="sd">    If not, adds the missing keys with the default values.</span>
+<span class="sd">    Returns a log of warnings and errors in case of missing or unknown keys.</span>
+
+<span class="sd">    :param dict_to_verify: The JSON configuration to verify.</span>
+<span class="sd">    :type dict_to_verify: dict</span>
+<span class="sd">    :param default_config: The default configuration used for verification.</span>
+<span class="sd">    :type default_config: dict</span>
+<span class="sd">    :param log: A list of log messages. Default is an empty list.</span>
+<span class="sd">    :type log: list, optional</span>
+<span class="sd">    :return: A tuple of the verified JSON configuration and the log of warnings/errors.</span>
+<span class="sd">    :rtype: tuple</span>
+
+<span class="sd">    Usage::</span>
+
+<span class="sd">        json_config = {</span>
+<span class="sd">            &quot;key1&quot;: &quot;value1&quot;,</span>
+<span class="sd">            &quot;key2&quot;: {</span>
+<span class="sd">                &quot;subkey1&quot;: &quot;subvalue1&quot;</span>
+<span class="sd">            }</span>
+<span class="sd">        }</span>
+
+<span class="sd">        default_config = {</span>
+<span class="sd">            &quot;key1&quot;: &quot;value1&quot;,</span>
+<span class="sd">            &quot;key2&quot;: {</span>
+<span class="sd">                &quot;subkey1&quot;: &quot;subvalue1&quot;,</span>
+<span class="sd">                &quot;subkey2&quot;: &quot;subvalue2&quot;</span>
+<span class="sd">            },</span>
+<span class="sd">            &quot;key3&quot;: &quot;value3&quot;</span>
+<span class="sd">        }</span>
+
+<span class="sd">        verified_config, log = verify_configuration_keys(json_config, default_config)</span>
+<span class="sd">        # verified_config will contain all keys from default_config, and log will contain warning/error messages</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">log</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dict_to_verify</span><span class="p">:</span>
+        <span class="n">dict_to_verify</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">default_config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dict_to_verify</span><span class="p">:</span>
+            <span class="n">dict_to_verify</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Warning: Missing key &quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&quot; has been added with default value &quot;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dict_to_verify</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">dict_to_verify</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">log</span> <span class="o">=</span> <span class="n">validate_and_correct_dictionary</span><span class="p">(</span><span class="n">dict_to_verify</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">value</span><span class="p">,</span> <span class="n">log</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error: Key &quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&quot; should contain a dictionary but found &quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">dict_to_verify</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dict_to_verify</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Error: Key &quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&quot; should be of type &quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot; but found &quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">dict_to_verify</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dict_to_verify</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">default_config</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error: Unknown key &quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&quot; found in config&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dict_to_verify</span><span class="p">,</span> <span class="n">log</span></div>
+
+
+<div class="viewcode-block" id="remove_json_comments"><a class="viewcode-back" href="../../project_utils.string_dict_utils.html#project_utils.string_dict_utils.remove_json_comments">[docs]</a><span class="k">def</span> <span class="nf">remove_json_comments</span><span class="p">(</span><span class="n">json_string</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes the comments from a JSON string.</span>
+
+<span class="sd">    :param json_string: The JSON string.</span>
+<span class="sd">    :type json_string: str</span>
+<span class="sd">    :return: The cleaned JSON string.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">json_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">cleaned_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;//&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+    <span class="n">cleaned_json</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cleaned_lines</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cleaned_json</span></div>
+
+
+<div class="viewcode-block" id="load_json_file"><a class="viewcode-back" href="../../project_utils.string_dict_utils.html#project_utils.string_dict_utils.load_json_file">[docs]</a><span class="k">def</span> <span class="nf">load_json_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads a JSON file.</span>
+
+<span class="sd">    :param filename: The path to the JSON file.</span>
+<span class="sd">    :type filename: str</span>
+<span class="sd">    :return: The content of the JSON file.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.JSON&quot;</span><span class="p">),</span> <span class="s2">&quot;File must be a JSON file&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">cleaned_json</span> <span class="o">=</span> <span class="n">remove_json_comments</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">cleaned_json</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save_json_file"><a class="viewcode-back" href="../../project_utils.string_dict_utils.html#project_utils.string_dict_utils.save_json_file">[docs]</a><span class="k">def</span> <span class="nf">save_json_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Saves a JSON file.</span>
+
+<span class="sd">    :param filename: The path to the JSON file.</span>
+<span class="sd">    :param data: The data to be saved.</span>
+<span class="sd">    :type filename: str</span>
+<span class="sd">    :type data: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.JSON&quot;</span><span class="p">),</span> <span class="s2">&quot;File must be a JSON file&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ruben Fernandez Carbon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
