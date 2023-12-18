@@ -46,11 +46,11 @@ if __name__ == '__main__':
                               'Interfaced with Python\'s DensityPy library.'),
          source_dirs=[
              '../../densityfort/ChargeMigration',
-                      # '../../densityfort/ChargeMigrationFT',
-                      # '../../densityfort/SpectrumReconstruction'
+                      '../../densityfort/ChargeMigrationFT',
+                      '../../densityfort/SpectrumReconstruction'
                       ],
          documentation_dir='/home/ruben/PycharmProjects/DensityPy/Documentation/fortrandocs',
          exclude_dirs=['../../densityfort/ChargeMigration/src/future_reconstruction_using_ci_work',
                        '../../densityfort/ChargeMigrationFT/src/future_reconstruction_using_ci_work'],
-         graphs=False,
+         graphs=True,
          delete_old_files=True)
