@@ -2,7 +2,7 @@
 import json
 from os import path
 
-from densitypy.Default_Settings.default_config import DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_CONTENT
+from densitypy.Default_Settings.default_config import DEFAULT_CONFIG_CONTENT
 from densitypy.project_utils.logger import setup_logger
 from densitypy.project_utils.string_dict_utils import load_json_file, recursively_normalize_dict_keys, \
     validate_and_correct_dictionary
@@ -35,12 +35,12 @@ def parse_configuration_file(config_file_path=None):
     else:
         logger.warning(
             f'{config_file_path if config_file_path else "No configuration file"} found. '
-            f'Making default configuration file with name {DEFAULT_CONFIG_FILE_PATH}. '
+            f'Making default configuration file with name {config_file_path}. '
             'Check/Edit configuration file before running.'
         )
-        write_example_configuration_file(DEFAULT_CONFIG_FILE_PATH)
+        write_example_configuration_file(config_file_path)
     #
-    config = load_json_file(config_file_path if load_user_configuration else DEFAULT_CONFIG_FILE_PATH)
+    config = load_json_file(config_file_path if load_user_configuration else config_file_path)
     config = recursively_normalize_dict_keys(config)
 
     default_config = recursively_normalize_dict_keys(DEFAULT_CONFIG_CONTENT)
@@ -55,14 +55,14 @@ def parse_configuration_file(config_file_path=None):
     return config
 
 
-def write_example_configuration_file(file_name: str = DEFAULT_CONFIG_FILE_PATH):
+def write_example_configuration_file(file_name: str ):
     """
     Writes an example configuration file.
 
     This function creates a configuration file with default settings in the current working directory.
     If a file name is not provided, it uses a default name.
 
-    :param file_name: The name of the file to be created. Default is DEFAULT_CONFIG_FILE_PATH.
+    :param file_name: The name of the file to be created.
     :type file_name: str, optional
     :raises Exception: Logs an error if the example configuration file cannot be written.
 
@@ -72,6 +72,10 @@ def write_example_configuration_file(file_name: str = DEFAULT_CONFIG_FILE_PATH):
     """
 
     try:
+        #Make sure it is a json file
+        if not file_name.endswith('.json'):
+            file_name += '.json'
+            logger.warning(f'File name {file_name} does not end with .json. Appending .json to file name.')
         # Write Configuration FIle with Defaults
         with open(file_name, 'w') as configfile:
             json.dump(DEFAULT_CONFIG_CONTENT, configfile, indent=4)

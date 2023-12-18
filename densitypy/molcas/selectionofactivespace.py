@@ -5,11 +5,12 @@ from configparser import ConfigParser
 from os import path
 import sys
 
+from densitypy.molcas.molcasscripts import copy_and_prepare_molcas_input_file_for_run, call_open_molcas
 from densitypy.project_utils.command_execution import execute_command, print_molcas_log_errors
-from densitypy.project_utils.file_directory_ops import find
+from densitypy.project_utils.file_directory_ops import find, make_directory, copy_file_to
 
 
-def SelectionOfActiveSpace(ini_file):
+def SelectionOfActiveSpace(json_config, **kwargs):
     """
     (DEPRECATED) This function is used to select the active space using Luscus GUI (DEPRECATED)
 
@@ -19,55 +20,68 @@ def SelectionOfActiveSpace(ini_file):
     # Read Project settings from the configuration file
     parser = ConfigParser()
 
-    if ini_file:
-        parser.read(ini_file)
-    else:
-        parser.read('chargemigration.ini')
+    # Split JSON config into sections
+    project_settings = json_config['projectsettings']
 
-    project_name = parser.get('Project settings', 'project_name')
-    XYZ_Geometry = parser.get('Project settings', 'XYZ Molecule Geometry')
-    basis_definition = parser.get('Project settings', 'Basis')
+    # Project Settings
+    project_name = project_settings['projectname']
+    xyz_geometry_path = project_settings['xyzmoleculegeometry']
+    list_of_orbitals = project_settings['listofactiveorbitals']
+    molcas_output_directory = project_settings['molcasoutputdirectory']
+
+    # If basis set is not defined, use 6-31G* or if is passed in kwargs, use that
+    if not kwargs.get('basis', False):
+        basis = '6-31G*'
+
+    # Prepare Input
+    make_directory(molcas_output_directory)
+    copy_file_to(xyz_geometry_path, molcas_output_directory)
+    temp_project_name = f'selecting_space_{project_name}'
+    molcas_input_path = path.join(molcas_output_directory, f'{temp_project_name}.input')
+
 
     # Write/Prepare input file used to select Active Space using luscus
-    with open(project_name + '.input', 'w') as pyinput:
+    with open(molcas_input_path, "w") as pyinput:
         pyinput.write("&GATEWAY"
                       " \n Title = " + project_name +
-                      " \n coord = " + XYZ_Geometry +
-                      "; basis = " + basis_definition +
+                      " \n coord = " + xyz_geometry_path +
+                      "; basis = " + basis +
                       "; group = c1"
                       "\n&SEWARD"
                       "\n&SCF"
-                      "\n&GRID_IT\nALL")
+                      # "\n&GRID_IT\nALL"
+                      )
 
     # Run Pymolcas using the input file previously created
-    print("Wait while Molcas runs a SCF calculations and creates a Luscus file you can use to analyze the Orbitals")
-    # execute_pymolcas_with_error_print("pymolcas " + project_name + ".input -f", project_name)
+    print("Wait while Molcas runs a SCF calculations and creates the orbital files which you can use to analyze the Orbitals")
     try:
-        execute_command("pymolcas " + project_name + ".input -f", write_stream=True)
+        call_open_molcas(temp_project_name, molcas_output_directory)
     except Exception as e:
         print(e)
-        print_molcas_log_errors(project_name + ".log", "Timing")
-    # Look for <ProjectName>.lus file to be used by LUSCUS GUI
-    pathtomolcasrc = path.expanduser("~/.Molcas/molcasrc")
-    # molcas_workdir = GetValueOfAsString(pathtomolcasrc, "MOLCAS_WORKDIR", "=")
-    molcas_workdir = "MOLCAS_WORKDIR"
-    luscusfiledirectory = find(project_name + ".lus", ".", molcas_workdir)
+        log_file_path = path.join(molcas_output_directory, f'selecting_space_{project_name}.log')
+        if path.exists(log_file_path):
+            try:
+                print_molcas_log_errors(log_file_path, "Timing")
+            except Exception as e:
+                print(e)
+        exit()
 
+    scf_h5_path = f"{find(f'selecting_space_{project_name}.scf.h5',molcas_output_directory)}/selecting_space_{project_name}.scf.h5"
+
+    if not scf_h5_path:
+        print("SCF failed, check log file for errors")
+        exit()
+
+    # todo provide helpful insight into what orbitals are recommended prior to even loading pegamoid
+
+    # Find what is the absolute path of pegamoid.py so we can call it from the terminal
+    pegamoid_path = path.abspath(__file__).split('selectionofactivespace.py')[0] + 'pegamoid.py'
+    print(f'pegamoid_path: {pegamoid_path}')
+    if not pegamoid_path:
+        print(f"pegamoid.py not found in {pegamoid_path}, please check if it is in the correct location")
+        exit()
     # Call luscus to allow selection of Active Space
-    print("Opening Molcas GUI Luscus")
+    print("Opening Molcas GUI Pegamoid")
+    execute_command(f"python {pegamoid_path} {scf_h5_path}")
 
-    execute_command(f"luscus {luscusfiledirectory}/{project_name}.lus", write_stream=True)
-
-    # Remove unnessesary created files just created
-    execute_command("rm " + project_name + ".input ", write_stream=True)
-
-    # Simply a reminder to the user to check input file
-    # this of course could be done automatically,
-    # however was not done here and the process is non time consuming
-    print("Active space selected, please update the input file accordingly before proceeding."
-          "\n To use the " + project_name + ".GvOrb file containning the active space that was "
-          "just created using Luscus, add fileorb= " + project_name + ".GvOrb to the input file "
-          "under Module RASSCF as well as include KeyWord 'typeindex'\n RASSCF will begin from "
-          "these Orbital file, thus keywords 'RAS(1-3Zafr) =' should be removed to avoid "
-          "confilics while declaring the active space")
     sys.exit()

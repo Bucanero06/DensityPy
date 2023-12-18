@@ -218,6 +218,7 @@ def read_xyz(xyz_file, return_coordinates_only=False):
             'atoms': returning_dict
         }
 
+
 def distance(avec, bvec):
     c = np.square(np.subtract(avec, bvec))
     cvec = np.sqrt(np.sum(c))
@@ -245,7 +246,7 @@ def find_max_and_min(coords):
 
 #################################################################################################
 # Creates input from users own input file for pymolcas(0)
-def copy_and_parse_molcas_input_file_to_edit(pymolcas_input, project_name, molcas_directory):
+def copy_and_prepare_molcas_input_file_for_run(pymolcas_input, project_name, molcas_directory):
     """
     Uses the user's input file to create a molcas input file by copying the user's input file and then
     utilizing it to add other necessary sections to the input file.
@@ -256,6 +257,7 @@ def copy_and_parse_molcas_input_file_to_edit(pymolcas_input, project_name, molca
         "RASSCF": 'Density Matrix',
         "RASSI": 'Density Matrix'
     }
+
     keywords_needed_found = []
 
     # Create input from user's own input file for pymolcas
@@ -281,18 +283,20 @@ def copy_and_parse_molcas_input_file_to_edit(pymolcas_input, project_name, molca
 
 
 # >Calls pymolcas and writes to scrach folder and log file(1)
-def call_open_molcas(project_name, molcas_directory):
+def call_open_molcas(project_name: str, molcas_directory: str):
     # >Calls pymolcas and writes to scratch folder and log file
     logger.info("Running OpenMolcas")
 
     # Use the context manager to temporarily change the working directory
     with change_directory(molcas_directory):
+        # make sure file exists
+        assert find(f'{project_name}.input', ".", molcas_directory), f'{project_name}.input not found in {molcas_directory}'
         try:
             _logger = setup_logger('open_molcas')
             execute_command(f'pymolcas {project_name}.input -f', _logger=logger)
         except Exception as e:
             logger.error('Error in call_open_molcas')
-            print_molcas_log_errors(project_name + ".log", "Timing")
+            print_molcas_log_errors(f'{project_name}.log', "Timing")
             logger.error(e)
             raise e
 
@@ -446,7 +450,6 @@ def parse_project_grid_file(output_filename, directorypath):
         if match:
 
             orbital_index = int(match.group(1))
-
 
             if orbital_index not in orbitals_to_extract:
                 assert orbital_index == 0
