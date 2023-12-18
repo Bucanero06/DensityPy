@@ -57,7 +57,7 @@ accurate modeling of electronic structures,
 please [install](https://molcas.gitlab.io/OpenMolcas/sphinx/installation.guide/ig.html) and make sure h5 and 
 GridIt(*on its way out*) configurations are enabled.
 
-![Screenshot from 2023-12-17 20-41-16.png](..%2F..%2FPictures%2FScreenshots%2FScreenshot%20from%202023-12-17%2020-41-16.png)
+![Screenshot from 2023-12-17 20-41-16](https://github.com/Bucanero06/DensityPy/assets/60953006/9e90fce9-b7d0-40f5-b09c-63f088a1cce0)
 We can begin from a single `.xyz` file, which contains the molecular geometry of the system of
 interest. Let our model system be n-methylacetamide (NMA), which has the following geometry:
 
@@ -89,7 +89,7 @@ python cli_run.py \
     Studies/ExampleStudy/ nma_configuration.json \
     --molcas_input_help --field_file_help 
 ``` 
-![Screenshot from 2023-12-17 23-29-44.png](..%2F..%2FPictures%2FScreenshots%2FScreenshot%20from%202023-12-17%2023-29-44.png)
+![Screenshot from 2023-12-17 23-29-44](https://github.com/Bucanero06/DensityPy/assets/60953006/639a99f2-e225-4df8-8a1f-56e34044045c)
 
 We already could run the code along the lines of the usage shown above, everything has been prefilled for you. However, 
 if we know nothing about a system's orbitals we can begin with some chemical intuitions and a SCF calculation and 
@@ -108,10 +108,9 @@ This will among others generate a quick h5 containing information about each orb
 visualized. 
 
 [Screencast from 12-17-2023 11:47:17 PM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/fdc60b98-4231-49ee-9d94-5747cb7f711b)
-![Screenshot from 2023-12-17 23-41-13](https://github.com/Bucanero06/DensityPy/assets/60953006/d7d30991-ae19-464a-8eed-59edb1e7fb02)
-We can then select the orbitals we want to include in our active space, and then run the code again 
+![Screenshot from 2023-12-17 23-41-13](https://github.com/Bucanero06/DensityPy/assets/60953006/0e2a9550-5d0b-44ed-8d5b-ed29bb68deed)
 
-```bash
+We can then select the orbitals we want to include in our active space, and then run the code again 
 
 The Options are:
 ```
@@ -123,7 +122,7 @@ Options:
   --run_spectrum_reconstruction  Enable spectrum reconstruction
   --field_file_help              Enable field file help
   --molcas_input_help            Enable Molcas input help
-  --lus                          Enable LUS
+  --scforbs                      Run SCF Orbital Calculations and plot
   --gridit                       Enable grid flag
   --write_charge_migration       Write charge migration
   --debug_mode                   Enable debug mode
