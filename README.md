@@ -6,6 +6,8 @@ DensityPy. This cli/function is engineered to facilitate computational chemistry
 ASTRA-ChargeMigration Fortran code.
 <p align="center">
   <img src="https://github.com/Bucanero06/Bucanero06/assets/60953006/e9e8a290-9e74-4d45-96ae-4114e423f637" width="400" />
+ <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/07edfb34-672b-4151-bb4b-14560f44fac7" height="248" />
+
 </p>
 
 Functionality and Scope:
@@ -105,9 +107,8 @@ python cli_run.py Studies/ExampleStudy/ nma_configuration.json --scforbs
 This will among others generate a quick h5 containing information about each orbital which will then be loaded and 
 visualized. 
 
-![Screenshot from 2023-12-17 23-41-13.png](..%2F..%2FPictures%2FScreenshots%2FScreenshot%20from%202023-12-17%2023-41-13.png)
-![Screenshot from 2023-12-17 23-48-30.png](..%2F..%2FPictures%2FScreenshots%2FScreenshot%20from%202023-12-17%2023-48-30.png)
-
+[Screencast from 12-17-2023 11:47:17 PM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/fdc60b98-4231-49ee-9d94-5747cb7f711b)
+![Screenshot from 2023-12-17 23-41-13](https://github.com/Bucanero06/DensityPy/assets/60953006/d7d30991-ae19-464a-8eed-59edb1e7fb02)
 We can then select the orbitals we want to include in our active space, and then run the code again 
 
 ```bash
