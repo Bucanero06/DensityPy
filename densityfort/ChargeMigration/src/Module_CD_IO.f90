@@ -44,9 +44,9 @@ contains
             strn(i:i) = ch2
         enddo
     end subroutine replace_char
-    subroutine Write_Summary(FileName, nPts, nAtoms, volume, Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
+    subroutine Write_Summary(FileName, nPts, nAtoms,  Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
         integer, intent(in) :: nPts, nAtoms, n_times, number_of_orbitals
-        real(kind(1d0)), intent(in) :: volume, Computed_volume, t_min, t_max, Radius_BS(:), OrbTab(:, :)
+        real(kind(1d0)), intent(in) ::  Computed_volume, t_min, t_max, Radius_BS(:), OrbTab(:, :)
         character(len = 16), intent(in) :: atom_names(:)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)) :: self_overlap, other_overlap
@@ -63,7 +63,7 @@ contains
         write(uid, "(a)")                     "SUMMARY"
         write(uid, "(a,i0)")                  "    Number of Points=", nPts
         write(uid, "(a,i0)")                  "    Number of Atoms=", nAtoms
-        write(uid, "(a,e14.6,a,e14.6)")       "    volume =", volume, " Computed volume =", Computed_volume
+        write(uid, "(a,e14.6,a,e14.6)")       "    Computed volume =", Computed_volume
         write(uid, "(a,i0,e14.6,e14.6)")      "    n_times, t_min, t_max=", n_times, t_min, t_max
         write(uid, "(a)")                     "    Bragg-Slater radii for Becke's Weights"
         do atom_idx = 1, nAtoms
@@ -80,7 +80,7 @@ contains
                 if (orbital_idx2 == orbital_idx1) cycle
                 other_overlap = other_overlap + calculate_overlap(OrbTab, nPts, orbital_idx1, orbital_idx2)
             end do
-            other_overlap = other_overlap * volume
+            other_overlap = other_overlap * Computed_volume
             write(uid, "(a,i0,a,e14.6,a,e14.6)") "    Norm(", orbital_idx1, ") =", self_overlap, "    Overlap other =", other_overlap
         end do
         close(uid)
@@ -89,7 +89,7 @@ contains
         write(*, "(a)")                     "SUMMARY"
         write(*, "(a,i0)")                  "    Number of Points=", nPts
         write(*, "(a,i0)")                  "    Number of Atoms=", nAtoms
-        write(*, "(a,e14.6,a,e14.6)")       "    volume =", volume, " Computed volume =", Computed_volume
+        write(*, "(a,e14.6,a,e14.6)")       "    Computed volume =", Computed_volume
         write(*, "(a,i0,e14.6,e14.6)")      "    n_times, t_min, t_max=", n_times, t_min, t_max
         write(*, "(a)")                     "    Bragg-Slater radii for Becke's Weights"
         do atom_idx = 1, nAtoms
@@ -106,7 +106,7 @@ contains
                 if (orbital_idx2 == orbital_idx1) cycle
                 other_overlap = other_overlap + calculate_overlap(OrbTab, nPts, orbital_idx1, orbital_idx2)
             end do
-            other_overlap = other_overlap * volume
+            other_overlap = other_overlap * Computed_volume
             write(*, "(a,i0,a,e14.6,a,e14.6)") "    Norm(", orbital_idx1, ") =", self_overlap, "    Overlap other =", other_overlap
         end do
 

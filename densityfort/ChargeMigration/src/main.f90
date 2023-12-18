@@ -136,6 +136,7 @@ program ChargeMigration
     write(*, *) "fortran dt=", dt
 
     call omp_set_num_threads(30) ! fixme do not hard code, use number of passed or allowed threads
+!    call omp_set_nested(.true.)
 
     !$OMP PARALLEL DO PRIVATE(strn, i)
     do i = 1, N_Simulations
@@ -268,7 +269,7 @@ program ChargeMigration
                 AtomicChargeEvolution, n_times, t_min, dt, nAtoms, atom_names)
     end do Sim_loop
     !
-    call Write_Summary(output_directory // "/Simulation_Summary", nPts, nAtoms, volume, Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
+    call Write_Summary(output_directory // "/Simulation_Summary", nPts, nAtoms,  Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
     stop
 
 
