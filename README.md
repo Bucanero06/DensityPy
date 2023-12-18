@@ -108,6 +108,7 @@ This will among others generate a quick h5 containing information about each orb
 visualized. 
 
 [Screencast from 12-17-2023 11:47:17 PM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/fdc60b98-4231-49ee-9d94-5747cb7f711b)
+
 ![Screenshot from 2023-12-17 23-41-13](https://github.com/Bucanero06/DensityPy/assets/60953006/0e2a9550-5d0b-44ed-8d5b-ed29bb68deed)
 
 We can then select the orbitals we want to include in our active space, and then run the code again 
