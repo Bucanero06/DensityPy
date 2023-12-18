@@ -421,6 +421,7 @@ def plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delay
 def difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delays, min_time,
                                                         max_time,
                                                         xyz_geometry_path):
+    raise NotImplementedError
     import pandas as pd
 
     # Load the datasets
@@ -653,29 +654,26 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
         fig, axes = plt.subplots(3, 2, figsize=(24, 18))
 
         # Dynamic Range Adjustment using different percentiles
-        percentile_1 = np.percentile(average_ft_dipole_grid, 1)
-        percentile_99 = np.percentile(average_ft_dipole_grid, 99)
-        norm_1_99 = colors.Normalize(vmin=percentile_1, vmax=percentile_99)
-        # axes[0, 0].contourf(ct2_grid, omega_grid, average_ft_dipole_grid, levels=100, cmap=color_map, norm=norm_1_99)
+        norm_1_99 = colors.Normalize(
+            vmin=np.percentile(average_ft_dipole_grid, 0.01),
+            vmax=np.percentile(average_ft_dipole_grid, 99.9))
         plt.colorbar(axes[0, 0].contourf(ct2_grid, omega_grid, average_ft_dipole_grid,
                                          levels=100, cmap=color_map, norm=norm_1_99), ax=axes[0, 0])
-        axes[0, 0].set_title('Percentile (1% - 99%) Adjusted Contour Map')
+        axes[0, 0].set_title('Percentile (0.01% - 99.9%) Adjusted Contour Map')
         axes[0, 0].set_xlabel('Central Time 2')
         axes[0, 0].set_ylabel('OmegaVec')
         #
-        percentile_5 = np.percentile(average_ft_dipole_grid, 5)
-        percentile_95 = np.percentile(average_ft_dipole_grid, 95)
-        norm_5_95 = colors.Normalize(vmin=percentile_5, vmax=percentile_95)
-        # axes[0, 1].contourf(ct2_grid, omega_grid, average_ft_dipole_grid, levels=100, cmap=color_map, norm=norm_5_95)
+        norm_5_95 = colors.Normalize(
+            vmin=np.percentile(average_ft_dipole_grid, 1),
+            vmax=np.percentile(average_ft_dipole_grid, 99))
         plt.colorbar(axes[0, 1].contourf(ct2_grid, omega_grid, average_ft_dipole_grid,
                                          levels=100, cmap=color_map, norm=norm_5_95), ax=axes[0, 1])
-        axes[0, 1].set_title('Percentile (5% - 95%) Adjusted Contour Map')
+        axes[0, 1].set_title('Percentile (1% - 99%) Adjusted Contour Map')
         axes[0, 1].set_xlabel('Central Time 2')
         axes[0, 1].set_ylabel('OmegaVec')
 
         # Logarithmic Scaling
         log_scaled_data = np.log1p(np.abs(average_ft_dipole_grid))  # Adding 1 to avoid log(0)
-        # axes[1, 0].contourf(ct2_grid, omega_grid, log_scaled_data, levels=100, cmap=color_map)
         plt.colorbar(axes[1, 0].contourf(ct2_grid, omega_grid, log_scaled_data, levels=100, cmap=color_map),
                      ax=axes[1, 0])
         axes[1, 0].set_title('Logarithmic Scaled Data Contour Map')
@@ -683,8 +681,6 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
         axes[1, 0].set_ylabel('OmegaVec')
 
         # Derivative Plots
-        # axes[1, 1].contourf(ct2_grid, omega_grid, np.gradient(average_ft_dipole_grid, axis=0), levels=100,
-        #                     cmap=color_map)
         plt.colorbar(axes[1, 1].contourf(ct2_grid, omega_grid, np.gradient(average_ft_dipole_grid, axis=0),
                                          levels=100, cmap=color_map), ax=axes[1, 1])
         axes[1, 1].set_title('First Derivative of Data')
@@ -693,7 +689,6 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
 
         # Smoothing (Gaussian Filter) and Filtering
         smoothed_data = gaussian_filter(average_ft_dipole_grid, sigma=1)  # Applying a Gaussian filter
-        # axes[2, 0].contourf(ct2_grid, omega_grid, smoothed_data, levels=100, cmap=color_map)
         plt.colorbar(axes[2, 0].contourf(ct2_grid, omega_grid, smoothed_data, levels=100, cmap=color_map),
                      ax=axes[2, 0])
         axes[2, 0].set_title('Smoothed Data Contour Map')
@@ -701,7 +696,6 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
         axes[2, 0].set_ylabel('OmegaVec')
 
         # Derivative Plots
-        # axes[2, 1].contourf(ct2_grid, omega_grid, np.gradient(smoothed_data, axis=0), levels=100, cmap=color_map)
         plt.colorbar(axes[2, 1].contourf(ct2_grid, omega_grid, np.gradient(smoothed_data, axis=0), levels=100,
                                          cmap=color_map), ax=axes[2, 1])
         axes[2, 1].set_title('First Derivative of Smoothed Data')
@@ -908,22 +902,23 @@ def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dep
                                                      atomic_ft_dipole_z_re_grid ** 2 + atomic_ft_dipole_z_im_grid ** 2) / 3)
 
             # Dynamic Range Adjustment using different percentiles
-            percentile_1 = np.percentile(average_ft_atomic_dipole_grid, 1)
-            percentile_99 = np.percentile(average_ft_atomic_dipole_grid, 99)
-            norm_1_99 = colors.Normalize(vmin=percentile_1, vmax=percentile_99)
+            norm_1_99 = colors.Normalize(
+                vmin=np.percentile(average_ft_atomic_dipole_grid, 0.01),
+                vmax=np.percentile(average_ft_atomic_dipole_grid, 99.9))
             plt.colorbar(axes[0, 0].contourf(ct2_grid, omega_grid, average_ft_atomic_dipole_grid,
                                              levels=100, cmap=color_map, norm=norm_1_99), ax=axes[0, 0])
-            axes[0, 0].set_title(f'Percentile (1% - 99%) Adjusted Contour Map of Atom {_atom_name} FT Charge Averaged')
+            axes[0, 0].set_title(
+                f'Percentile (0.01% - 99.9%) Adjusted Contour Map of Atom {_atom_name} FT Charge Averaged')
             axes[0, 0].set_xlabel('Central Time 2')
             axes[0, 0].set_ylabel('OmegaVec')
 
             #
-            percentile_5 = np.percentile(average_ft_atomic_dipole_grid, 5)
-            percentile_95 = np.percentile(average_ft_atomic_dipole_grid, 95)
-            norm_5_95 = colors.Normalize(vmin=percentile_5, vmax=percentile_95)
+            norm_5_95 = colors.Normalize(
+                vmin=np.percentile(average_ft_atomic_dipole_grid, 5),
+                vmax=np.percentile(average_ft_atomic_dipole_grid, 95))
             plt.colorbar(axes[0, 1].contourf(ct2_grid, omega_grid, average_ft_atomic_dipole_grid,
                                              levels=100, cmap=color_map, norm=norm_5_95), ax=axes[0, 1])
-            axes[0, 1].set_title(f'Percentile (5% - 95%) Adjusted Contour Map of Atom {_atom_name} FT Charge Averaged')
+            axes[0, 1].set_title(f'Percentile (1% - 99%) Adjusted Contour Map of Atom {_atom_name} FT Charge Averaged')
             axes[0, 1].set_xlabel('Central Time 2')
             axes[0, 1].set_ylabel('OmegaVec')
 
@@ -965,34 +960,8 @@ def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dep
 
 '''Dipolar 2D Spectra'''
 
-
 def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
-                     pump_settings, probe_settings, charge_migration_ft_settings):
-    # Pump Settings
-    type_of_pulse_pump = pump_settings['typeofpulse']
-    start_time = pump_settings['starttime']
-    pump_central_frequency = pump_settings['pumpcentralfrequency']
-    pump_periods = pump_settings['pumpperiods']
-    pump_phase = pump_settings['pumpphase']
-    pump_intensity = pump_settings['pumpintensity']
-    pump_polarization = pump_settings['pumppolarization']
-
-    # Probe Settings
-    type_of_pulse_probe = probe_settings['typeofpulse']
-    time_delay_start = probe_settings['timedelaystart']
-    time_delay_stop = probe_settings['timedelaystop']
-    number_of_pp = probe_settings['numberofpp']
-    time_Delay_weight_factor = probe_settings['timedelayweightfactor']
-    probe_central_frequency = probe_settings['probecentralfrequency']
-    probe_periods = probe_settings['probeperiods']
-    probe_phase = probe_settings['probephase']
-    probe_intensity = probe_settings['probeintensity']
-    probe_polarization = probe_settings['probepolarization']
-
-    # Charge Migration Settings
-    ft_time_step = charge_migration_ft_settings['fttimestep']
-    ft_width_step = charge_migration_ft_settings['ftwidthstep']
-
+                                 pump_settings, probe_settings, charge_migration_ft_settings, match_scales=False):
     OMEGA_TAUOMEGA_FILE_NAMES = [
         'Dipole/DipoleFT_ww.csv',
         'Dipole/DipoleFT_ww_reconstructed.csv',
@@ -1001,7 +970,7 @@ def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, re
                                  OMEGA_TAUOMEGA_FILE_NAMES]
 
     length_of_data_to_match = None
-    FEATURES_COL_NAMES = [
+    FEATURES_COL_NAMES = [  # Todo do per polarization images too
         '2DDipoleX_Re',
         '2DDipoleX_Im',
         '2DDipoleY_Re',
@@ -1010,18 +979,21 @@ def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, re
         '2DDipoleZ_Im'
     ]
 
+    ft_time_step = charge_migration_ft_settings['fttimestep']
+    ft_width_step = charge_migration_ft_settings['ftwidthstep']
+
+    _zmax = None
+    _zmin = None
     for file_path in OMEGA_TAUOMEGA_FILE_PATHS:
         # Load the CSV file
         logger.info(f'Plotting {file_path}')
-
         data = pd.read_csv(file_path)
 
         if length_of_data_to_match is None:
             length_of_data_to_match = len(data)
-            # assert data.columns.tolist() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
         else:
-            assert length_of_data_to_match == len(data), f'Length of {file_path} is not the same as the previous file'
-            # assert data.columns.tolist() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
+            assert length_of_data_to_match == len(
+                data), f'Length of {file_path} is not the same as the previous file'
 
         # Displaying the first few rows of the file to understand its structure
         logger.debug(data.head())
@@ -1029,63 +1001,41 @@ def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, re
 
         # Calculating the average of all polarizations
         data['AveragedDensity'] = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
+
+        # Adding the averaged density to the DataFrame
         if 'DipoleFT_ww_reconstructed' in file_path:
             # FIXME Flip accross the frequency axis but keep the same index (idk why this bug exists)
             data['AveragedDensity'] = pd.Series(data['AveragedDensity'].values[::-1],
                                                 index=data['AveragedDensity'].index)
-        import matplotlib.pyplot as plt
-        import numpy as np
 
-        # # Creating an interactive plot using Plotly
-        # _plot_contour_map(x=data['OmegaVec'] + data['TauOmegaVec'],
-        #                   y=data['OmegaVec'],
-        #                   z=data['AveragedDensity'],
-        #                   title=f'Contour Map of Average FT Dipole Magnitude\n'
-        #                         f'DipoleFT_ALL.csv\n'
-        #                         f'Pump Settings:  {pump_central_frequency}, {pump_periods}, {pump_phase}, {pump_intensity}, {pump_polarization}\n'
-        #                         f'Probe Settings:  {probe_central_frequency}, {probe_periods}, {probe_phase}, {probe_intensity}, {probe_polarization}\n'
-        #                         f'Dephasing Factor: {dephasing_factor}, Relaxation Factor: {relaxation_factor}'
-        #                         f'FT Time Step: {ft_time_step}, FT Width Step: {ft_width_step}',
-        #                   x_label='Central Time 2 - Probe (tau)',
-        #                   y_label='OmegaVec',
-        #                   output_file=f'{file_path}'.replace('.csv', '.html'))
+        # Plotting the contour map
+        if match_scales:
+            if _zmax is None:
+                _zmax = np.percentile(data['AveragedDensity'], 99.5)
+                _zmin = np.percentile(data['AveragedDensity'], 0.01)
+        else:
+            _zmax = np.percentile(data['AveragedDensity'], 99.9)
+            _zmin = np.percentile(data['AveragedDensity'], 0.01)
 
-        # Preparing the data for plotting
-        omega_unique_values = data['OmegaVec'].unique()
-        tauomega_unique_values = data['TauOmegaVec'].unique()
-
-        # Creating a meshgrid for plotting
-        omega_grid, tauomega_grid = np.meshgrid(omega_unique_values, tauomega_unique_values, indexing='ij')
-
-        # Reshaping 'AveragedDensity' to match the shape of the meshgrid
-        averaged_density_grid = data['AveragedDensity'].values.reshape(omega_grid.shape)
-
-        # Plotting
-        plt.figure(figsize=(10, 8))
-        # Since we are adding a bigger title to include pump and probe details lets make the figure bigger
-        plt.contourf(omega_grid + tauomega_grid, omega_grid, averaged_density_grid,
-                     levels=100, cmap='viridis',
-                     vmin=0, vmax=60  # Setting the colormap limits
-                     )
-        plt.colorbar(label='Averaged Density')
-        plt.xlabel('OmegaVec')
-        plt.ylabel('TauOmegaVec')
-        plt.title(f'2D Spectra Plot of Averaged \n{file_path}\n'
-                  # Pump Details
-                  f'Pump Settings:  {pump_central_frequency}, {pump_periods}, {pump_phase}, {pump_intensity}, {pump_polarization}\n'
-                  # Probe Details
-                  f'Probe Settings:  {probe_central_frequency}, {probe_periods}, {probe_phase}, {probe_intensity}, {probe_polarization}\n'
-                  # Other Details
-                  f'Dephasing Factor: {dephasing_factor}, Relaxation Factor: {relaxation_factor}'
-                  f'FT Time Step: {ft_time_step}, FT Width Step: {ft_width_step}')
-
-        # Remove the csv if it has it in the name and replace with png
-        output_file = file_path.replace('.csv', '.png')
-        output_file = output_file if output_file != file_path else f'{file_path}.png'
-        plt.savefig(output_file)
-        # plt.show()
-        # plt.clf()
-
+        _plot_contour_map(
+            x=data['TauOmegaVec'] + data['OmegaVec'],
+            y=data['OmegaVec'],
+            z=data['AveragedDensity'],
+            title=f'Contour Map of Average FT Dipole (Pure-Absorption)\n'
+                  f'{file_path}\n'
+                  f'Pump Settings:  {pump_settings["pumpcentralfrequency"]}, {pump_settings["pumpperiods"]}, {pump_settings["pumpphase"]}, {pump_settings["pumpintensity"]}, {pump_settings["pumppolarization"]}\n'
+                  f'Probe Settings:  {probe_settings["probecentralfrequency"]}, {probe_settings["probeperiods"]}, {probe_settings["probephase"]}, {probe_settings["probeintensity"]}, {probe_settings["probepolarization"]}\n'
+                  f'FT Time Step: {ft_time_step}, FT Width Step: {ft_width_step}, Dephasing Factor: {dephasing_factor}, Relaxation Factor: {relaxation_factor}',
+            x_label='OmegaVec + TauOmegaVec',
+            y_label='OmegaVec',
+            output_file=f'{file_path}'.replace('.csv', '.html'),
+            contour_kwargs={
+                'colorscale': 'Viridis',
+                'contours_coloring': 'heatmap',
+                'zmin': _zmin,
+                'zmax': _zmax,
+            }
+        )
 
 def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
     OMEGA_TAUOMEGA_FILE_NAMES = [
@@ -1112,11 +1062,9 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
 
         if length_of_data_to_match is None:
             length_of_data_to_match = len(data)
-            # assert data.columns.tolist() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
         else:
             assert length_of_data_to_match == len(
                 data), f'Length of {file_path} is not the same as the previous file'
-            # assert data.columns.tolist() in INDECES_COL_NAMES + FEATURES_COL_NAMES, f'Column names of {file_path} is not the same as the previous file'
 
         # Displaying the first few rows of the file to understand its structure
         logger.debug(data.head())
@@ -1154,13 +1102,13 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
 
         # Dynamic range adjustment for the contour plots
         # Using percentiles to set color scale limits
-        percentile_5 = np.percentile(averaged_density_grid, 5)
-        percentile_95 = np.percentile(averaged_density_grid, 95)
+        percentile_min = np.percentile(averaged_density_grid, 0.01)
+        percentile_max = np.percentile(averaged_density_grid, 99.9)
 
         # Symmetrical color map for first derivative
         first_derivative = np.gradient(averaged_density_grid, axis=0)  # recalculating first derivative
-        derivative_min = np.percentile(first_derivative, 5)
-        derivative_max = np.percentile(first_derivative, 95)
+        derivative_min = np.percentile(first_derivative, 0.01)
+        derivative_max = np.percentile(first_derivative, 99.9)
         derivative_abs_max = max(abs(derivative_min), abs(derivative_max))
 
         # Plotting with adjustments
@@ -1176,20 +1124,16 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
         axes[0, 0].set_title("Adjusted Peak Analysis")
 
         # Adjusted Normalized Density
-        # axes[0, 1].contourf(omega_grid + tauomega_grid, omega_grid, averaged_density_grid, levels=100,
-        #                     cmap='viridis',
-        #                     vmin=percentile_5, vmax=percentile_95
-        #                     )
-        norm_5_95 = colors.Normalize(vmin=percentile_5, vmax=percentile_95)
         plt.colorbar(axes[0, 1].contourf(omega_grid + tauomega_grid, omega_grid, averaged_density_grid,
-                                         levels=100, cmap='viridis', norm=norm_5_95), ax=axes[0, 1])
-        axes[0, 1].set_title("Adjusted Normalized Density (5th and 95th Percentiles)")
+                                         levels=100, cmap='viridis',
+                                         norm=colors.Normalize(vmin=percentile_min, vmax=percentile_max)
+                                         ), ax=axes[0, 1])
+        axes[0, 1].set_title("Adjusted Normalized Density (0.01% and 99.9% Percentiles)")
 
         # Adjusted First Derivative
-        # axes[1, 0].contourf(omega_grid + tauomega_grid, omega_grid, first_derivative, levels=100, cmap='seismic',
-        #                     vmin=-derivative_abs_max, vmax=derivative_abs_max)
         plt.colorbar(axes[1, 0].contourf(omega_grid + tauomega_grid, omega_grid, first_derivative,
                                          levels=100,
+                                         vmin=-derivative_abs_max, vmax=derivative_abs_max,
                                          cmap='viridis'), ax=axes[1, 0])
         axes[1, 0].set_title("Adjusted First Derivative")
 
@@ -1209,85 +1153,7 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
         # plt.show()
 
 
-def plot_2d_spectrum_interactive(study_directory, experiment_directory):
-    OMEGA_TAUOMEGA_FILE_NAMES = [
-        'Dipole/DipoleFT_ww.csv',
-        'Dipole/DipoleFT_ww_reconstructed.csv',
-    ]
-    OMEGA_TAUOMEGA_FILE_PATHS = [f'{study_directory}/{experiment_directory}/{file_name}' for file_name in
-                                 OMEGA_TAUOMEGA_FILE_NAMES]
 
-    length_of_data_to_match = None
-    FEATURES_COL_NAMES = [
-        '2DDipoleX_Re',
-        '2DDipoleX_Im',
-        '2DDipoleY_Re',
-        '2DDipoleY_Im',
-        '2DDipoleZ_Re',
-        '2DDipoleZ_Im'
-    ]
-    _zmax = None
-    for file_path in OMEGA_TAUOMEGA_FILE_PATHS:
-        # Load the CSV file
-        logger.info(f'Plotting {file_path}')
-        data = pd.read_csv(file_path)
-
-        if length_of_data_to_match is None:
-            length_of_data_to_match = len(data)
-        else:
-            assert length_of_data_to_match == len(
-                data), f'Length of {file_path} is not the same as the previous file'
-
-        # Displaying the first few rows of the file to understand its structure
-        logger.debug(data.head())
-        logger.debug(f'Length of data: {len(data)}')
-
-        # Calculating the average of all polarizations
-        data['AveragedDensity'] = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
-
-        # Adding the averaged density to the DataFrame
-        if 'DipoleFT_ww_reconstructed' in file_path:
-            # FIXME Flip accross the frequency axis but keep the same index (idk why this bug exists)
-            data['AveragedDensity'] = pd.Series(data['AveragedDensity'].values[::-1],
-                                                index=data['AveragedDensity'].index)
-
-        # Plotting the contour map
-        import plotly.graph_objects as go
-        #Calculate the zmax that is going to be used for Dipole and Reconstruct Atomic Dipole
-        if _zmax is None:
-            # _zmax = data['AveragedDensity'].max()
-            # use the percentile to set the zmax
-            _zmax = np.percentile(data['AveragedDensity'], 99)
-
-        # Creating a meshgrid for plotting
-        fig = go.Figure(data=
-        go.Contour(
-            z=data['AveragedDensity'],
-            x= data['TauOmegaVec']+data['OmegaVec'],
-            y= data['OmegaVec'],
-            colorscale='Viridis',  # Can be dynamically changed
-            contours_coloring='heatmap',
-            # Remove the black lines of the controur
-            # line_width=0,
-            # Fix the color scale to be the same for all plots
-            zmin=0,
-            zmax=_zmax,
-
-
-        )
-        )
-
-        # Add titles and labels
-        fig.update_layout(
-            title='Averaged 2D Electronic Density Spectra Plot',
-            xaxis_title='OmegaVec + TauOmegaVec',
-            yaxis_title='OmegaVec'
-        )
-        #
-        # # Save the plot as an interactive HTML file
-        output_file = file_path.replace('.csv', '.html')
-        fig.write_html(output_file)
-        fig.show()
 
 
 '''Becke Plots'''
@@ -1394,13 +1260,15 @@ def plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path,
 '''__helper_functions__'''
 
 
-def _plot_contour_map(x, y, z, title, x_label, y_label, output_file):
+def _plot_contour_map(x, y, z, title, x_label, y_label, output_file, contour_kwargs=None):
     # Creating an interactive plot using Plotly
     import plotly.graph_objects as go
-    fig = go.Figure(data=go.Contour(z=z, x=x, y=y))
+    fig = go.Figure(data=go.Contour(z=z, x=x, y=y, **contour_kwargs))
     fig.update_layout(title=title, xaxis_title=x_label, yaxis_title=y_label)
     fig.write_html(output_file)
-    fig.show()
+    # fig.show()
+
+    return fig
 
 
 def _calculate_min_max_significant_time(data, target_column, percentile_range=(20, 60)):
