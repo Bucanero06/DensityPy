@@ -1,5 +1,5 @@
-## Astra:
-
+## Installations
+*docker image under way*
 #### MKL and iFort installation:
     
 ``` bash
@@ -20,5 +20,5 @@ source /opt/intel/oneapi/setvars.sh --force
         1. Switched deprecated -mkl usage to -qmkl
         2. Changed MKL_PATH and MKL_INCLUDE to reflect the OneAPI installation
 
-  
+### OpenMolcas installation:
 
