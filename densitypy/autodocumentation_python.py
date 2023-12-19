@@ -1,9 +1,11 @@
-import logging
 import os
-import subprocess
 
 from densitypy.project_utils.command_execution import execute_command
-from densitypy.project_utils.file_directory_ops import change_directory_manager
+from densitypy.project_utils.file_directory_ops import change_directory_manager, validate_directory_and_get_full_path, \
+    make_directory, copy_to
+from densitypy.project_utils.logger import setup_logger
+
+logger = setup_logger('autodocumentation_python')
 
 
 def initialize_sphinx(source_dir, project_name, author_name, version='0.0.1'):
@@ -29,6 +31,8 @@ def find_python_modules(start_path, ignore_folders=None):
 
     modules = []
     for root, dirs, files in os.walk(start_path):
+        logger.info(f'{dirs = }')
+
         # Exclude the specified directories and their subdirectories
         dirs[:] = [d for d in dirs if os.path.join(root, d) not in exclude_paths]
 
@@ -45,8 +49,8 @@ def find_python_modules(start_path, ignore_folders=None):
                 print('plotdensity in modules')
             else:
                 # Replace with plotdensity
-                logging.warning(f'plotdensit in modules, replacing with plotdensity\n'
-                                f'Original module path: {module_path}')
+                logger.warning(f'plotdensit in modules, replacing with plotdensity\n'
+                               f'Original module path: {module_path}')
                 module_path = module_path.replace('plotdensit', 'plotdensity')
                 modules[i] = module_path
 
@@ -84,17 +88,31 @@ def update_conf_py(documentation_dir, source_dir):
                 "    'sphinx.ext.autosectionlabel',\n"
                 "    'sphinx.ext.autodoc.typehints',\n"
                 "    'sphinx.ext.inheritance_diagram',\n"
+                "    'sphinx_click',\n"
                 "]\n")
-
+        f.write("\ntodo_include_todos = True\n")
     # Just in case copy the conf.py file to the source directory
-    subprocess.run(['cp', conf_py_path, source_conf_py_path])
+    # subprocess.run(['cp', conf_py_path, source_conf_py_path])
+    execute_command(f"cp {conf_py_path} {source_conf_py_path}")
 
 
 def create_module_rst_files(modules, rst_dir):
     for module in modules:
+        print(f'{module = }')
+
         with open(os.path.join(rst_dir, f'{module}.rst'), 'w') as f:
             f.write(
-                f"{module}\n{'=' * len(module)}\n\n.. automodule:: {module}\n    :members:\n    :undoc-members:\n    :show-inheritance:\n")
+                f"{module}\n{'=' * len(module)}\n\n"
+                f".. automodule:: {module}\n"
+                f"    :members:\n"
+                f"    :undoc-members:\n"
+                f"    :show-inheritance:\n\n."
+                f". click:: {module}:cli_run\n"
+                f"    :prog: densitypy\n"
+                f"    :nested: full\n\n"
+                f".. inheritance-diagram:: {module}\n"
+                f"    :parts: 1\n\n"
+            )
 
 
 def update_index_rst(documentation_dir, modules):
@@ -125,23 +143,80 @@ def update_index_rst(documentation_dir, modules):
                 file.write(line)
 
     # Just in case copy the index.rst file to the source directory
-    subprocess.run(['cp', index_rst_path, source_index_rst_path])
+    # subprocess.run(['cp', index_rst_path, source_index_rst_path])
+    execute_command(f"cp {index_rst_path} {source_index_rst_path}")
 
 
 def build_sphinx_docs(documentation_dir):
-    subprocess.run(['make', 'html'], cwd=documentation_dir)
+    # subprocess.run(['make', 'html'], cwd=documentation_dir)
+    with change_directory_manager(documentation_dir):
+        execute_command(f"make html")
 
 
-def main(project_name, author_name, source_dir, documentation_dir, exclude_dirs=None, remove_old_files=False):
+def rename_files_and_replace_top_level_package_name(directory, top_level_package_name):
+    logger.info(f'Renaming files and replacing top level package name in {directory}')
+    target_prefix = top_level_package_name + '.'
+    # Walk through all files and folders within the directory
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            logger.info(f'{file = }')
+            file_path = os.path.join(root, file)
+
+            # Check if the file name starts with target_prefix and rename it
+            should_replace_name = file.endswith('.html') or file.endswith('.txt') or file.endswith(
+                '.js') or file.endswith('.rst')
+            if should_replace_name:
+                if file.startswith(target_prefix):
+                    new_file_name = file.replace(target_prefix, '')
+                    new_file_path = os.path.join(root, new_file_name)
+                    os.rename(file_path, new_file_path)
+                    file_path = new_file_path  # Update file_path to the new file name
+
+                # Read the file and replace target_prefix with ''
+                with open(file_path, 'r') as f:
+                    filedata = f.read()
+
+                filedata = filedata.replace(target_prefix, '')
+
+                # Write the file out again
+                with open(file_path, 'w') as f:
+                    f.write(filedata)
+
+def clean_up_and_exit(documentation_dir):
+    try:
+        execute_command(f"mv {documentation_dir} {documentation_dir}_original")
+        make_directory(f'{documentation_dir}', delete_if_exists=True)  # New directory
+        copy_to(f'{documentation_dir}_original/build/html/*', f'{documentation_dir}/', True)
+
+    except Exception as e:
+        logger.warning(f'Failed to clean up {documentation_dir}: {e}')
+        execute_command(f"rm -r {documentation_dir}")
+        execute_command(f"mv {documentation_dir}_original {documentation_dir}")
+    finally:
+        execute_command(f"rm -r {documentation_dir}_original")
+        exit()
+def main(project_name, author_name, source_dir, documentation_dir, exclude_dirs=None, delete_old_files=False):
+    source_dir = validate_directory_and_get_full_path(source_dir)
+    documentation_dir = documentation_dir.strip()
+
     if not exclude_dirs:
         exclude_dirs = []
 
-    if remove_old_files and os.path.exists(documentation_dir):
+    if isinstance(exclude_dirs, str):
+        exclude_dirs = exclude_dirs.split(',')
+        exclude_dirs = [exclude_dir.strip() for exclude_dir in exclude_dirs]
+
+    if not exclude_dirs:
+        exclude_dirs = []
+
+    if delete_old_files and os.path.exists(documentation_dir):
         from densitypy.project_utils.file_directory_ops import delete_files_or_directories
         delete_files_or_directories(documentation_dir)
 
     if not os.path.exists(documentation_dir):
         os.makedirs(documentation_dir)
+
+    documentation_dir = validate_directory_and_get_full_path(documentation_dir)
 
     initialize_sphinx(documentation_dir, project_name, author_name=author_name)
     modules = find_python_modules(source_dir, ignore_folders=exclude_dirs)
@@ -151,10 +226,17 @@ def main(project_name, author_name, source_dir, documentation_dir, exclude_dirs=
     # Move the source files into the source directory
     execute_command(f"mv {documentation_dir}/*.rst {documentation_dir}/source/")
     build_sphinx_docs(documentation_dir)
+    rename_files_and_replace_top_level_package_name(os.path.join(documentation_dir, 'build', 'html'),
+                                                    top_level_package_name=source_dir.split(os.path.sep)[-1])
+
+
+
+    clean_up_and_exit(documentation_dir)
 
 
 if __name__ == '__main__':
     import click
+
 
     @click.command()
     @click.option('--project_name', '-p', help='Name of the project', required=True)
@@ -163,8 +245,8 @@ if __name__ == '__main__':
     @click.option('--documentation_dir', '-d', help='Documentation directory', required=True)
     @click.option('--exclude_dirs', '-e', help='Directories to exclude', default=None)
     @click.option('--remove_old_files', '-r', is_flag=True, help='Remove old files', default=False)
-
     def main_cli(project_name, author_name, source_dir, documentation_dir, exclude_dirs, remove_old_files):
         main(project_name, author_name, source_dir, documentation_dir, exclude_dirs, remove_old_files)
+
 
     main_cli()
