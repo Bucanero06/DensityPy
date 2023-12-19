@@ -1,7 +1,0 @@
-molcas.selectionofactivespace
-=======================================
-
-.. automodule:: molcas.selectionofactivespace
-    :members:
-    :undoc-members:
-    :show-inheritance:

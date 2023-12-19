@@ -1,7 +1,0 @@
-post_processing.chden_plotting_needs_work_to_update.rpoints2vtk
-=========================================================================
-
-.. automodule:: post_processing.chden_plotting_needs_work_to_update.rpoints2vtk
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -5,3 +5,11 @@ docs.pythondocs.source.conf
     :members:
     :undoc-members:
     :show-inheritance:
+
+.. click:: docs.pythondocs.source.conf:cli_run
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: docs.pythondocs.source.conf
+    :parts: 1
+
