@@ -34,7 +34,7 @@ class change_directory_manager:
         os.chdir(self.original_dir)
 
 
-def copy_file_to(input, output):
+def copy_to(input, output, include_directories=True):
     """
     Copies a file to a new location.
 
@@ -43,9 +43,11 @@ def copy_file_to(input, output):
     :type input: str
     :type output: str
     """
+
+    cp_flags = '-r' if include_directories else ''
     try:
-        logger.info(f"Copying file: {input} to {output}")
-        execute_command(f'cp {input} {output}')
+        logger.info(f"Copying: {input} to {output}")
+        execute_command(f'cp {cp_flags} {input} {output}')
     except Exception as e:
         logger.info("Error copying file: " + str(e))
 
@@ -62,14 +64,6 @@ def delete_files_or_directories(*paths, ignore_errors=False):
 
         delete_files_or_directories('/path/to/file', '/path/to/directory')  # Deletes specified file and directory
     """
-    # for paths in paths:
-    #     if os.path.isfile(paths):
-    #         os.remove(paths)  # Delete the file
-    #     elif os.path.isdir(paths):
-    #         shutil.rmtree(paths)  # Delete the directory and its contents
-    #     else:
-    #         raise FileNotFoundError(f"Path '{paths}' does not exist.")
-
     for paths in paths:
         try:
             if os.path.isfile(paths):
@@ -77,13 +71,15 @@ def delete_files_or_directories(*paths, ignore_errors=False):
             elif os.path.isdir(paths):
                 shutil.rmtree(paths)  # Delete the directory and its contents
             else:
-                raise FileNotFoundError(f"Path '{paths}' does not exist.")
+                if not ignore_errors:
+                    raise FileNotFoundError(f"Path '{paths}' does not exist.")
         except Exception as e:
             if ignore_errors:
                 logger.warning(f"Error deleting file or directory: {e}")
             else:
                 logger.error(f"Error deleting file or directory: {e}")
                 raise e
+
 
 def find(filename, *args):
     """
@@ -204,3 +200,12 @@ def uniquify(filepath):
         counter += 1
 
     return filepath
+
+
+def validate_directory_and_get_full_path(path):
+    path = path.strip()
+    if not os.path.exists(path):
+        raise ValueError(f'{path} does not exist.')
+    if not os.path.isdir(path):
+        raise ValueError(f'{path} is not a directory.')
+    return os.path.abspath(path)
