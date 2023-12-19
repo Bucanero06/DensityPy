@@ -141,7 +141,8 @@ Options:
 
 
 ## Documentation
-The documentation is currently being updated, but you can find the latest version [here](https://bucanero06.github.io/DensityPy/).
+The documentation is currently being updated, but you can find the latest version 
+[here](https://bucanero06.github.io/DensityPy/) [GITHUBPAGES-PENDING]. 
 Running the following command will generate the documentation locally using Sphinx and FORD for 
 [python](densitypy%2Fautodocumentation_python.py) and [fortran](densitypy%2Fautodocumentation_fortran.py) respectively:
 ```bash
