@@ -1,0 +1,15 @@
+densitypy.project_utils.file_parsing
+====================================
+
+.. automodule:: densitypy.project_utils.file_parsing
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. click:: densitypy.project_utils.file_parsing:cli_run
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: densitypy.project_utils.file_parsing
+    :parts: 1
+

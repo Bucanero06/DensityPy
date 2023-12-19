@@ -1,0 +1,15 @@
+densitypy.molcas.DipolesLogParser
+=================================
+
+.. automodule:: densitypy.molcas.DipolesLogParser
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. click:: densitypy.molcas.DipolesLogParser:cli_run
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: densitypy.molcas.DipolesLogParser
+    :parts: 1
+

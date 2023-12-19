@@ -1,0 +1,15 @@
+densitypy.molcas.selectionofactivespace
+=======================================
+
+.. automodule:: densitypy.molcas.selectionofactivespace
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. click:: densitypy.molcas.selectionofactivespace:cli_run
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: densitypy.molcas.selectionofactivespace
+    :parts: 1
+

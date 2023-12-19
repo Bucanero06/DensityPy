@@ -141,5 +141,26 @@ Options:
 
 
 ## Documentation
-python -m Documentation.autodocumentation_fortran --project_name "Charge Migration" --project_description "Fortran code for the calculation of the charge migration in molecules. Interfaced with Python's DensityPy library." --source_dirs "densityfort/ChargeMigration,densityfort/ChargeMigrationFT,densityfort/SpectrumReconstruction" --documentation_dir "Documentation/fortrandocs" --exclude_dirs "densityfort/ChargeMigration/src/future_reconstruction_using_ci_work,densityfort/ChargeMigrationFT/src/future_reconstruction_using_ci_work" --graphs True --delete_old_files True
-python -m Documentation.autodocumentation_python -p DensityPy -a "Ruben Fernandez Carbon" -s densitypy -d Documentation/pythondocs -e venv,Studies,old_files,densityfort,densitypy/frontend_tbd,frontend_tbd,Documentation/pythondocs -r
+The documentation is currently being updated, but you can find the latest version [here](https://bucanero06.github.io/DensityPy/).
+Running the following command will generate the documentation locally using Sphinx and FORD for 
+[python](densitypy%2Fautodocumentation_python.py) and [fortran](densitypy%2Fautodocumentation_fortran.py) respectively:
+```bash
+bash update_documentation.sh
+```
+or if needed
+```
+python -m densitypy.autodocumentation_python 
+        -p DensityPy -a {Author} -s {DENSITYPYROOTDIR} -d {OUTPUTDOCUMENTATIONDIR} -e [EXCLUDEDIRS] -r
+        
+python -m densitypy.autodocumentation_fortran 
+        --project_name "Charge Migration" --project_description {...} 
+        --source_dirs "densityfort/ChargeMigration,densityfort/ChargeMigrationFT,densityfort/SpectrumReconstruction" 
+        --documentation_dir "docs/fortrandocs" 
+        --exclude_dirs "densityfort/ChargeMigration/src/future_reconstruction_using_ci_work,densityfort/ChargeMigrationFT/src/future_reconstruction_using_ci_work" 
+        --graphs True --remove_old_files
+```
+The documentation can handle
+
+autodocumentation of docstrings for both modules and functions, handling markdown as well as latex and the generation 
+of inheritance diagrams.
+

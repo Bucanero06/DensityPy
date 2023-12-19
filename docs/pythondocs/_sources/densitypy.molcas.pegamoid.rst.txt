@@ -1,0 +1,15 @@
+densitypy.molcas.pegamoid
+=========================
+
+.. automodule:: densitypy.molcas.pegamoid
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. click:: densitypy.molcas.pegamoid:cli_run
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: densitypy.molcas.pegamoid
+    :parts: 1
+

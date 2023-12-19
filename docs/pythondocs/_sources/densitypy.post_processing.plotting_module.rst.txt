@@ -1,0 +1,15 @@
+densitypy.post_processing.plotting_module
+=========================================
+
+.. automodule:: densitypy.post_processing.plotting_module
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. click:: densitypy.post_processing.plotting_module:cli_run
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: densitypy.post_processing.plotting_module
+    :parts: 1
+

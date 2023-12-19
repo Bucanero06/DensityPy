@@ -1,0 +1,15 @@
+densitypy.project_utils.fortran_compilation_handler
+===================================================
+
+.. automodule:: densitypy.project_utils.fortran_compilation_handler
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. click:: densitypy.project_utils.fortran_compilation_handler:cli_run
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: densitypy.project_utils.fortran_compilation_handler
+    :parts: 1
+

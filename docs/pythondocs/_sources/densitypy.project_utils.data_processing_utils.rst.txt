@@ -1,0 +1,15 @@
+densitypy.project_utils.data_processing_utils
+=============================================
+
+.. automodule:: densitypy.project_utils.data_processing_utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. click:: densitypy.project_utils.data_processing_utils:cli_run
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: densitypy.project_utils.data_processing_utils
+    :parts: 1
+

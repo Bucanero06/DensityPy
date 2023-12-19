@@ -1,0 +1,15 @@
+densitypy.post_processing.chden_plotting_needs_work_to_update.plottingscripts
+=============================================================================
+
+.. automodule:: densitypy.post_processing.chden_plotting_needs_work_to_update.plottingscripts
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. click:: densitypy.post_processing.chden_plotting_needs_work_to_update.plottingscripts:cli_run
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: densitypy.post_processing.chden_plotting_needs_work_to_update.plottingscripts
+    :parts: 1
+
