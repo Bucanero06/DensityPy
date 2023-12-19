@@ -7,7 +7,7 @@ import sys
 
 from densitypy.molcas.molcasscripts import copy_and_prepare_molcas_input_file_for_run, call_open_molcas
 from densitypy.project_utils.command_execution import execute_command, print_molcas_log_errors
-from densitypy.project_utils.file_directory_ops import find, make_directory, copy_file_to
+from densitypy.project_utils.file_directory_ops import find, make_directory, copy_to
 
 
 def SelectionOfActiveSpace(json_config, **kwargs):
@@ -35,7 +35,7 @@ def SelectionOfActiveSpace(json_config, **kwargs):
 
     # Prepare Input
     make_directory(molcas_output_directory)
-    copy_file_to(xyz_geometry_path, molcas_output_directory)
+    copy_to(xyz_geometry_path, molcas_output_directory)
     temp_project_name = f'selecting_space_{project_name}'
     molcas_input_path = path.join(molcas_output_directory, f'{temp_project_name}.input')
 

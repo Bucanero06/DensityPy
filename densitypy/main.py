@@ -12,17 +12,17 @@ from densitypy.molcas.molcasscripts import create_help_input_file, copy_and_prep
     load_project_rasscf_h5_file, write_grid_density_file
 from densitypy.molcas.selectionofactivespace import SelectionOfActiveSpace
 from densitypy.post_processing.plotting_module import plot_2d_spectrum, plot_2d_spectrum_peak_analysis, \
-    difference_between_dipole_and_atomic_charges_v_time, plot_pulses, plot_ft_pulses, plot_dipoles_v_time, \
+    plot_pulses, plot_ft_pulses, plot_dipoles_v_time, \
     plot_atomic_dipoles_v_time, plot_ft_all_dipoles_v_time, plot_ft_all_atomic_dipoles_v_time
 from densitypy.project_utils.configuration_parser import parse_configuration_file
-from densitypy.project_utils.file_directory_ops import change_directory_manager, make_directory, copy_file_to, \
+from densitypy.project_utils.file_directory_ops import change_directory_manager, make_directory, copy_to, \
     file_lenth, find
 from densitypy.project_utils.logger import setup_logger
 
 logger = setup_logger(__name__.split('.')[-1])
 
 
-def run_densitypy(study_directory,json_config_path, molcas_input,
+def run_densitypy(study_directory, json_config_path, molcas_input,
                   run_charge_migration=False, run_charge_migration_ft=False,
                   run_spectrum_reconstruction=False,
                   field_file_help=False, molcas_input_help=False,
@@ -30,13 +30,10 @@ def run_densitypy(study_directory,json_config_path, molcas_input,
                   debug_mode=False, justh5=False, justgetdipoles=False, justgetdensity=False,
                   weights_file=None, givenfieldfile=None,
                   make_fortran=False, make_fortran_config=None,
-
                   plot=True  # todo usage to be changed, here for testing
-
                   ):
     """
-    Entry Way to DensityPy
-    This function is engineered to facilitate computational chemistry simulations with OpenMolcas and the ASTRA-ChargeMigration Fortran code.
+    Entry Way to DensityPy. This function is engineered to facilitate computational chemistry simulations with OpenMolcas and the ASTRA-ChargeMigration Fortran code.
 
     Functionality and Scope:
         Molcas Integration: Incorporates Molcas for quantum chemical calculations, essential for accurate modeling of electronic structures.
@@ -44,28 +41,27 @@ def run_densitypy(study_directory,json_config_path, molcas_input,
         Data Visualization and Analysis: Provides tools for generating plots and graphs, crucial for interpreting complex simulation data.
         Configurable Workflow: Leverages a JSON-based configuration system, allowing for flexible and detailed setup of simulation parameters.
 
-    Parameters
+    Parameters:
         json_config_path: String, path to the JSON configuration file.
         study_directory: String, directory path for output and intermediate files.
         molcas_input: String, optional path to the Molcas input file.
         Additional flags and options to control specific features and modes of operation.
 
     Usage:
-        run_densitypy(json_config_path="xy_polarized_config.json",
-                  study_directory="Studies/ExampleStudy",
-                  molcas_input=False,  # 'molcas_input_help.input', # False just means not running molcas
-                  run_charge_migration=True,
-                  run_charge_migration_ft=True,
-                  run_spectrum_reconstruction=True,
-                  plot=True,
-                  #
-                  field_file_help=False, molcas_input_help=False,
-                  scforbs=False, gridit=True, write_charge_migration=None, debug_mode=False,
-                  justh5=False, justgetdipoles=False, justgetdensity=False, weights_file=None, givenfieldfile=None,
-                  make_fortran=False, make_fortran_config={'directory': '/home/ruben/PycharmProjects/DensityPy/densityfort',
-                                 'make_flags': 'all DEB_FLAG=d'}
-                    )
+        run_densitypy(
+              json_config_path="xy_polarized_config.json",
+              study_directory="Studies/ExampleStudy",
+              molcas_input='molcas_input_help.input',
+              run_charge_migration=True,
+              run_charge_migration_ft=True,
+              run_spectrum_reconstruction=True,
+              plot=True,
+              field_file_help=False, molcas_input_help=False,
+              scforbs=False, gridit=True, write_charge_migration=None, debug_mode=False,
+              justh5=False, justgetdipoles=False, justgetdensity=False, weights_file=None, givenfieldfile=None,
+              make_fortran=False, make_fortran_config={'directory': '/home/ruben/PycharmProjects/DensityPy/densityfort','make_flags': 'all DEB_FLAG=d'})
     """
+
 
     if make_fortran:
         from densitypy.project_utils.fortran_compilation_handler import compile_ifort_fortran_code
@@ -211,7 +207,7 @@ def run_densitypy(study_directory,json_config_path, molcas_input,
                                                                                project_name=project_name,
                                                                                molcas_directory=molcas_output_directory)
 
-            copy_file_to(xyz_geometry_path, molcas_output_directory)
+            copy_to(xyz_geometry_path, molcas_output_directory)
 
             # gridit can be fixme deprecated until updated to use new grid algorithm
             #   True = use gridit on molcas with with uniform grid points
@@ -240,10 +236,10 @@ def run_densitypy(study_directory,json_config_path, molcas_input,
             # >Run Open Molcas
             call_open_molcas(project_name, molcas_output_directory)
             # Extract Data Required for Charge Migration
-            copy_file_to(molcas_input, molcas_output_directory + "/")
+            copy_to(molcas_input, molcas_output_directory + "/")
             logfilepath = find(project_name + ".log", ".", molcas_output_directory)
-            copy_file_to(logfilepath + "/" + project_name + ".log ", molcas_output_directory + "/")
-            copy_file_to(xyz_geometry_path, molcas_output_directory + "/")
+            copy_to(logfilepath + "/" + project_name + ".log ", molcas_output_directory + "/")
+            copy_to(xyz_geometry_path, molcas_output_directory + "/")
 
             if "RASSI" in keywords_needed_found:  # todo add to documentation that dipoles are only parsed for RASSI
                 project = DipolesLogParser(log_path=f'{molcas_output_directory}/{project_name}.log')
@@ -363,6 +359,7 @@ if __name__ == "__main__":
     )
 
 # counting them down
+
 # todo
 #   -update gridit to use the new grid algorithm:
 #       -OpenMolcas GridIt is not maintained, has different bugs across versions, and worst is slow for our purposes
@@ -373,6 +370,7 @@ if __name__ == "__main__":
 #         read before.
 #       -Use the better grids for improved results and a lower computational cost
 #       -Improve analysis to see better the information at the peaks
+#   -Code Review for Lindblad Equation and Becke Weights
 #   -modularize the fortran codebase for Lindblad Equation and Becke Weights
 #   -Instead of using the second pulse as timedelay we should use the last pulse since that would be the probe
 #   -update for C_i optimization and reconstruction
