@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>project_utils.data_processing_utils &mdash; DensityPy 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=f6245a2f"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            DensityPy
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli_run.html">cli_run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Default_Settings.default_config.html">Default_Settings.default_config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autodocumentation_fortran.html">autodocumentation_fortran</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autodocumentation_python.html">autodocumentation_python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../charge_migration.chargemigratonscripts.html">charge_migration.chargemigratonscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../charge_migration.difference_dipole_charge.html">charge_migration.difference_dipole_charge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../main.html">main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../molcas.DipolesLogParser.html">molcas.DipolesLogParser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../molcas.molcasscripts.html">molcas.molcasscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../molcas.pegamoid.html">molcas.pegamoid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../molcas.selectionofactivespace.html">molcas.selectionofactivespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../post_processing.chden_plotting_needs_work_to_update.plotdensity.html">post_processing.chden_plotting_needs_work_to_update.plotdensity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../post_processing.chden_plotting_needs_work_to_update.plottingscripts.html">post_processing.chden_plotting_needs_work_to_update.plottingscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../post_processing.chden_plotting_needs_work_to_update.rpoints2vtk.html">post_processing.chden_plotting_needs_work_to_update.rpoints2vtk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../post_processing.plotting_module.html">post_processing.plotting_module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_utils.command_execution.html">project_utils.command_execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_utils.configuration_parser.html">project_utils.configuration_parser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_utils.data_processing_utils.html">project_utils.data_processing_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_utils.file_directory_ops.html">project_utils.file_directory_ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_utils.file_parsing.html">project_utils.file_parsing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_utils.fortran_compilation_handler.html">project_utils.fortran_compilation_handler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_utils.logger.html">project_utils.logger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project_utils.string_dict_utils.html">project_utils.string_dict_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs.pythondocs.source.conf.html">docs.pythondocs.source.conf</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DensityPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">project_utils.data_processing_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for project_utils.data_processing_utils</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python3.10</span>
+<span class="kn">import</span> <span class="nn">decimal</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">h5py</span> <span class="k">as</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">project_utils.logger</span> <span class="kn">import</span> <span class="n">setup_logger</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="extract_datasets_from_h5_to_csv"><a class="viewcode-back" href="../../../project_utils.data_processing_utils.html#project_utils.data_processing_utils.extract_datasets_from_h5_to_csv">[docs]</a><span class="k">def</span> <span class="nf">extract_datasets_from_h5_to_csv</span><span class="p">(</span><span class="n">h5_filepath</span><span class="p">,</span> <span class="n">dataset_mapping</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract specific datasets from an HDF5 file and save them to CSV files.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - h5_filepath: Path to the input HDF5 file.</span>
+<span class="sd">    - dataset_mapping: Dictionary where keys are dataset names in the HDF5 file</span>
+<span class="sd">                       and values are the output filenames for CSV files.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        - it will flatten the data in the dataset to a 2D array if the dataset is a 3D array</span>
+<span class="sd">            - 3D arrays of shape (x, y, z) → 2D arrays of shape (x*y, z)</span>
+<span class="sd">            - 4D arrays of shape (w, x, y, z) → 2D arrays of shape (wxy, z)</span>
+<span class="sd">            - ... and so on.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">h5_filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5_file</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">dataset_name</span><span class="p">,</span> <span class="n">output_file</span> <span class="ow">in</span> <span class="n">dataset_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dataset_name</span> <span class="ow">in</span> <span class="n">h5_file</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracting dataset </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">h5_filepath</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">flatten_ND_to_2D</span><span class="p">(</span><span class="n">h5_file</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">][:])</span>  <span class="c1"># Flatten the data to 2D</span>
+                    <span class="c1"># Save the data as a CSV file</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2"> not found in </span><span class="si">{</span><span class="n">h5_filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error extracting dataset </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="flatten_ND_to_2D"><a class="viewcode-back" href="../../../project_utils.data_processing_utils.html#project_utils.data_processing_utils.flatten_ND_to_2D">[docs]</a><span class="k">def</span> <span class="nf">flatten_ND_to_2D</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Flatten a multi-dimensional array keeping the last dimension and format its values.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">flat</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># Flatten all dimensions except the last one</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">flat</span> <span class="o">=</span> <span class="n">array</span>  <span class="c1"># If already 1D, no reshaping needed</span>
+    <span class="k">return</span> <span class="n">flat</span></div>
+
+
+<div class="viewcode-block" id="float_range"><a class="viewcode-back" href="../../../project_utils.data_processing_utils.html#project_utils.data_processing_utils.float_range">[docs]</a><span class="k">def</span> <span class="nf">float_range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A generator function that yields a range of floating point numbers.</span>
+
+<span class="sd">    :param start: The start of the range.</span>
+<span class="sd">    :param stop: The end of the range.</span>
+<span class="sd">    :param step: The step size.</span>
+<span class="sd">    :type start: float</span>
+<span class="sd">    :type stop: float</span>
+<span class="sd">    :type step: float</span>
+<span class="sd">    :yields: Each value in the range.</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">stop</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="nb">format</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="s1">&#39;.1f&#39;</span><span class="p">)</span>  <span class="c1"># float(start)</span>
+        <span class="n">start</span> <span class="o">+=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">step</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_dipole_values_as_array"><a class="viewcode-back" href="../../../project_utils.data_processing_utils.html#project_utils.data_processing_utils.get_dipole_values_as_array">[docs]</a><span class="k">def</span> <span class="nf">get_dipole_values_as_array</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads a file and returns the values of a string in the file as an array.</span>
+
+<span class="sd">    :param filename: The path to the file.</span>
+<span class="sd">    :param string: The string to search for.</span>
+<span class="sd">    :param delimiter: The delimiter that separates the string and its values.</span>
+<span class="sd">    :type filename: str</span>
+<span class="sd">    :type string: str</span>
+<span class="sd">    :type delimiter: str</span>
+<span class="sd">    :return: The values of the string in the file.</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fin</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">string</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">option_value</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">delimiter</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">option_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="natural_sort"><a class="viewcode-back" href="../../../project_utils.data_processing_utils.html#project_utils.data_processing_utils.natural_sort">[docs]</a><span class="k">def</span> <span class="nf">natural_sort</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sorts the given iterable in a natural order.</span>
+
+<span class="sd">    This function is a key-function to the built-in `sorted` function and can be</span>
+<span class="sd">    used as a drop-in replacement for it.</span>
+
+<span class="sd">    A natural sort, also known as an alphanumeric sort, is a sorting method that orders strings containing numbers in</span>
+<span class="sd">    a way that considers the numerical value of the digits rather than treating the entire string as a sequence of</span>
+<span class="sd">    characters. In other words, it sorts strings with numbers in a way that reflects their numerical order.</span>
+
+<span class="sd">    :param iterable: The iterable to be sorted.</span>
+<span class="sd">    :param key: A callable used to extract a comparison key from each element in the iterable.</span>
+<span class="sd">    :param reverse: If set to True, the iterable will be sorted in descending order.</span>
+<span class="sd">    :type iterable: iterable</span>
+<span class="sd">    :type key: callable, optional</span>
+<span class="sd">    :type reverse: bool, optional</span>
+<span class="sd">    :return: A new list containing the sorted elements from the iterable.</span>
+<span class="sd">    :rtype: list</span>
+
+<span class="sd">    Usage::</span>
+<span class="sd">        &gt;&gt;&gt; natural_sort([&#39;2 ft&#39;, &#39;10 ft&#39;, &#39;1 ft&#39;])</span>
+<span class="sd">        [&#39;1 ft&#39;, &#39;2 ft&#39;, &#39;10 ft&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__float_convert</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">__float_convert</span><span class="p">(</span><span class="n">match</span><span class="p">)</span> <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d+|\D+&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ruben Fernandez Carbon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

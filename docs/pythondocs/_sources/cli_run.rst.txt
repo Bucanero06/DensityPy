@@ -1,0 +1,7 @@
+cli_run
+=======
+
+.. automodule:: cli_run
+    :members:
+    :undoc-members:
+    :show-inheritance:

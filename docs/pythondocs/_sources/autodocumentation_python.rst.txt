@@ -1,0 +1,7 @@
+autodocumentation_python
+==================================
+
+.. automodule:: autodocumentation_python
+    :members:
+    :undoc-members:
+    :show-inheritance:

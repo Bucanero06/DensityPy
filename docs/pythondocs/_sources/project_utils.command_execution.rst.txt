@@ -1,0 +1,7 @@
+project_utils.command_execution
+=========================================
+
+.. automodule:: project_utils.command_execution
+    :members:
+    :undoc-members:
+    :show-inheritance:

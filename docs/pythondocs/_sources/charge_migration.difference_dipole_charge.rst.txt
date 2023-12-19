@@ -1,0 +1,7 @@
+charge_migration.difference_dipole_charge
+===================================================
+
+.. automodule:: charge_migration.difference_dipole_charge
+    :members:
+    :undoc-members:
+    :show-inheritance:

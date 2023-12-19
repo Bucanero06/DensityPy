@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autodocumentation_python &mdash; DensityPy 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=f6245a2f"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            DensityPy
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli_run.html">cli_run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Default_Settings.default_config.html">Default_Settings.default_config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autodocumentation_fortran.html">autodocumentation_fortran</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autodocumentation_python.html">autodocumentation_python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charge_migration.chargemigratonscripts.html">charge_migration.chargemigratonscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charge_migration.difference_dipole_charge.html">charge_migration.difference_dipole_charge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../main.html">main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.DipolesLogParser.html">molcas.DipolesLogParser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.molcasscripts.html">molcas.molcasscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.pegamoid.html">molcas.pegamoid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../molcas.selectionofactivespace.html">molcas.selectionofactivespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.chden_plotting_needs_work_to_update.plotdensity.html">post_processing.chden_plotting_needs_work_to_update.plotdensity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.chden_plotting_needs_work_to_update.plottingscripts.html">post_processing.chden_plotting_needs_work_to_update.plottingscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.chden_plotting_needs_work_to_update.rpoints2vtk.html">post_processing.chden_plotting_needs_work_to_update.rpoints2vtk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../post_processing.plotting_module.html">post_processing.plotting_module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.command_execution.html">project_utils.command_execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.configuration_parser.html">project_utils.configuration_parser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.data_processing_utils.html">project_utils.data_processing_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.file_directory_ops.html">project_utils.file_directory_ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.file_parsing.html">project_utils.file_parsing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.fortran_compilation_handler.html">project_utils.fortran_compilation_handler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.logger.html">project_utils.logger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project_utils.string_dict_utils.html">project_utils.string_dict_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docs.pythondocs.source.conf.html">docs.pythondocs.source.conf</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DensityPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autodocumentation_python</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autodocumentation_python</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">project_utils.command_execution</span> <span class="kn">import</span> <span class="n">execute_command</span>
+<span class="kn">from</span> <span class="nn">project_utils.file_directory_ops</span> <span class="kn">import</span> <span class="n">change_directory_manager</span><span class="p">,</span> <span class="n">validate_directory_and_get_full_path</span><span class="p">,</span> \
+    <span class="n">make_directory</span><span class="p">,</span> <span class="n">copy_to</span>
+<span class="kn">from</span> <span class="nn">project_utils.logger</span> <span class="kn">import</span> <span class="n">setup_logger</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">setup_logger</span><span class="p">(</span><span class="s1">&#39;autodocumentation_python&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="initialize_sphinx"><a class="viewcode-back" href="../../autodocumentation_python.html#autodocumentation_python.initialize_sphinx">[docs]</a><span class="k">def</span> <span class="nf">initialize_sphinx</span><span class="p">(</span><span class="n">source_dir</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">author_name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;0.0.1&#39;</span><span class="p">):</span>
+    <span class="c1"># Run sphinx-quickstart automatically</span>
+    <span class="k">with</span> <span class="n">change_directory_manager</span><span class="p">(</span><span class="n">source_dir</span><span class="p">):</span>
+        <span class="n">execute_command</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sphinx-quickstart --quiet &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;--project &#39;</span><span class="si">{</span><span class="n">project_name</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;--author &#39;</span><span class="si">{</span><span class="n">author_name</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;--language en &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;-v </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2"> --release </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2"> &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;--suffix .rst --master index --makefile --batchfile --sep --dot _&quot;</span>
+                        <span class="p">)</span></div>
+        <span class="c1"># subprocess.run([&#39;sphinx-quickstart&#39;, &#39;--quiet&#39;, &#39;--project&#39;, str(project_name),  # &#39;--author&#39;, str(author_name),</span>
+        <span class="c1">#                 # &#39;-v&#39;, str(version), &#39;--release&#39;, str(version),</span>
+        <span class="c1">#                 &#39;--language&#39;, &#39;en&#39;, &#39;--suffix&#39;, &#39;.rst&#39;,</span>
+        <span class="c1">#                 &#39;--master&#39;, &#39;index&#39;, &#39;--makefile&#39;, &#39;--batchfile&#39;, &#39;--sep&#39;, &#39;--dot&#39;, &#39;_&#39;], cwd=source_dir)</span>
+
+
+<div class="viewcode-block" id="find_python_modules"><a class="viewcode-back" href="../../autodocumentation_python.html#autodocumentation_python.find_python_modules">[docs]</a><span class="k">def</span> <span class="nf">find_python_modules</span><span class="p">(</span><span class="n">start_path</span><span class="p">,</span> <span class="n">ignore_folders</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">ignore_folders</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ignore_folders</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">exclude_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">start_path</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">ignore_folders</span><span class="p">]</span>
+
+    <span class="n">modules</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">start_path</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">dirs</span><span class="w"> </span><span class="si">= }</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Exclude the specified directories and their subdirectories</span>
+        <span class="n">dirs</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dirs</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude_paths</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">file</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>
+                <span class="n">module_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                <span class="n">module_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">module_path</span><span class="p">,</span> <span class="n">start_path</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">)</span>
+                <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+
+    <span class="c1"># FIXME HOTFIX for plotdensity file, not sure where the error is coming from but is only this module</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">module_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">modules</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;chden_plotting_needs_work_to_update.plotdensit&#39;</span> <span class="ow">in</span> <span class="n">module_path</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;chden_plotting_needs_work_to_update.plotdensity&#39;</span> <span class="ow">in</span> <span class="n">module_path</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;plotdensity in modules&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Replace with plotdensity</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;plotdensit in modules, replacing with plotdensity</span><span class="se">\n</span><span class="s1">&#39;</span>
+                               <span class="sa">f</span><span class="s1">&#39;Original module path: </span><span class="si">{</span><span class="n">module_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">module_path</span> <span class="o">=</span> <span class="n">module_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;plotdensit&#39;</span><span class="p">,</span> <span class="s1">&#39;plotdensity&#39;</span><span class="p">)</span>
+                <span class="n">modules</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">module_path</span>
+
+    <span class="k">return</span> <span class="n">modules</span></div>
+
+
+<div class="viewcode-block" id="update_conf_py"><a class="viewcode-back" href="../../autodocumentation_python.html#autodocumentation_python.update_conf_py">[docs]</a><span class="k">def</span> <span class="nf">update_conf_py</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">,</span> <span class="n">source_dir</span><span class="p">):</span>
+    <span class="n">conf_py_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">,</span> <span class="s1">&#39;conf.py&#39;</span><span class="p">)</span>
+    <span class="n">source_conf_py_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="s1">&#39;conf.py&#39;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">source_conf_py_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">conf_py_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;import os</span><span class="se">\n</span><span class="s2">import sys</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># write the lines</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sys.path.insert(0, os.path.abspath(&#39;</span><span class="si">{</span><span class="n">source_dir</span><span class="si">}</span><span class="s2">&#39;))</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">html_theme = &#39;sphinx_rtd_theme&#39;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">extensions = [</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;    &#39;sphinx.ext.autodoc&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &#39;sphinx.ext.doctest&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &#39;sphinx.ext.intersphinx&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &#39;sphinx.ext.todo&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &#39;sphinx.ext.coverage&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &#39;sphinx.ext.mathjax&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &#39;sphinx.ext.ifconfig&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &#39;sphinx.ext.viewcode&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &#39;sphinx.ext.githubpages&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &#39;sphinx.ext.napoleon&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &#39;sphinx.ext.autosummary&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &#39;sphinx.ext.autosectionlabel&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &#39;sphinx.ext.autodoc.typehints&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &#39;sphinx.ext.inheritance_diagram&#39;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Just in case copy the conf.py file to the source directory</span>
+    <span class="c1"># subprocess.run([&#39;cp&#39;, conf_py_path, source_conf_py_path])</span>
+    <span class="n">execute_command</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cp </span><span class="si">{</span><span class="n">conf_py_path</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">source_conf_py_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_module_rst_files"><a class="viewcode-back" href="../../autodocumentation_python.html#autodocumentation_python.create_module_rst_files">[docs]</a><span class="k">def</span> <span class="nf">create_module_rst_files</span><span class="p">(</span><span class="n">modules</span><span class="p">,</span> <span class="n">rst_dir</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rst_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="s1">.rst&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">module</span><span class="p">)</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">.. automodule:: </span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="se">\n</span><span class="s2">    :members:</span><span class="se">\n</span><span class="s2">    :undoc-members:</span><span class="se">\n</span><span class="s2">    :show-inheritance:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="update_index_rst"><a class="viewcode-back" href="../../autodocumentation_python.html#autodocumentation_python.update_index_rst">[docs]</a><span class="k">def</span> <span class="nf">update_index_rst</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">,</span> <span class="n">modules</span><span class="p">):</span>
+    <span class="n">index_rst_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">,</span> <span class="s1">&#39;index.rst&#39;</span><span class="p">)</span>
+    <span class="n">source_index_rst_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">,</span> <span class="s1">&#39;source/index.rst&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">source_index_rst_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">index_rst_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="c1"># Write descirption</span>
+        <span class="n">in_toctree</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;.. toctree::&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">in_toctree</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">in_toctree</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;:caption: Contents:&#39;</span><span class="p">:</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">modules</span><span class="p">)):</span>  <span class="c1"># Sort and remove duplicates</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   </span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">in_toctree</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                <span class="c1"># End of the toctree block</span>
+                <span class="n">in_toctree</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+    <span class="c1"># Just in case copy the index.rst file to the source directory</span>
+    <span class="c1"># subprocess.run([&#39;cp&#39;, index_rst_path, source_index_rst_path])</span>
+    <span class="n">execute_command</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cp </span><span class="si">{</span><span class="n">index_rst_path</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">source_index_rst_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="build_sphinx_docs"><a class="viewcode-back" href="../../autodocumentation_python.html#autodocumentation_python.build_sphinx_docs">[docs]</a><span class="k">def</span> <span class="nf">build_sphinx_docs</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">):</span>
+    <span class="c1"># subprocess.run([&#39;make&#39;, &#39;html&#39;], cwd=documentation_dir)</span>
+    <span class="k">with</span> <span class="n">change_directory_manager</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">):</span>
+        <span class="n">execute_command</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;make html&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rename_files_and_replace_top_level_package_name"><a class="viewcode-back" href="../../autodocumentation_python.html#autodocumentation_python.rename_files_and_replace_top_level_package_name">[docs]</a><span class="k">def</span> <span class="nf">rename_files_and_replace_top_level_package_name</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">top_level_package_name</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Renaming files and replacing top level package name in </span><span class="si">{</span><span class="n">directory</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="c1"># Walk through all files and folders within the directory</span>
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file</span><span class="w"> </span><span class="si">= }</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+
+            <span class="c1"># Check if the file name starts with &#39;&#39; and rename it</span>
+            <span class="n">should_replace_name</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.html&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.txt&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span>
+                <span class="s1">&#39;.js&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.rst&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">should_replace_name</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+                    <span class="n">new_file_name</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">new_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">new_file_name</span><span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">new_file_path</span><span class="p">)</span>
+                    <span class="n">file_path</span> <span class="o">=</span> <span class="n">new_file_path</span>  <span class="c1"># Update file_path to the new file name</span>
+
+                <span class="c1"># Read the file and replace &#39;&#39; with &#39;&#39;</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">filedata</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+                <span class="n">filedata</span> <span class="o">=</span> <span class="n">filedata</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+                <span class="c1"># Write the file out again</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filedata</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../autodocumentation_python.html#autodocumentation_python.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span> <span class="n">author_name</span><span class="p">,</span> <span class="n">source_dir</span><span class="p">,</span> <span class="n">documentation_dir</span><span class="p">,</span> <span class="n">exclude_dirs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delete_old_files</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">source_dir</span> <span class="o">=</span> <span class="n">validate_directory_and_get_full_path</span><span class="p">(</span><span class="n">source_dir</span><span class="p">)</span>
+    <span class="n">documentation_dir</span> <span class="o">=</span> <span class="n">documentation_dir</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">exclude_dirs</span><span class="p">:</span>
+        <span class="n">exclude_dirs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exclude_dirs</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">exclude_dirs</span> <span class="o">=</span> <span class="n">exclude_dirs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="n">exclude_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">exclude_dir</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">exclude_dir</span> <span class="ow">in</span> <span class="n">exclude_dirs</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">exclude_dirs</span><span class="p">:</span>
+        <span class="n">exclude_dirs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">delete_old_files</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">project_utils.file_directory_ops</span> <span class="kn">import</span> <span class="n">delete_files_or_directories</span>
+        <span class="n">delete_files_or_directories</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">)</span>
+
+    <span class="n">documentation_dir</span> <span class="o">=</span> <span class="n">validate_directory_and_get_full_path</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">)</span>
+
+    <span class="n">initialize_sphinx</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">author_name</span><span class="o">=</span><span class="n">author_name</span><span class="p">)</span>
+    <span class="n">modules</span> <span class="o">=</span> <span class="n">find_python_modules</span><span class="p">(</span><span class="n">source_dir</span><span class="p">,</span> <span class="n">ignore_folders</span><span class="o">=</span><span class="n">exclude_dirs</span><span class="p">)</span>
+    <span class="n">update_conf_py</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">,</span> <span class="n">source_dir</span><span class="p">)</span>
+    <span class="n">create_module_rst_files</span><span class="p">(</span><span class="n">modules</span><span class="p">,</span> <span class="n">documentation_dir</span><span class="p">)</span>
+    <span class="n">update_index_rst</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">,</span> <span class="n">modules</span><span class="p">)</span>
+    <span class="c1"># Move the source files into the source directory</span>
+    <span class="n">execute_command</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mv </span><span class="si">{</span><span class="n">documentation_dir</span><span class="si">}</span><span class="s2">/*.rst </span><span class="si">{</span><span class="n">documentation_dir</span><span class="si">}</span><span class="s2">/source/&quot;</span><span class="p">)</span>
+    <span class="n">build_sphinx_docs</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">)</span>
+    <span class="n">rename_files_and_replace_top_level_package_name</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">,</span> <span class="s1">&#39;build&#39;</span><span class="p">,</span> <span class="s1">&#39;html&#39;</span><span class="p">),</span>
+                                                    <span class="n">top_level_package_name</span><span class="o">=</span><span class="n">source_dir</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">clean_up_and_exit</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># make_directory(f&#39;{documentation_dir}_tmp&#39;, delete_if_exists=True)  # New directory</span>
+            <span class="c1"># copy_to(f&#39;{documentation_dir}/build/html/*&#39;, f&#39;{documentation_dir}_tmp/&#39;, True)</span>
+            <span class="c1"># execute_command(f&quot;rm -r {documentation_dir}&quot;)</span>
+            <span class="c1"># execute_command(f&quot;mv {documentation_dir}_tmp {documentation_dir}&quot;)</span>
+
+            <span class="n">execute_command</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mv </span><span class="si">{</span><span class="n">documentation_dir</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">documentation_dir</span><span class="si">}</span><span class="s2">_tmp&quot;</span><span class="p">)</span>
+            <span class="n">make_directory</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">documentation_dir</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">delete_if_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># New directory</span>
+            <span class="n">copy_to</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">documentation_dir</span><span class="si">}</span><span class="s1">_tmp/build/html/*&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">documentation_dir</span><span class="si">}</span><span class="s1">/&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to clean up </span><span class="si">{</span><span class="n">documentation_dir</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">execute_command</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rm -r </span><span class="si">{</span><span class="n">documentation_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">execute_command</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mv </span><span class="si">{</span><span class="n">documentation_dir</span><span class="si">}</span><span class="s2">_tmp </span><span class="si">{</span><span class="n">documentation_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">execute_command</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rm -r </span><span class="si">{</span><span class="n">documentation_dir</span><span class="si">}</span><span class="s2">_tmp&quot;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">()</span>
+
+    <span class="n">clean_up_and_exit</span><span class="p">(</span><span class="n">documentation_dir</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">click</span>
+
+
+    <span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+    <span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--project_name&#39;</span><span class="p">,</span> <span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Name of the project&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--author_name&#39;</span><span class="p">,</span> <span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Name of the author&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--source_dir&#39;</span><span class="p">,</span> <span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Source directory&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--documentation_dir&#39;</span><span class="p">,</span> <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Documentation directory&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--exclude_dirs&#39;</span><span class="p">,</span> <span class="s1">&#39;-e&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Directories to exclude&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--remove_old_files&#39;</span><span class="p">,</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Remove old files&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">main_cli</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span> <span class="n">author_name</span><span class="p">,</span> <span class="n">source_dir</span><span class="p">,</span> <span class="n">documentation_dir</span><span class="p">,</span> <span class="n">exclude_dirs</span><span class="p">,</span> <span class="n">remove_old_files</span><span class="p">):</span>
+        <span class="n">main</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span> <span class="n">author_name</span><span class="p">,</span> <span class="n">source_dir</span><span class="p">,</span> <span class="n">documentation_dir</span><span class="p">,</span> <span class="n">exclude_dirs</span><span class="p">,</span> <span class="n">remove_old_files</span><span class="p">)</span>
+
+
+    <span class="n">main_cli</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ruben Fernandez Carbon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

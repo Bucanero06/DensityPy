@@ -1,0 +1,7 @@
+autodocumentation_fortran
+===================================
+
+.. automodule:: autodocumentation_fortran
+    :members:
+    :undoc-members:
+    :show-inheritance:

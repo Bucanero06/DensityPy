@@ -1,0 +1,7 @@
+docs.pythondocs.source.conf
+===========================
+
+.. automodule:: docs.pythondocs.source.conf
+    :members:
+    :undoc-members:
+    :show-inheritance:

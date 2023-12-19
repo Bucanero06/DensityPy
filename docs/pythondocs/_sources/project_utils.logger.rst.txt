@@ -1,0 +1,7 @@
+project_utils.logger
+==============================
+
+.. automodule:: project_utils.logger
+    :members:
+    :undoc-members:
+    :show-inheritance:

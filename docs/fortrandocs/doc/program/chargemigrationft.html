@@ -1,0 +1,3059 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="Documentation for Charge Migration">
+    <meta name="author" content="" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>ChargeMigrationFT &ndash; Charge Migration</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+      <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">Charge Migration </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/programs.html">Programs</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>ChargeMigrationFT      <small>Program</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip"
+                 data-bs-placement="bottom" data-html="true"
+                 title="34.3% of total for programs.">296 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/main.f90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/main.f90.html'>main.f90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">ChargeMigrationFT</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    $(function () {
+    $('[data-bs-toggle="tooltip"]').tooltip()
+    })
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-inpdir~3">InpDir</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-outdir~3">OutDir</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-filegeometry~3">FileGeometry</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-steptime~6">StepTime</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-stepwidth~6">StepWidth</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-ext_field_file">Ext_field_file</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-verbous~4">Verbous</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-nomegas~16">nOmegas</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-ntauomegas~10">nTauOmegas</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-omegamin~3">OmegaMin</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-omegamax~3">OmegaMax</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-tauomegamin~3">TauOmegaMin</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-tauomegamax~3">TauOmegaMax</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-dipolefttotal~3">DipoleFTtotal</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-dipoleftminus~2">DipoleFTminus</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-dipoleftplus">DipoleFTplus</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-dipoleftwt~4">DipoleFTwt</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-dipoleftww~4">DipoleFTww</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-atomicchargeft~3">AtomicChargeFT</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-chargeftwt~3">ChargeFTwt</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-chargeftww~2">ChargeFTww</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-xuvcharge">XUVCharge</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-omegavec~11">OmegaVec</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-tauomegavec~8">TauOmegaVec</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-tvec~7">tvec</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-iomega">iOmega</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-ntimes">ntimes</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-i~3">i</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-tmin~8">tmin</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-tmax~2">tmax</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-dipole_ft_path_all">DIPOLE_FT_PATH_ALL</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-charge_ft_path_all">CHARGE_FT_PATH_ALL</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-gs_idx">GS_IDX</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-nstates~5">nStates</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-uid_atomicchargeall~3">uid_AtomicChargeALL</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-uid">uid</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-evec~4">Evec</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-zmuev">zMuEV</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-natoms~24">nAtoms</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-atcoord~8">AtCoord</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-atomname~5">AtomName</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-dt~9">dt</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-isim~5">iSim</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-n_simulations~4">N_Simulations</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-simulation_tagv">Simulation_Tagv</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-train~3">train</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-xuvdipole~2">XUVDipole</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-xuvdipoleft">XUVDipoleFT</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-atomicchargeevolution~3">AtomicChargeEvolution</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-debug">Debug</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-ipol">iPol</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-iatom~3">iAtom</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-it">it</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#variable-icoord">iCoord</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#subs-0"
+         aria-expanded="false" aria-controls="subs-0">
+         <h4 class="card-header bg-primary text-white">Subroutines</h4>
+      </a>
+      <div id="subs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../program/chargemigrationft.html#proc-determinenumberoftimes">DetermineNumberOfTimes</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#proc-regularize_xuvdipole">Regularize_XUVDipole</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#proc-regularize_xuvatomiccharge">Regularize_XUVAtomicCharge</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#proc-regularize_dipole_and_atomiccharge1">Regularize_Dipole_and_AtomicCharge1</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#proc-computeft_dipole_and_atomiccharges">ComputeFT_Dipole_and_AtomicCharges</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#proc-regularize_dipole_withrespectto_timedelay">Regularize_Dipole_withRespectto_TimeDelay</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#proc-compute_ftofdipole_withrespectto_time">Compute_FTofDipole_withRespectto_Time</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#proc-regularize_charge_withtimedelay">Regularize_Charge_withtimedelay</a>
+            <a class="list-group-item" href="../program/chargemigrationft.html#proc-compute_ftcharge_withtimedelay">Compute_FTCharge_withTimeDelay</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+        <div class="card mb-4">
+      <h3 class="card-header card-title bg-light">Uses</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <ul class="list-inline">
+                  <li class="list-inline-item">ModulePulses_3D</li>
+                  <li class="list-inline-item">ModuleString</li>
+                  <li class="list-inline-item">ModuleErrorHandling</li>
+                  <li class="list-inline-item">ModuleConstants</li>
+                  <li class="list-inline-item">ModuleDiagonalize</li>
+                  <li class="list-inline-item"><a href='../module/module_cmft_rtp.html'>Module_CMFT_RTP</a></li>
+                  <li class="list-inline-item">ModuleSystemUtils</li>
+                  <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
+                  <li class="list-inline-item">ModuleIO</li>
+                  <li class="list-inline-item"><a href='../module/module_cmft_cd_io.html'>Module_CMFT_CD_IO</a></li>
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: program~~chargemigrationft~~UsesGraph Pages: 1 -->
+<svg id="programchargemigrationftUsesGraph" width="445pt" height="324pt"
+ viewBox="0.00 0.00 445.00 324.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="program~~chargemigrationft~~UsesGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 320)">
+<title>program~~chargemigrationft~~UsesGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-320 441,-320 441,4 -4,4"/>
+<!-- program~chargemigrationft -->
+<g id="program~~chargemigrationft~~UsesGraph_node1" class="node">
+<title>program~chargemigrationft</title>
+<polygon fill="none" stroke="black" points="437,-171 322,-171 322,-147 437,-147 437,-171"/>
+<text text-anchor="middle" x="379.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50">ChargeMigrationFT</text>
+</g>
+<!-- ModuleConstants -->
+<g id="program~~chargemigrationft~~UsesGraph_node2" class="node">
+<title>ModuleConstants</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="115,-316 11,-316 11,-292 115,-292 115,-316"/>
+<text text-anchor="middle" x="63" y="-301.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ModuleConstants</text>
+</g>
+<!-- program~chargemigrationft&#45;&gt;ModuleConstants -->
+<g id="program~~chargemigrationft~~UsesGraph_edge1" class="edge">
+<title>program~chargemigrationft&#45;&gt;ModuleConstants</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M223,-302C191.87,-312.08 155.48,-313.25 125.38,-311.61"/>
+<polygon fill="#000000" stroke="#000000" points="125.22,-308.09 115.01,-310.92 124.76,-315.07 125.22,-308.09"/>
+</g>
+<!-- ModuleDiagonalize -->
+<g id="program~~chargemigrationft~~UsesGraph_node3" class="node">
+<title>ModuleDiagonalize</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="281.5,-192 166.5,-192 166.5,-168 281.5,-168 281.5,-192"/>
+<text text-anchor="middle" x="224" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ModuleDiagonalize</text>
+</g>
+<!-- program~chargemigrationft&#45;&gt;ModuleDiagonalize -->
+<g id="program~~chargemigrationft~~UsesGraph_edge2" class="edge">
+<title>program~chargemigrationft&#45;&gt;ModuleDiagonalize</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M321.78,-166.76C311.98,-168.1 301.71,-169.51 291.68,-170.88"/>
+<polygon fill="#000000" stroke="#000000" points="291.18,-167.41 281.74,-172.24 292.13,-174.35 291.18,-167.41"/>
+</g>
+<!-- ModuleErrorHandling -->
+<g id="program~~chargemigrationft~~UsesGraph_node4" class="node">
+<title>ModuleErrorHandling</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="126,-274 0,-274 0,-250 126,-250 126,-274"/>
+<text text-anchor="middle" x="63" y="-259.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ModuleErrorHandling</text>
+</g>
+<!-- program~chargemigrationft&#45;&gt;ModuleErrorHandling -->
+<g id="program~~chargemigrationft~~UsesGraph_edge3" class="edge">
+<title>program~chargemigrationft&#45;&gt;ModuleErrorHandling</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M372.4,-171.3C359.68,-195.72 327.98,-250.6 286,-281 262.78,-297.82 252.28,-293.17 225,-302"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M223,-302C212.39,-305.44 155.13,-289.66 112.35,-276.91"/>
+<polygon fill="#000000" stroke="#000000" points="113.23,-273.52 102.64,-274 111.22,-280.23 113.23,-273.52"/>
+</g>
+<!-- ModuleIO -->
+<g id="program~~chargemigrationft~~UsesGraph_node5" class="node">
+<title>ModuleIO</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="255.5,-150 192.5,-150 192.5,-126 255.5,-126 255.5,-150"/>
+<text text-anchor="middle" x="224" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ModuleIO</text>
+</g>
+<!-- program~chargemigrationft&#45;&gt;ModuleIO -->
+<g id="program~~chargemigrationft~~UsesGraph_edge4" class="edge">
+<title>program~chargemigrationft&#45;&gt;ModuleIO</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M321.78,-151.24C303.25,-148.71 283.04,-145.94 265.91,-143.6"/>
+<polygon fill="#000000" stroke="#000000" points="266.07,-140.09 255.68,-142.2 265.12,-147.02 266.07,-140.09"/>
+</g>
+<!-- ModulePulses_3D -->
+<g id="program~~chargemigrationft~~UsesGraph_node6" class="node">
+<title>ModulePulses_3D</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="115.5,-232 10.5,-232 10.5,-208 115.5,-208 115.5,-232"/>
+<text text-anchor="middle" x="63" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ModulePulses_3D</text>
+</g>
+<!-- program~chargemigrationft&#45;&gt;ModulePulses_3D -->
+<g id="program~~chargemigrationft~~UsesGraph_edge5" class="edge">
+<title>program~chargemigrationft&#45;&gt;ModulePulses_3D</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M223,-220C191.14,-223.91 155.41,-224.27 125.91,-223.49"/>
+<polygon fill="#000000" stroke="#000000" points="125.86,-219.99 115.75,-223.18 125.64,-226.99 125.86,-219.99"/>
+</g>
+<!-- ModuleString -->
+<g id="program~~chargemigrationft~~UsesGraph_node7" class="node">
+<title>ModuleString</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="265.5,-108 182.5,-108 182.5,-84 265.5,-84 265.5,-108"/>
+<text text-anchor="middle" x="224" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ModuleString</text>
+</g>
+<!-- program~chargemigrationft&#45;&gt;ModuleString -->
+<g id="program~~chargemigrationft~~UsesGraph_edge6" class="edge">
+<title>program~chargemigrationft&#45;&gt;ModuleString</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M353.65,-146.94C335.18,-138.17 309.27,-126.26 286,-117 281.31,-115.13 276.38,-113.27 271.43,-111.47"/>
+<polygon fill="#000000" stroke="#000000" points="272.57,-108.16 261.98,-108.1 270.22,-114.76 272.57,-108.16"/>
+</g>
+<!-- ModuleSystemUtils -->
+<g id="program~~chargemigrationft~~UsesGraph_node8" class="node">
+<title>ModuleSystemUtils</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="280.5,-66 167.5,-66 167.5,-42 280.5,-42 280.5,-66"/>
+<text text-anchor="middle" x="224" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ModuleSystemUtils</text>
+</g>
+<!-- program~chargemigrationft&#45;&gt;ModuleSystemUtils -->
+<g id="program~~chargemigrationft~~UsesGraph_edge7" class="edge">
+<title>program~chargemigrationft&#45;&gt;ModuleSystemUtils</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M368.03,-146.74C352.04,-128.71 319.79,-95 286,-75 283.02,-73.24 279.87,-71.59 276.63,-70.06"/>
+<polygon fill="#000000" stroke="#000000" points="277.92,-66.81 267.35,-66.06 275.15,-73.23 277.92,-66.81"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="program~~chargemigrationft~~UsesGraph_node9" class="node">
+<title>iso_fortran_env</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="110,-190 16,-190 16,-166 110,-166 110,-190"/>
+<text text-anchor="middle" x="63" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</g>
+<!-- program~chargemigrationft&#45;&gt;iso_fortran_env -->
+<g id="program~~chargemigrationft~~UsesGraph_edge8" class="edge">
+<title>program~chargemigrationft&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M358.06,-171.08C329.47,-187.02 275.38,-213.82 225,-220"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M223,-220C211.99,-221.35 155.76,-205.59 113.27,-192.99"/>
+<polygon fill="#000000" stroke="#000000" points="114.2,-189.61 103.61,-190.11 112.2,-196.32 114.2,-189.61"/>
+</g>
+<!-- module~module_cmft_cd_io -->
+<g id="program~~chargemigrationft~~UsesGraph_node10" class="node">
+<title>module~module_cmft_cd_io</title>
+<g id="a_program~~chargemigrationft~~UsesGraph_node10"><a xlink:href=".././module/module_cmft_cd_io.html" xlink:title="Module_CMFT_CD_IO">
+<polygon fill="#337ab7" stroke="#337ab7" points="286,-272 162,-272 162,-248 286,-248 286,-272"/>
+<text text-anchor="middle" x="224" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;module~module_cmft_cd_io -->
+<g id="program~~chargemigrationft~~UsesGraph_edge9" class="edge">
+<title>program~chargemigrationft&#45;&gt;module~module_cmft_cd_io</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M365.89,-171.17C348.84,-187.14 316.99,-215.33 286,-234 280.1,-237.55 273.63,-240.86 267.18,-243.85"/>
+<polygon fill="#000000" stroke="#000000" points="265.54,-240.75 257.8,-247.99 268.36,-247.15 265.54,-240.75"/>
+</g>
+<!-- module~module_cmft_rtp -->
+<g id="program~~chargemigrationft~~UsesGraph_node11" class="node">
+<title>module~module_cmft_rtp</title>
+<g id="a_program~~chargemigrationft~~UsesGraph_node11"><a xlink:href=".././module/module_cmft_rtp.html" xlink:title="Module_CMFT_RTP">
+<polygon fill="#337ab7" stroke="#337ab7" points="279.5,-24 168.5,-24 168.5,0 279.5,0 279.5,-24"/>
+<text text-anchor="middle" x="224" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_RTP</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;module~module_cmft_rtp -->
+<g id="program~~chargemigrationft~~UsesGraph_edge10" class="edge">
+<title>program~chargemigrationft&#45;&gt;module~module_cmft_rtp</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M372.7,-146.68C360.3,-121.64 328.83,-64.53 286,-33 283.91,-31.46 281.7,-30.03 279.4,-28.69"/>
+<polygon fill="#000000" stroke="#000000" points="280.72,-25.44 270.22,-24.03 277.55,-31.68 280.72,-25.44"/>
+</g>
+<!-- module~module_cmft_cd_io&#45;&gt;ModuleConstants -->
+<g id="program~~chargemigrationft~~UsesGraph_edge11" class="edge">
+<title>module~module_cmft_cd_io&#45;&gt;ModuleConstants</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M179.55,-272.02C160.27,-277.36 137.4,-283.69 117.12,-289.3"/>
+<polygon fill="#000000" stroke="#000000" points="116.1,-285.95 107.39,-291.99 117.97,-292.7 116.1,-285.95"/>
+</g>
+<!-- module~module_cmft_cd_io&#45;&gt;ModuleErrorHandling -->
+<g id="program~~chargemigrationft~~UsesGraph_edge12" class="edge">
+<title>module~module_cmft_cd_io&#45;&gt;ModuleErrorHandling</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M161.98,-260.77C153.55,-260.87 144.82,-260.98 136.2,-261.09"/>
+<polygon fill="#000000" stroke="#000000" points="136.13,-257.59 126.17,-261.22 136.21,-264.59 136.13,-257.59"/>
+</g>
+<!-- module~module_cmft_cd_io&#45;&gt;ModulePulses_3D -->
+<g id="program~~chargemigrationft~~UsesGraph_edge13" class="edge">
+<title>module~module_cmft_cd_io&#45;&gt;ModulePulses_3D</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M175.29,-248C158.55,-243.79 139.55,-239.01 122.05,-234.6"/>
+<polygon fill="#000000" stroke="#000000" points="122.5,-231.11 111.95,-232.06 120.79,-237.9 122.5,-231.11"/>
+</g>
+<!-- module~module_cmft_cd_io&#45;&gt;iso_fortran_env -->
+<g id="program~~chargemigrationft~~UsesGraph_edge14" class="edge">
+<title>module~module_cmft_cd_io&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M188.61,-247.95C179.61,-244.11 170.15,-239.42 162,-234 143.42,-221.64 145.04,-210.64 126,-199 123.19,-197.28 120.22,-195.68 117.16,-194.2"/>
+<polygon fill="#000000" stroke="#000000" points="118.37,-190.9 107.8,-190.08 115.55,-197.31 118.37,-190.9"/>
+</g>
+</g>
+</svg>
+</div>        <div><a type="button" class="graph-help" data-toggle="modal" href="#UsesGraph-help-text">Help</a></div>
+          <div class="modal fade" id="UsesGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                </div>
+              <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ </div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+    <p>\mainpage Program <ProgramName> <Insert here what the program does></p>
+<p>Synopsis:</p>
+<hr>
+<div class="codehilite"><pre><span></span><code> &lt;Program Name&gt; &lt;mandatory run-time parameters (RTP)&gt; [&lt;optional RTP&gt;]
+</code></pre></div>
+
+<hr>
+<p>Description:</p>
+<hr>
+<p>Input parameters:      {#Input_Parameters}
+ =================
+ <a href="@ref ...Input">...Input</a> as specified in the command line.</p>
+<p>\file</p>
+<p>!</p>
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: program~~chargemigrationft~~CallsGraph Pages: 1 -->
+<svg id="programchargemigrationftCallsGraph" width="641pt" height="1082pt"
+ viewBox="0.00 0.00 641.00 1082.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="program~~chargemigrationft~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 1078)">
+<title>program~~chargemigrationft~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1078 637,-1078 637,4 -4,4"/>
+<!-- program~chargemigrationft -->
+<g id="program~~chargemigrationft~~CallsGraph_node1" class="node">
+<title>program~chargemigrationft</title>
+<polygon fill="none" stroke="black" points="115,-528 0,-528 0,-504 115,-504 115,-528"/>
+<text text-anchor="middle" x="57.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50">ChargeMigrationFT</text>
+</g>
+<!-- parse_simulation_file -->
+<g id="program~~chargemigrationft~~CallsGraph_node2" class="node">
+<title>parse_simulation_file</title>
+<polygon fill="#777777" stroke="#777777" points="392.5,-1032 267.5,-1032 267.5,-1008 392.5,-1008 392.5,-1032"/>
+<text text-anchor="middle" x="330" y="-1017.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parse_simulation_file</text>
+</g>
+<!-- program~chargemigrationft&#45;&gt;parse_simulation_file -->
+<g id="program~~chargemigrationft~~CallsGraph_edge1" class="edge">
+<title>program~chargemigrationft&#45;&gt;parse_simulation_file</title>
+<path fill="none" stroke="#000000" d="M58.96,-528.31C61.81,-597 79.28,-932.25 151,-999 179,-1025.06 221.16,-1030.94 257.42,-1030"/>
+<polygon fill="#000000" stroke="#000000" points="257.64,-1033.49 267.48,-1029.57 257.34,-1026.5 257.64,-1033.49"/>
+</g>
+<!-- proc~appenddipole2ftallfile -->
+<g id="program~~chargemigrationft~~CallsGraph_node3" class="node">
+<title>proc~appenddipole2ftallfile</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node3"><a xlink:href=".././proc/appenddipole2ftallfile.html" xlink:title="Module_CMFT_CD_IO::AppendDipole2FTAllFile">
+<polygon fill="#d9534f" stroke="#d9534f" points="458,-444 202,-444 202,-420 458,-420 458,-444"/>
+<text text-anchor="middle" x="330" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::AppendDipole2FTAllFile</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~appenddipole2ftallfile -->
+<g id="program~~chargemigrationft~~CallsGraph_edge2" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~appenddipole2ftallfile</title>
+<path fill="none" stroke="#000000" d="M71.73,-503.88C88.7,-489.12 119.7,-464.7 151,-453 163.9,-448.18 177.66,-444.4 191.6,-441.44"/>
+<polygon fill="#000000" stroke="#000000" points="192.64,-444.8 201.77,-439.43 191.28,-437.93 192.64,-444.8"/>
+</g>
+<!-- proc~compute_ftcharge_withtimedelay -->
+<g id="program~~chargemigrationft~~CallsGraph_node4" class="node">
+<title>proc~compute_ftcharge_withtimedelay</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node4"><a xlink:href=".././proc/compute_ftcharge_withtimedelay.html" xlink:title="ChargeMigrationFT::Compute_FTCharge_withTimeDelay">
+<polygon fill="#d9534f" stroke="#d9534f" points="485,-948 175,-948 175,-924 485,-924 485,-948"/>
+<text text-anchor="middle" x="330" y="-933.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ChargeMigrationFT::Compute_FTCharge_withTimeDelay</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~compute_ftcharge_withtimedelay -->
+<g id="program~~chargemigrationft~~CallsGraph_edge3" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~compute_ftcharge_withtimedelay</title>
+<path fill="none" stroke="#000000" d="M59.48,-528.13C64.65,-589.08 90.87,-861.17 151,-915 155.6,-919.12 160.56,-922.73 165.8,-925.88"/>
+<polygon fill="#000000" stroke="#000000" points="164.39,-929.1 174.85,-930.76 167.71,-922.94 164.39,-929.1"/>
+</g>
+<!-- proc~compute_ftofdipole_withrespectto_time -->
+<g id="program~~chargemigrationft~~CallsGraph_node5" class="node">
+<title>proc~compute_ftofdipole_withrespectto_time</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node5"><a xlink:href=".././proc/compute_ftofdipole_withrespectto_time.html" xlink:title="ChargeMigrationFT::Compute_FTofDipole_withRespectto_Time">
+<polygon fill="#d9534f" stroke="#d9534f" points="500.5,-906 159.5,-906 159.5,-882 500.5,-882 500.5,-906"/>
+<text text-anchor="middle" x="330" y="-891.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ChargeMigrationFT::Compute_FTofDipole_withRespectto_Time</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~compute_ftofdipole_withrespectto_time -->
+<g id="program~~chargemigrationft~~CallsGraph_edge4" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~compute_ftofdipole_withrespectto_time</title>
+<path fill="none" stroke="#000000" d="M59.85,-528.35C66.4,-585.76 96.72,-825.65 151,-873 152.17,-874.02 153.37,-875.01 154.58,-875.97"/>
+<polygon fill="#000000" stroke="#000000" points="152.71,-878.94 162.89,-881.87 156.76,-873.23 152.71,-878.94"/>
+</g>
+<!-- proc~computeft_dipole_and_atomiccharges -->
+<g id="program~~chargemigrationft~~CallsGraph_node6" class="node">
+<title>proc~computeft_dipole_and_atomiccharges</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node6"><a xlink:href=".././proc/computeft_dipole_and_atomiccharges.html" xlink:title="ChargeMigrationFT::ComputeFT_Dipole_and_AtomicCharges">
+<polygon fill="#d9534f" stroke="#d9534f" points="497,-864 163,-864 163,-840 497,-840 497,-864"/>
+<text text-anchor="middle" x="330" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ChargeMigrationFT::ComputeFT_Dipole_and_AtomicCharges</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~computeft_dipole_and_atomiccharges -->
+<g id="program~~chargemigrationft~~CallsGraph_edge5" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~computeft_dipole_and_atomiccharges</title>
+<path fill="none" stroke="#000000" d="M60.29,-528.31C68.29,-581.41 102.45,-790 151,-831 152.35,-832.14 153.72,-833.24 155.13,-834.3"/>
+<polygon fill="#000000" stroke="#000000" points="153.19,-837.21 163.42,-839.95 157.13,-831.43 153.19,-837.21"/>
+</g>
+<!-- proc~determinenumberoftimes -->
+<g id="program~~chargemigrationft~~CallsGraph_node7" class="node">
+<title>proc~determinenumberoftimes</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node7"><a xlink:href=".././proc/determinenumberoftimes.html" xlink:title="ChargeMigrationFT::DetermineNumberOfTimes">
+<polygon fill="#d9534f" stroke="#d9534f" points="462,-822 198,-822 198,-798 462,-798 462,-822"/>
+<text text-anchor="middle" x="330" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ChargeMigrationFT::DetermineNumberOfTimes</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~determinenumberoftimes -->
+<g id="program~~chargemigrationft~~CallsGraph_edge6" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~determinenumberoftimes</title>
+<path fill="none" stroke="#000000" d="M58.41,-528.02C58.79,-571.33 66.42,-720.5 151,-789 161.9,-797.83 174.47,-804.19 187.8,-808.7"/>
+<polygon fill="#000000" stroke="#000000" points="187.04,-812.12 197.62,-811.66 189.06,-805.42 187.04,-812.12"/>
+</g>
+<!-- proc~getruntimeparameters~2 -->
+<g id="program~~chargemigrationft~~CallsGraph_node8" class="node">
+<title>proc~getruntimeparameters~2</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node8"><a xlink:href=".././proc/getruntimeparameters~2.html" xlink:title="Module_CMFT_RTP::GetRunTimeParameters">
+<polygon fill="#d9534f" stroke="#d9534f" points="452.5,-990 207.5,-990 207.5,-966 452.5,-966 452.5,-990"/>
+<text text-anchor="middle" x="330" y="-975.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_RTP::GetRunTimeParameters</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~getruntimeparameters~2 -->
+<g id="program~~chargemigrationft~~CallsGraph_edge7" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~getruntimeparameters~2</title>
+<path fill="none" stroke="#000000" d="M59.19,-528.09C63.14,-592.7 85.04,-896.69 151,-957 164.05,-968.94 180.09,-976.61 197.13,-981.32"/>
+<polygon fill="#000000" stroke="#000000" points="196.73,-984.82 207.27,-983.76 198.37,-978.02 196.73,-984.82"/>
+</g>
+<!-- proc~load_dipole -->
+<g id="program~~chargemigrationft~~CallsGraph_node9" class="node">
+<title>proc~load_dipole</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node9"><a xlink:href=".././proc/load_dipole.html" xlink:title="Module_CMFT_CD_IO::Load_Dipole">
+<polygon fill="#d9534f" stroke="#d9534f" points="428.5,-738 231.5,-738 231.5,-714 428.5,-714 428.5,-738"/>
+<text text-anchor="middle" x="330" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::Load_Dipole</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~load_dipole -->
+<g id="program~~chargemigrationft~~CallsGraph_edge8" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~load_dipole</title>
+<path fill="none" stroke="#000000" d="M60.41,-528.31C66.47,-562.82 88.71,-660.85 151,-705 171.31,-719.39 196.3,-726.84 221.07,-730.28"/>
+<polygon fill="#000000" stroke="#000000" points="220.94,-733.79 231.28,-731.48 221.75,-726.84 220.94,-733.79"/>
+</g>
+<!-- proc~load_q_charge_and_write2all -->
+<g id="program~~chargemigrationft~~CallsGraph_node10" class="node">
+<title>proc~load_q_charge_and_write2all</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node10"><a xlink:href=".././proc/load_q_charge_and_write2all.html" xlink:title="Module_CMFT_CD_IO::Load_Q_Charge_and_Write2ALL">
+<polygon fill="#d9534f" stroke="#d9534f" points="480,-696 180,-696 180,-672 480,-672 480,-696"/>
+<text text-anchor="middle" x="330" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::Load_Q_Charge_and_Write2ALL</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~load_q_charge_and_write2all -->
+<g id="program~~chargemigrationft~~CallsGraph_edge9" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~load_q_charge_and_write2all</title>
+<path fill="none" stroke="#000000" d="M62.1,-528.09C71.41,-557.03 99.25,-630.32 151,-663 157.15,-666.88 163.66,-670.23 170.42,-673.11"/>
+<polygon fill="#000000" stroke="#000000" points="169.18,-676.39 179.77,-676.76 171.72,-669.87 169.18,-676.39"/>
+</g>
+<!-- proc~load_xuvatomiccharge -->
+<g id="program~~chargemigrationft~~CallsGraph_node11" class="node">
+<title>proc~load_xuvatomiccharge</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node11"><a xlink:href=".././proc/load_xuvatomiccharge.html" xlink:title="Module_CMFT_CD_IO::Load_XUVAtomicCharge">
+<polygon fill="#d9534f" stroke="#d9534f" points="460,-654 200,-654 200,-630 460,-630 460,-654"/>
+<text text-anchor="middle" x="330" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::Load_XUVAtomicCharge</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~load_xuvatomiccharge -->
+<g id="program~~chargemigrationft~~CallsGraph_edge10" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~load_xuvatomiccharge</title>
+<path fill="none" stroke="#000000" d="M65.21,-528.34C78.31,-551.11 109.69,-599.34 151,-621 163.09,-627.34 176.25,-632.12 189.78,-635.7"/>
+<polygon fill="#000000" stroke="#000000" points="189.14,-639.14 199.68,-638.09 190.78,-632.34 189.14,-639.14"/>
+</g>
+<!-- proc~loadenergies -->
+<g id="program~~chargemigrationft~~CallsGraph_node12" class="node">
+<title>proc~loadenergies</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node12"><a xlink:href=".././proc/loadenergies.html" xlink:title="Module_CMFT_CD_IO::LoadEnergies">
+<polygon fill="#d9534f" stroke="#d9534f" points="432,-780 228,-780 228,-756 432,-756 432,-780"/>
+<text text-anchor="middle" x="330" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::LoadEnergies</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~loadenergies -->
+<g id="program~~chargemigrationft~~CallsGraph_edge11" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~loadenergies</title>
+<path fill="none" stroke="#000000" d="M59.23,-528.07C62.28,-567.13 77.61,-690.78 151,-747 170.02,-761.57 193.7,-769.28 217.52,-772.93"/>
+<polygon fill="#000000" stroke="#000000" points="217.36,-776.44 227.72,-774.25 218.26,-769.49 217.36,-776.44"/>
+</g>
+<!-- proc~loadftdipole_asfuncitonof_timedelay -->
+<g id="program~~chargemigrationft~~CallsGraph_node13" class="node">
+<title>proc~loadftdipole_asfuncitonof_timedelay</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node13"><a xlink:href=".././proc/loadftdipole_asfuncitonof_timedelay.html" xlink:title="Module_CMFT_CD_IO::LoadFTDipole_asfuncitonof_TimeDelay">
+<polygon fill="#d9534f" stroke="#d9534f" points="499,-570 161,-570 161,-546 499,-546 499,-570"/>
+<text text-anchor="middle" x="330" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::LoadFTDipole_asfuncitonof_TimeDelay</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~loadftdipole_asfuncitonof_timedelay -->
+<g id="program~~chargemigrationft~~CallsGraph_edge12" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~loadftdipole_asfuncitonof_timedelay</title>
+<path fill="none" stroke="#000000" d="M107.27,-528.09C121.32,-531.29 136.72,-534.54 151,-537 167.41,-539.82 184.73,-542.38 201.87,-544.67"/>
+<polygon fill="#000000" stroke="#000000" points="201.56,-548.16 211.93,-545.98 202.47,-541.21 201.56,-548.16"/>
+</g>
+<!-- proc~loadftofchargeasfuncoftimedelay -->
+<g id="program~~chargemigrationft~~CallsGraph_node14" class="node">
+<title>proc~loadftofchargeasfuncoftimedelay</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node14"><a xlink:href=".././proc/loadftofchargeasfuncoftimedelay.html" xlink:title="Module_CMFT_CD_IO::LoadFTofChargeasFuncofTimeDelay">
+<polygon fill="#d9534f" stroke="#d9534f" points="491,-528 169,-528 169,-504 491,-504 491,-528"/>
+<text text-anchor="middle" x="330" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::LoadFTofChargeasFuncofTimeDelay</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~loadftofchargeasfuncoftimedelay -->
+<g id="program~~chargemigrationft~~CallsGraph_edge13" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~loadftofchargeasfuncoftimedelay</title>
+<path fill="none" stroke="#000000" d="M115.21,-516C128.42,-516 143.17,-516 158.57,-516"/>
+<polygon fill="#000000" stroke="#000000" points="158.78,-519.5 168.78,-516 158.78,-512.5 158.78,-519.5"/>
+</g>
+<!-- proc~loadgeometry~2 -->
+<g id="program~~chargemigrationft~~CallsGraph_node15" class="node">
+<title>proc~loadgeometry~2</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node15"><a xlink:href=".././proc/loadgeometry~2.html" xlink:title="Module_CMFT_CD_IO::LoadGeometry">
+<polygon fill="#d9534f" stroke="#d9534f" points="435.5,-486 224.5,-486 224.5,-462 435.5,-462 435.5,-486"/>
+<text text-anchor="middle" x="330" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::LoadGeometry</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~loadgeometry~2 -->
+<g id="program~~chargemigrationft~~CallsGraph_edge14" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~loadgeometry~2</title>
+<path fill="none" stroke="#000000" d="M107.27,-503.91C121.32,-500.71 136.72,-497.46 151,-495 171.39,-491.49 193.18,-488.39 214.29,-485.72"/>
+<polygon fill="#000000" stroke="#000000" points="214.76,-489.19 224.26,-484.49 213.9,-482.24 214.76,-489.19"/>
+</g>
+<!-- proc~regularize_charge_withtimedelay -->
+<g id="program~~chargemigrationft~~CallsGraph_node16" class="node">
+<title>proc~regularize_charge_withtimedelay</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node16"><a xlink:href=".././proc/regularize_charge_withtimedelay.html" xlink:title="ChargeMigrationFT::Regularize_Charge_withtimedelay">
+<polygon fill="#d9534f" stroke="#d9534f" points="480.5,-108 179.5,-108 179.5,-84 480.5,-84 480.5,-108"/>
+<text text-anchor="middle" x="330" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ChargeMigrationFT::Regularize_Charge_withtimedelay</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~regularize_charge_withtimedelay -->
+<g id="program~~chargemigrationft~~CallsGraph_edge15" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~regularize_charge_withtimedelay</title>
+<path fill="none" stroke="#000000" d="M59.48,-503.87C64.65,-442.92 90.87,-170.83 151,-117 156.95,-111.67 163.5,-107.2 170.46,-103.47"/>
+<polygon fill="#000000" stroke="#000000" points="171.99,-106.62 179.49,-99.13 168.96,-100.31 171.99,-106.62"/>
+</g>
+<!-- proc~regularize_dipole_and_atomiccharge1 -->
+<g id="program~~chargemigrationft~~CallsGraph_node17" class="node">
+<title>proc~regularize_dipole_and_atomiccharge1</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node17"><a xlink:href=".././proc/regularize_dipole_and_atomiccharge1.html" xlink:title="ChargeMigrationFT::Regularize_Dipole_and_AtomicCharge1">
+<polygon fill="#d9534f" stroke="#d9534f" points="495,-402 165,-402 165,-378 495,-378 495,-402"/>
+<text text-anchor="middle" x="330" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ChargeMigrationFT::Regularize_Dipole_and_AtomicCharge1</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~regularize_dipole_and_atomiccharge1 -->
+<g id="program~~chargemigrationft~~CallsGraph_edge16" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~regularize_dipole_and_atomiccharge1</title>
+<path fill="none" stroke="#000000" d="M65.21,-503.66C78.31,-480.89 109.69,-432.66 151,-411 154.54,-409.14 158.18,-407.42 161.89,-405.82"/>
+<polygon fill="#000000" stroke="#000000" points="163.25,-409.04 171.25,-402.1 160.66,-402.54 163.25,-409.04"/>
+</g>
+<!-- proc~regularize_dipole_withrespectto_timedelay -->
+<g id="program~~chargemigrationft~~CallsGraph_node18" class="node">
+<title>proc~regularize_dipole_withrespectto_timedelay</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node18"><a xlink:href=".././proc/regularize_dipole_withrespectto_timedelay.html" xlink:title="ChargeMigrationFT::Regularize_Dipole_withRespectto_TimeDelay">
+<polygon fill="#d9534f" stroke="#d9534f" points="509,-360 151,-360 151,-336 509,-336 509,-360"/>
+<text text-anchor="middle" x="330" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ChargeMigrationFT::Regularize_Dipole_withRespectto_TimeDelay</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~regularize_dipole_withrespectto_timedelay -->
+<g id="program~~chargemigrationft~~CallsGraph_edge17" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~regularize_dipole_withrespectto_timedelay</title>
+<path fill="none" stroke="#000000" d="M62.1,-503.91C71.41,-474.97 99.25,-401.68 151,-369 153.38,-367.49 155.82,-366.07 158.31,-364.72"/>
+<polygon fill="#000000" stroke="#000000" points="160.1,-367.74 167.51,-360.16 156.99,-361.47 160.1,-367.74"/>
+</g>
+<!-- proc~regularize_xuvatomiccharge -->
+<g id="program~~chargemigrationft~~CallsGraph_node19" class="node">
+<title>proc~regularize_xuvatomiccharge</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node19"><a xlink:href=".././proc/regularize_xuvatomiccharge.html" xlink:title="ChargeMigrationFT::Regularize_XUVAtomicCharge">
+<polygon fill="#d9534f" stroke="#d9534f" points="470,-318 190,-318 190,-294 470,-294 470,-318"/>
+<text text-anchor="middle" x="330" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ChargeMigrationFT::Regularize_XUVAtomicCharge</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~regularize_xuvatomiccharge -->
+<g id="program~~chargemigrationft~~CallsGraph_edge18" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~regularize_xuvatomiccharge</title>
+<path fill="none" stroke="#000000" d="M60.41,-503.69C66.47,-469.18 88.71,-371.15 151,-327 159.94,-320.66 169.79,-315.67 180.13,-311.78"/>
+<polygon fill="#000000" stroke="#000000" points="181.41,-315.04 189.75,-308.5 179.16,-308.41 181.41,-315.04"/>
+</g>
+<!-- proc~regularize_xuvdipole -->
+<g id="program~~chargemigrationft~~CallsGraph_node20" class="node">
+<title>proc~regularize_xuvdipole</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node20"><a xlink:href=".././proc/regularize_xuvdipole.html" xlink:title="ChargeMigrationFT::Regularize_XUVDipole">
+<polygon fill="#d9534f" stroke="#d9534f" points="449.5,-276 210.5,-276 210.5,-252 449.5,-252 449.5,-276"/>
+<text text-anchor="middle" x="330" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ChargeMigrationFT::Regularize_XUVDipole</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~regularize_xuvdipole -->
+<g id="program~~chargemigrationft~~CallsGraph_edge19" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~regularize_xuvdipole</title>
+<path fill="none" stroke="#000000" d="M59.23,-503.93C62.28,-464.87 77.61,-341.22 151,-285 165.38,-273.98 182.43,-266.89 200.18,-262.51"/>
+<polygon fill="#000000" stroke="#000000" points="201.08,-265.9 210.11,-260.35 199.59,-259.06 201.08,-265.9"/>
+</g>
+<!-- proc~savebidimentioal_dipole_spectrum -->
+<g id="program~~chargemigrationft~~CallsGraph_node21" class="node">
+<title>proc~savebidimentioal_dipole_spectrum</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node21"><a xlink:href=".././proc/savebidimentioal_dipole_spectrum.html" xlink:title="Module_CMFT_CD_IO::SaveBidimentioal_Dipole_Spectrum">
+<polygon fill="#d9534f" stroke="#d9534f" points="491,-234 169,-234 169,-210 491,-210 491,-234"/>
+<text text-anchor="middle" x="330" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::SaveBidimentioal_Dipole_Spectrum</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~savebidimentioal_dipole_spectrum -->
+<g id="program~~chargemigrationft~~CallsGraph_edge20" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~savebidimentioal_dipole_spectrum</title>
+<path fill="none" stroke="#000000" d="M58.41,-503.98C58.79,-460.67 66.42,-311.5 151,-243 153.95,-240.61 157.03,-238.39 160.22,-236.35"/>
+<polygon fill="#000000" stroke="#000000" points="161.98,-239.37 168.87,-231.33 158.47,-233.32 161.98,-239.37"/>
+</g>
+<!-- proc~set_cd_io_verbous~3 -->
+<g id="program~~chargemigrationft~~CallsGraph_node22" class="node">
+<title>proc~set_cd_io_verbous~3</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node22"><a xlink:href=".././proc/set_cd_io_verbous~3.html" xlink:title="Module_CMFT_CD_IO::Set_CD_IO_Verbous">
+<polygon fill="#d9534f" stroke="#d9534f" points="447,-192 213,-192 213,-168 447,-168 447,-192"/>
+<text text-anchor="middle" x="330" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::Set_CD_IO_Verbous</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~set_cd_io_verbous~3 -->
+<g id="program~~chargemigrationft~~CallsGraph_edge21" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~set_cd_io_verbous~3</title>
+<path fill="none" stroke="#000000" d="M60.29,-503.69C68.29,-450.59 102.45,-242 151,-201 165.78,-188.52 183.88,-180.86 202.81,-176.42"/>
+<polygon fill="#000000" stroke="#000000" points="203.68,-179.82 212.77,-174.38 202.27,-172.96 203.68,-179.82"/>
+</g>
+<!-- proc~write_bidimentionalchargeftww -->
+<g id="program~~chargemigrationft~~CallsGraph_node23" class="node">
+<title>proc~write_bidimentionalchargeftww</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node23"><a xlink:href=".././proc/write_bidimentionalchargeftww.html" xlink:title="Module_CMFT_CD_IO::Write_BidimentionalChargeFTww">
+<polygon fill="#d9534f" stroke="#d9534f" points="482,-150 178,-150 178,-126 482,-126 482,-150"/>
+<text text-anchor="middle" x="330" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::Write_BidimentionalChargeFTww</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~write_bidimentionalchargeftww -->
+<g id="program~~chargemigrationft~~CallsGraph_edge22" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~write_bidimentionalchargeftww</title>
+<path fill="none" stroke="#000000" d="M59.85,-503.65C66.4,-446.24 96.72,-206.35 151,-159 156.44,-154.26 162.35,-150.2 168.6,-146.75"/>
+<polygon fill="#000000" stroke="#000000" points="170.58,-149.68 178,-142.11 167.48,-143.4 170.58,-149.68"/>
+</g>
+<!-- proc~writeallatomicchargefttosinglefile -->
+<g id="program~~chargemigrationft~~CallsGraph_node24" class="node">
+<title>proc~writeallatomicchargefttosinglefile</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node24"><a xlink:href=".././proc/writeallatomicchargefttosinglefile.html" xlink:title="Module_CMFT_CD_IO::WriteAllAtomicChargeFTtoSingleFile">
+<polygon fill="#d9534f" stroke="#d9534f" points="491,-612 169,-612 169,-588 491,-588 491,-612"/>
+<text text-anchor="middle" x="330" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::WriteAllAtomicChargeFTtoSingleFile</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~writeallatomicchargefttosinglefile -->
+<g id="program~~chargemigrationft~~CallsGraph_edge23" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~writeallatomicchargefttosinglefile</title>
+<path fill="none" stroke="#000000" d="M71.73,-528.12C88.7,-542.88 119.7,-567.3 151,-579 157.27,-581.34 163.74,-583.44 170.33,-585.32"/>
+<polygon fill="#000000" stroke="#000000" points="169.51,-588.72 180.07,-587.91 171.31,-581.95 169.51,-588.72"/>
+</g>
+<!-- proc~writeatomicchargeft -->
+<g id="program~~chargemigrationft~~CallsGraph_node25" class="node">
+<title>proc~writeatomicchargeft</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node25"><a xlink:href=".././proc/writeatomicchargeft.html" xlink:title="Module_CMFT_CD_IO::WriteAtomicChargeFT">
+<polygon fill="#d9534f" stroke="#d9534f" points="453.5,-66 206.5,-66 206.5,-42 453.5,-42 453.5,-66"/>
+<text text-anchor="middle" x="330" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::WriteAtomicChargeFT</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~writeatomicchargeft -->
+<g id="program~~chargemigrationft~~CallsGraph_edge24" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~writeatomicchargeft</title>
+<path fill="none" stroke="#000000" d="M59.19,-503.91C63.14,-439.3 85.04,-135.31 151,-75 163.86,-63.24 179.62,-55.62 196.38,-50.89"/>
+<polygon fill="#000000" stroke="#000000" points="197.48,-54.22 206.35,-48.43 195.81,-47.43 197.48,-54.22"/>
+</g>
+<!-- proc~writedipoleftfile -->
+<g id="program~~chargemigrationft~~CallsGraph_node26" class="node">
+<title>proc~writedipoleftfile</title>
+<g id="a_program~~chargemigrationft~~CallsGraph_node26"><a xlink:href=".././proc/writedipoleftfile.html" xlink:title="Module_CMFT_CD_IO::WriteDipoleFTFile">
+<polygon fill="#d9534f" stroke="#d9534f" points="442,-24 218,-24 218,0 442,0 442,-24"/>
+<text text-anchor="middle" x="330" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module_CMFT_CD_IO::WriteDipoleFTFile</text>
+</a>
+</g>
+</g>
+<!-- program~chargemigrationft&#45;&gt;proc~writedipoleftfile -->
+<g id="program~~chargemigrationft~~CallsGraph_edge25" class="edge">
+<title>program~chargemigrationft&#45;&gt;proc~writedipoleftfile</title>
+<path fill="none" stroke="#000000" d="M58.96,-503.69C61.81,-435 79.28,-99.75 151,-33 166.63,-18.45 186.68,-10.19 207.64,-5.9"/>
+<polygon fill="#000000" stroke="#000000" points="208.41,-9.32 217.66,-4.15 207.21,-2.42 208.41,-9.32"/>
+</g>
+<!-- p -->
+<g id="program~~chargemigrationft~~CallsGraph_node31" class="node">
+<title>p</title>
+<polygon fill="#777777" stroke="#777777" points="616,-528 562,-528 562,-504 616,-504 616,-528"/>
+<text text-anchor="middle" x="589" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p</text>
+</g>
+<!-- proc~appenddipole2ftallfile&#45;&gt;p -->
+<g id="program~~chargemigrationft~~CallsGraph_edge26" class="edge">
+<title>proc~appenddipole2ftallfile&#45;&gt;p</title>
+<path fill="none" stroke="#000000" d="M458.2,-438.23C475.67,-441.6 493.06,-446.35 509,-453 532.71,-462.89 555.15,-482.09 570.01,-496.7"/>
+<polygon fill="#000000" stroke="#000000" points="567.55,-499.19 577.06,-503.86 572.53,-494.28 567.55,-499.19"/>
+</g>
+<!-- add -->
+<g id="program~~chargemigrationft~~CallsGraph_node27" class="node">
+<title>add</title>
+<polygon fill="#777777" stroke="#777777" points="616,-948 562,-948 562,-924 616,-924 616,-948"/>
+<text text-anchor="middle" x="589" y="-933.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">add</text>
+</g>
+<!-- proc~getruntimeparameters~2&#45;&gt;add -->
+<g id="program~~chargemigrationft~~CallsGraph_edge27" class="edge">
+<title>proc~getruntimeparameters~2&#45;&gt;add</title>
+<path fill="none" stroke="#000000" d="M452.96,-965.95C471.79,-963.41 490.97,-960.44 509,-957 523.22,-954.29 538.65,-950.4 552.07,-946.71"/>
+<polygon fill="#000000" stroke="#000000" points="553.2,-950.02 561.88,-943.95 551.31,-943.29 553.2,-950.02"/>
+</g>
+<!-- get -->
+<g id="program~~chargemigrationft~~CallsGraph_node29" class="node">
+<title>get</title>
+<polygon fill="#777777" stroke="#777777" points="616,-906 562,-906 562,-882 616,-882 616,-906"/>
+<text text-anchor="middle" x="589" y="-891.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get</text>
+</g>
+<!-- proc~getruntimeparameters~2&#45;&gt;get -->
+<g id="program~~chargemigrationft~~CallsGraph_edge28" class="edge">
+<title>proc~getruntimeparameters~2&#45;&gt;get</title>
+<path fill="none" stroke="#000000" d="M452.94,-975.83C472.45,-972.08 491.84,-966.15 509,-957 530.69,-945.43 525.55,-930.04 545,-915 547.56,-913.02 550.34,-911.15 553.21,-909.41"/>
+<polygon fill="#000000" stroke="#000000" points="554.91,-912.48 561.98,-904.59 551.53,-906.35 554.91,-912.48"/>
+</g>
+<!-- parse -->
+<g id="program~~chargemigrationft~~CallsGraph_node32" class="node">
+<title>parse</title>
+<polygon fill="#777777" stroke="#777777" points="616,-1074 562,-1074 562,-1050 616,-1050 616,-1074"/>
+<text text-anchor="middle" x="589" y="-1059.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parse</text>
+</g>
+<!-- proc~getruntimeparameters~2&#45;&gt;parse -->
+<g id="program~~chargemigrationft~~CallsGraph_edge29" class="edge">
+<title>proc~getruntimeparameters~2&#45;&gt;parse</title>
+<path fill="none" stroke="#000000" d="M452.94,-980.17C472.45,-983.92 491.84,-989.85 509,-999 530.69,-1010.57 525.55,-1025.96 545,-1041 547.56,-1042.98 550.34,-1044.85 553.21,-1046.59"/>
+<polygon fill="#000000" stroke="#000000" points="551.53,-1049.65 561.98,-1051.41 554.91,-1043.52 551.53,-1049.65"/>
+</g>
+<!-- printusage -->
+<g id="program~~chargemigrationft~~CallsGraph_node33" class="node">
+<title>printusage</title>
+<polygon fill="#777777" stroke="#777777" points="624,-1032 554,-1032 554,-1008 624,-1008 624,-1032"/>
+<text text-anchor="middle" x="589" y="-1017.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">printusage</text>
+</g>
+<!-- proc~getruntimeparameters~2&#45;&gt;printusage -->
+<g id="program~~chargemigrationft~~CallsGraph_edge30" class="edge">
+<title>proc~getruntimeparameters~2&#45;&gt;printusage</title>
+<path fill="none" stroke="#000000" d="M452.96,-990.05C471.79,-992.59 490.97,-995.56 509,-999 520.43,-1001.18 532.64,-1004.12 543.96,-1007.11"/>
+<polygon fill="#000000" stroke="#000000" points="543.07,-1010.49 553.64,-1009.72 544.9,-1003.73 543.07,-1010.49"/>
+</g>
+<!-- setdescription -->
+<g id="program~~chargemigrationft~~CallsGraph_node34" class="node">
+<title>setdescription</title>
+<polygon fill="#777777" stroke="#777777" points="633,-990 545,-990 545,-966 633,-966 633,-990"/>
+<text text-anchor="middle" x="589" y="-975.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">setdescription</text>
+</g>
+<!-- proc~getruntimeparameters~2&#45;&gt;setdescription -->
+<g id="program~~chargemigrationft~~CallsGraph_edge31" class="edge">
+<title>proc~getruntimeparameters~2&#45;&gt;setdescription</title>
+<path fill="none" stroke="#000000" d="M452.73,-978C481.55,-978 510.82,-978 534.73,-978"/>
+<polygon fill="#000000" stroke="#000000" points="534.97,-981.5 544.97,-978 534.97,-974.5 534.97,-981.5"/>
+</g>
+<!-- errormessage -->
+<g id="program~~chargemigrationft~~CallsGraph_node28" class="node">
+<title>errormessage</title>
+<polygon fill="#777777" stroke="#777777" points="632.5,-780 545.5,-780 545.5,-756 632.5,-756 632.5,-780"/>
+<text text-anchor="middle" x="589" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">errormessage</text>
+</g>
+<!-- proc~loadenergies&#45;&gt;errormessage -->
+<g id="program~~chargemigrationft~~CallsGraph_edge32" class="edge">
+<title>proc~loadenergies&#45;&gt;errormessage</title>
+<path fill="none" stroke="#000000" d="M432.2,-768C467.39,-768 505.43,-768 535.12,-768"/>
+<polygon fill="#000000" stroke="#000000" points="535.25,-771.5 545.25,-768 535.25,-764.5 535.25,-771.5"/>
+</g>
+<!-- ncd_phi -->
+<g id="program~~chargemigrationft~~CallsGraph_node30" class="node">
+<title>ncd_phi</title>
+<polygon fill="#777777" stroke="#777777" points="616,-318 562,-318 562,-294 616,-294 616,-318"/>
+<text text-anchor="middle" x="589" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ncd_phi</text>
+</g>
+<!-- proc~regularize_charge_withtimedelay&#45;&gt;ncd_phi -->
+<g id="program~~chargemigrationft~~CallsGraph_edge33" class="edge">
+<title>proc~regularize_charge_withtimedelay&#45;&gt;ncd_phi</title>
+<path fill="none" stroke="#000000" d="M480.92,-101.44C490.94,-105.43 500.43,-110.54 509,-117 563.24,-157.91 580.52,-243.01 585.8,-283.57"/>
+<polygon fill="#000000" stroke="#000000" points="582.35,-284.23 586.99,-293.75 589.31,-283.41 582.35,-284.23"/>
+</g>
+<!-- proc~regularize_dipole_and_atomiccharge1&#45;&gt;ncd_phi -->
+<g id="program~~chargemigrationft~~CallsGraph_edge34" class="edge">
+<title>proc~regularize_dipole_and_atomiccharge1&#45;&gt;ncd_phi</title>
+<path fill="none" stroke="#000000" d="M483.02,-377.94C491.95,-375.43 500.67,-372.48 509,-369 532.71,-359.11 555.15,-339.91 570.01,-325.3"/>
+<polygon fill="#000000" stroke="#000000" points="572.53,-327.72 577.06,-318.14 567.55,-322.81 572.53,-327.72"/>
+</g>
+<!-- proc~regularize_dipole_withrespectto_timedelay&#45;&gt;ncd_phi -->
+<g id="program~~chargemigrationft~~CallsGraph_edge35" class="edge">
+<title>proc~regularize_dipole_withrespectto_timedelay&#45;&gt;ncd_phi</title>
+<path fill="none" stroke="#000000" d="M452.96,-335.95C471.79,-333.41 490.97,-330.44 509,-327 523.22,-324.29 538.65,-320.4 552.07,-316.71"/>
+<polygon fill="#000000" stroke="#000000" points="553.2,-320.02 561.88,-313.95 551.31,-313.29 553.2,-320.02"/>
+</g>
+<!-- proc~regularize_xuvatomiccharge&#45;&gt;ncd_phi -->
+<g id="program~~chargemigrationft~~CallsGraph_edge36" class="edge">
+<title>proc~regularize_xuvatomiccharge&#45;&gt;ncd_phi</title>
+<path fill="none" stroke="#000000" d="M470.03,-306C500.32,-306 529.82,-306 551.75,-306"/>
+<polygon fill="#000000" stroke="#000000" points="551.87,-309.5 561.87,-306 551.87,-302.5 551.87,-309.5"/>
+</g>
+<!-- proc~regularize_xuvdipole&#45;&gt;ncd_phi -->
+<g id="program~~chargemigrationft~~CallsGraph_edge37" class="edge">
+<title>proc~regularize_xuvdipole&#45;&gt;ncd_phi</title>
+<path fill="none" stroke="#000000" d="M449.61,-275.61C469.51,-278.24 489.9,-281.35 509,-285 523.22,-287.71 538.65,-291.6 552.07,-295.29"/>
+<polygon fill="#000000" stroke="#000000" points="551.31,-298.71 561.88,-298.05 553.2,-291.98 551.31,-298.71"/>
+</g>
+<!-- proc~writeallatomicchargefttosinglefile&#45;&gt;p -->
+<g id="program~~chargemigrationft~~CallsGraph_edge38" class="edge">
+<title>proc~writeallatomicchargefttosinglefile&#45;&gt;p</title>
+<path fill="none" stroke="#000000" d="M483.02,-587.94C491.95,-585.43 500.67,-582.48 509,-579 532.71,-569.11 555.15,-549.91 570.01,-535.3"/>
+<polygon fill="#000000" stroke="#000000" points="572.53,-537.72 577.06,-528.14 567.55,-532.81 572.53,-537.72"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprogramchargemigrationftCallsGraph = svgPanZoom('#programchargemigrationftCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>        <div><a type="button" class="graph-help" data-toggle="modal" href="#CallsGraph-help-text">Help</a></div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                </div>
+              <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1.16 1.16) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<br>
+
+    <section>
+    <h2>Variables</h2>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-inpdir~3"></span>
+              character(len=:),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>InpDir</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-outdir~3"></span>
+              character(len=:),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>OutDir</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-filegeometry~3"></span>
+              character(len=:),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>FileGeometry</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-steptime~6"></span>
+              real(kind=kind(1d0))
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>StepTime</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-stepwidth~6"></span>
+              real(kind=kind(1d0))
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>StepWidth</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ext_field_file"></span>
+              character(len=:),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>Ext_field_file</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-verbous~4"></span>
+              logical
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Verbous</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nomegas~16"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nOmegas</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ntauomegas~10"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nTauOmegas</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-omegamin~3"></span>
+              real(kind=kind(1d0))
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>OmegaMin</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-omegamax~3"></span>
+              real(kind=kind(1d0))
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>OmegaMax</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tauomegamin~3"></span>
+              real(kind=kind(1d0))
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>TauOmegaMin</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tauomegamax~3"></span>
+              real(kind=kind(1d0))
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>TauOmegaMax</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dipolefttotal~3"></span>
+              complex(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>DipoleFTtotal</strong>(:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dipoleftminus~2"></span>
+              complex(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>DipoleFTminus</strong>(:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dipoleftplus"></span>
+              complex(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>DipoleFTplus</strong>(:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dipoleftwt~4"></span>
+              complex(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>DipoleFTwt</strong>(:,:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dipoleftww~4"></span>
+              complex(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>DipoleFTww</strong>(:,:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-atomicchargeft~3"></span>
+              complex(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>AtomicChargeFT</strong>(:,:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-chargeftwt~3"></span>
+              complex(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>ChargeFTwt</strong>(:,:,:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-chargeftww~2"></span>
+              complex(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>ChargeFTww</strong>(:,:,:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-xuvcharge"></span>
+              complex(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>XUVCharge</strong>(:,:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-omegavec~11"></span>
+              real(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>OmegaVec</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tauomegavec~8"></span>
+              real(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>TauOmegaVec</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tvec~7"></span>
+              real(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>tvec</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-iomega"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>iOmega</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ntimes"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ntimes</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-i~3"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>i</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tmin~8"></span>
+              real(kind=kind(1d0))
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>tmin</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tmax~2"></span>
+              real(kind=kind(1d0))
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>tmax</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dipole_ft_path_all"></span>
+              character(len=*),
+            </td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>DIPOLE_FT_PATH_ALL</strong></td>
+<td> =</td>
+                <td>&#34;/Dipole/DipoleFT_ALL.csv&#34;</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-charge_ft_path_all"></span>
+              character(len=*),
+            </td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>CHARGE_FT_PATH_ALL</strong></td>
+<td> =</td>
+                <td>&#34;/AtomicCharge/AtomicChargeFT_ALL.csv&#34;</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-gs_idx"></span>
+              integer,
+            </td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>GS_IDX</strong></td>
+<td> =</td>
+                <td>1</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nstates~5"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nStates</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-uid_atomicchargeall~3"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>uid_AtomicChargeALL</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-uid"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>uid</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-evec~4"></span>
+              real(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>Evec</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-zmuev"></span>
+              complex(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>zMuEV</strong>(:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-natoms~24"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nAtoms</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-atcoord~8"></span>
+              real(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>AtCoord</strong>(:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-atomname~5"></span>
+              character(len=16),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>AtomName</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dt~9"></span>
+              real(kind=kind(1d0))
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dt</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-isim~5"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>iSim</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n_simulations~4"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>N_Simulations</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-simulation_tagv"></span>
+              character(len=64),
+            </td>
+            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>Simulation_Tagv</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-train~3"></span>
+              type(pulse_train),
+            </td>
+            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>train</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-xuvdipole~2"></span>
+              complex(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>XUVDipole</strong>(:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-xuvdipoleft"></span>
+              complex(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>XUVDipoleFT</strong>(:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-atomicchargeevolution~3"></span>
+              real(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>AtomicChargeEvolution</strong>(:,:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-debug"></span>
+              complex(kind=kind(1d0)),
+            </td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>Debug</strong>(:,:,:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ipol"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>iPol</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-iatom~3"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>iAtom</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-it"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>it</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-icoord"></span>
+              integer
+            </td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>iCoord</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    </section>
+    <br>
+    
+    
+    
+
+    
+
+
+    <section>
+    <h2>Subroutines</h2>
+      <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-determinenumberoftimes"></span><h3> subroutine <a href='../proc/determinenumberoftimes.html'>DetermineNumberOfTimes</a>(FileName, tmin, tmax, nTimes)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-filename"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>FileName</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tmin"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>tmin</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tmax"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>tmax</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ntimes"></span>
+              integer,
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nTimes</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+      <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-regularize_xuvdipole"></span><h3> subroutine <a href='../proc/regularize_xuvdipole.html'>Regularize_XUVDipole</a>(XUVDipole, tmin, dt, nTimes, StepTime, StepWidth)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-xuvdipole"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>XUVDipole</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tmin~2"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>tmin</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dt"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dt</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ntimes~2"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nTimes</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-steptime"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>StepTime</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-stepwidth"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>StepWidth</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+      <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-regularize_xuvatomiccharge"></span><h3> subroutine <a href='../proc/regularize_xuvatomiccharge.html'>Regularize_XUVAtomicCharge</a>(Charge, tmin, dt, nTimes, StepTime, StepWidth)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-charge"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Charge</strong>(:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tmin~3"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>tmin</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dt~2"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dt</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ntimes~3"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nTimes</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-steptime~2"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>StepTime</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-stepwidth~2"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>StepWidth</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+      <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-regularize_dipole_and_atomiccharge1"></span><h3> subroutine <a href='../proc/regularize_dipole_and_atomiccharge1.html'>Regularize_Dipole_and_AtomicCharge1</a>(Dipole, Charge, tmin, dt, nTimes, StepTime, StepWidth)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dipole"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Dipole</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-charge~2"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Charge</strong>(:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tmin~4"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>tmin</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dt~3"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dt</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ntimes~4"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nTimes</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-steptime~3"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>StepTime</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-stepwidth~3"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>StepWidth</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+      <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-computeft_dipole_and_atomiccharges"></span><h3> subroutine <a href='../proc/computeft_dipole_and_atomiccharges.html'>ComputeFT_Dipole_and_AtomicCharges</a>(DipoleFTminus, AtomicChargeFT, Dipole, OmegaVec, AtomicChargeEvolution, tmin, dt, nTimes, nOmegas)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dipoleftminus"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>DipoleFTminus</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-atomicchargeft"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(out),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>AtomicChargeFT</strong>(:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dipole~2"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Dipole</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-omegavec"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>OmegaVec</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-atomicchargeevolution"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>AtomicChargeEvolution</strong>(:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tmin~5"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>tmin</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dt~4"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dt</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ntimes~5"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nTimes</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nomegas"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nOmegas</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+      <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-regularize_dipole_withrespectto_timedelay"></span><h3> subroutine <a href='../proc/regularize_dipole_withrespectto_timedelay.html'>Regularize_Dipole_withRespectto_TimeDelay</a>(DipoleFTwt, tvec, N_Simulations)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dipoleftwt"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>DipoleFTwt</strong>(:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tvec"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>tvec</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n_simulations"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>N_Simulations</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+      <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-compute_ftofdipole_withrespectto_time"></span><h3> subroutine <a href='../proc/compute_ftofdipole_withrespectto_time.html'>Compute_FTofDipole_withRespectto_Time</a>(DipoleFTwt, DipoleFTww, tvec, TauOmegaVec, N_Simulations, nTauOmegas)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dipoleftwt~2"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>DipoleFTwt</strong>(:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dipoleftww"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(out),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>DipoleFTww</strong>(:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tvec~2"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>tvec</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tauomegavec"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>TauOmegaVec</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n_simulations~2"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>N_Simulations</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ntauomegas"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nTauOmegas</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+      <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-regularize_charge_withtimedelay"></span><h3> subroutine <a href='../proc/regularize_charge_withtimedelay.html'>Regularize_Charge_withtimedelay</a>(ChargeFTwt, tvec, nAtoms, N_Simulations)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-chargeftwt"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ChargeFTwt</strong>(:,:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tvec~3"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>tvec</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-natoms"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nAtoms</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n_simulations~3"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>N_Simulations</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+      <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-compute_ftcharge_withtimedelay"></span><h3> subroutine <a href='../proc/compute_ftcharge_withtimedelay.html'>Compute_FTCharge_withTimeDelay</a>(ChargeFTwt, tvec, ChargeFTww, N_simulations, nOmegas, nAtoms, nTauOmegas, TauOmegaVec)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>$           if(iAtom==1)write(<em>,</em>) iSim, iOmega, t, w</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-chargeftwt~2"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ChargeFTwt</strong>(:,:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tvec~4"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>tvec</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-chargeftww"></span>
+              complex(kind=kind(1d0)),
+            </td>
+<td>intent(out),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>ChargeFTww</strong>(:,:,:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n_simulations"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>N_simulations</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nomegas~2"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nOmegas</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-natoms~2"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nAtoms</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ntauomegas~2"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nTauOmegas</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tauomegavec~2"></span>
+              real(kind=kind(1d0)),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>TauOmegaVec</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+    </section>    
+    
+
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col"><p>Charge Migration was developed by <br>&copy; 2023 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+            </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>    
+
+    <!-- MathJax JavaScript
+             ================================================== -->
+             <!-- Placed at the end of the document so the pages load faster -->
+        <script type="text/x-mathjax-config">
+          MathJax.Hub.Config({
+          TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+          jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+          extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+          });
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+          <script src="../tipuesearch/tipuesearch_content.js"></script>
+          <script src="../tipuesearch/tipuesearch_set.js"></script>
+          <script src="../tipuesearch/tipuesearch.js"></script>
+
+  </body>
+</html>

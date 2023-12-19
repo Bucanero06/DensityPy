@@ -1,0 +1,45 @@
+.. DensityPy documentation master file, created by
+   sphinx-quickstart on Tue Dec 19 13:18:43 2023.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to DensityPy's documentation!
+=====================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   cli_run
+   Default_Settings.default_config
+   autodocumentation_fortran
+   autodocumentation_python
+   charge_migration.chargemigratonscripts
+   charge_migration.difference_dipole_charge
+   main
+   molcas.DipolesLogParser
+   molcas.molcasscripts
+   molcas.pegamoid
+   molcas.selectionofactivespace
+   post_processing.chden_plotting_needs_work_to_update.plotdensity
+   post_processing.chden_plotting_needs_work_to_update.plottingscripts
+   post_processing.chden_plotting_needs_work_to_update.rpoints2vtk
+   post_processing.plotting_module
+   project_utils.command_execution
+   project_utils.configuration_parser
+   project_utils.data_processing_utils
+   project_utils.file_directory_ops
+   project_utils.file_parsing
+   project_utils.fortran_compilation_handler
+   project_utils.logger
+   project_utils.string_dict_utils
+   docs.pythondocs.source.conf
+
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
