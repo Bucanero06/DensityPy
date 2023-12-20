@@ -296,8 +296,10 @@ dephasing & relaxation factors can be changed to account for the environment and
 After finishing, the pipeline can be visualized (although changing) through interactive and png plots like: 
 #TODO ADD PLOTS --placeholder->
 
-[Screencast from 12-19-2023 10:45:37 PM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/d69aa1d2-4a6a-44c6-bced-553b41aaaf1a)
+[Screencast from 12-20-2023 05:09:56 PM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/a1f04802-067d-4d8b-a596-5b06ed591aee)
 
+![Screenshot from 2023-12-20 17-16-45](https://github.com/Bucanero06/DensityPy/assets/60953006/69fee775-9d5f-4ead-a0fc-25bd6dcc4b16)
+*caption: Dipole and reconstructed Dipole from Atomic Charges, left and right figures respectively.*
 ![dipole-heatmap.png](docs%2Fimages%2Fdipole-heatmap.png)
 
 `I am currently having difficulties with my knight's email`, please reach out to me here, `Github`, otherwise either 
