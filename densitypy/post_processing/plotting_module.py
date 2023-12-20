@@ -514,7 +514,7 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
     #   "carrier_envelope_phase_...", "intensity_...", "amplitude_...", "period_...", "iOmega", "OmegaVec", "FTDipoleX_Re",
     #   "FTDipoleX_Im", "FTDipoleY_Re", "FTDipoleY_Im", "FTDipoleZ_Re", "FTDipoleZ_Im"
 
-    FILE_PATH = f'{os.path.join(study_directory,experiment_directory)}/Dipole/DipoleFT_ALL.csv'
+    FILE_PATH = f'{os.path.join(study_directory, experiment_directory)}/Dipole/DipoleFT_ALL.csv'
 
     # Pump Settings
     type_of_pulse_pump = pump_settings['typeofpulse']
@@ -957,8 +957,9 @@ def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dep
 
 '''Dipolar 2D Spectra'''
 
+
 def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
-                                 pump_settings, probe_settings, charge_migration_ft_settings, match_scales=False):
+                     pump_settings, probe_settings, charge_migration_ft_settings, match_scales=False):
     OMEGA_TAUOMEGA_FILE_NAMES = [
         'Dipole/DipoleFT_ww.csv',
         'Dipole/DipoleFT_ww_reconstructed.csv',
@@ -1026,13 +1027,15 @@ def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, re
             x_label='OmegaVec + TauOmegaVec',
             y_label='OmegaVec',
             output_file=f'{file_path}'.replace('.csv', '.html'),
+            add_diagonal_line=True,
             contour_kwargs={
                 'colorscale': 'Viridis',
                 'contours_coloring': 'heatmap',
                 'zmin': _zmin,
-                'zmax': _zmax,
+                'zmax': _zmax
             }
         )
+
 
 def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
     OMEGA_TAUOMEGA_FILE_NAMES = [
@@ -1151,20 +1154,33 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
         plt.close('all')
 
 
-
-
-
-
 '''__helper_functions__'''
 
 
-def _plot_contour_map(x, y, z, title, x_label, y_label, output_file, contour_kwargs=None):
+def _plot_contour_map(x, y, z, title, x_label, y_label, output_file,add_diagonal_line=False, contour_kwargs=None):
     if contour_kwargs is None:
         contour_kwargs = {}
     # Creating an interactive plot using Plotly
     import plotly.graph_objects as go
-    fig = go.Figure(data=go.Contour(z=z, x=x, y=y, **contour_kwargs))
+    fig = go.Figure(data=go.Contour(z=z, x=x, y=y,
+                                    **contour_kwargs))
     fig.update_layout(title=title, xaxis_title=x_label, yaxis_title=y_label)
+
+
+    if add_diagonal_line:
+        fig.add_shape(
+            type="line",
+            x0=min(y),
+            y0=min(y),
+            x1=max(y),
+            y1=max(y),
+            line=dict(
+                color="white",
+                width=2,
+                dash="dot",
+            ),
+        )
+
     fig.write_html(output_file)
     # fig.show()
 
@@ -1265,6 +1281,7 @@ def __generate_becke_atomic_weghts_column_names(xyz_geometry_path):
 
     return column_names
 
+
 '''Becke Plots'''
 
 
@@ -1364,7 +1381,6 @@ def plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path,
 
     # Display the plot
     fig.show()
-
 
 # def Dipole_Charge_Comparison(dipole_file, charge_file, output_file):
 #     """DEPRECATED - NEEDS TO BE UPDATED TO WORK WITH NEW FORMAT"""
