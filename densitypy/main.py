@@ -313,18 +313,18 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
             # plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path, weights_file)
 
             # Lets plot the Pulses
-            plot_pulses(study_directory, experiment_directory, time_delay_range, min_time, max_time, plot_all=False)
-            plot_ft_pulses(study_directory, experiment_directory, time_delay_range, plot_all=False)
-
-            # Lets plot the Dipolar Reponse vs Time (t)
-            plot_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
-                                plot_all=False)
-            plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
-                                       xyz_geometry_path, plot_all=False)
-            # difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delay_range,
-            #                                                     min_time, max_time, xyz_geometry_path)
-
-            # Lets plot the Dipolar Reponse vs Time (t) in the Frequency Domain (w)
+            # plot_pulses(study_directory, experiment_directory, time_delay_range, min_time, max_time, plot_all=False)
+            # plot_ft_pulses(study_directory, experiment_directory, time_delay_range, plot_all=False)
+            #
+            # # Lets plot the Dipolar Reponse vs Time (t)
+            # plot_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
+            #                     plot_all=False)
+            # plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
+            #                            xyz_geometry_path, plot_all=False)
+            # # difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delay_range,
+            # #                                                     min_time, max_time, xyz_geometry_path)
+            #
+            # # Lets plot the Dipolar Reponse vs Time (t) in the Frequency Domain (w)
             plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
                                        pump_settings, probe_settings, charge_migration_ft_settings,
                                        try_color_maps=False)
@@ -335,7 +335,7 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
 
             # Lets plot the 2D Spectrum
             plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
-                             pump_settings, probe_settings, charge_migration_ft_settings)
+                             pump_settings, probe_settings, charge_migration_ft_settings, match_scales=False)
             plot_2d_spectrum_peak_analysis(study_directory, experiment_directory)
 
 
