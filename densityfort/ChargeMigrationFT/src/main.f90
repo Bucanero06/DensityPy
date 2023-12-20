@@ -1,23 +1,23 @@
 ! {{{ Detailed description
 
-!> \mainpage Program <ProgramName> <Insert here what the program does>
-!!
-!! Synopsis:
-!! ---------
-!!
-!!     <Program Name> <mandatory run-time parameters (RTP)> [<optional RTP>]
-!!
-!! ___
-!! Description:
-!! ------------
-!!
-!! Input parameters:      {#Input_Parameters}
-!! =================
-!! [...Input](@ref ...Input) as specified in the command line.
-!!
-!> \file
-!!
-!!
+!\mainpage Program <ProgramName> <Insert here what the program does>
+!
+! Synopsis:
+! ---------
+!
+!     <Program Name> <mandatory run-time parameters (RTP)> [<optional RTP>]
+!
+! ___
+! Description:
+! ------------
+!
+! Input parameters:      {#Input_Parameters}
+! =================
+! [...Input](@ref ...Input) as specified in the command line.
+!
+! \file
+!
+!
 ! }}}
 program ChargeMigrationFT
 
@@ -181,7 +181,7 @@ program ChargeMigrationFT
         call Regularize_Dipole_and_AtomicCharge1(zMuEV, AtomicChargeEvolution, tmin, dt, nTimes, StepTime, StepWidth)
 
         zMuEV = zMuEV - XUVDipole
-        AtomicChargeEvolution = AtomicChargeEvolution - XUVCharge!!!
+        AtomicChargeEvolution = AtomicChargeEvolution - XUVCharge!
 
         call ComputeFT_Dipole_and_AtomicCharges(DipoleFTminus, AtomicChargeFT, zMuEV, OmegaVec, &
                 AtomicChargeEvolution, tmin, dt, nTimes, nOmegas)
@@ -497,7 +497,7 @@ contains
                 do iSim = 1, N_Simulations
                     t = tvec(iSim)
                     zexpFact = exp(Zi * w * t)
-                    !!$           if(iAtom==1)write(*,*) iSim, iOmega, t, w
+                    !          if(iAtom==1)write(*,*) iSim, iOmega, t, w
                     do iPol = 1, 3
                         ChargeFTww(iPol, :, iOmega, iAtom) = ChargeFTww(iPol, :, iOmega, iAtom) + &
                                 zExpFact * ChargeFTwt(iPol, :, iSim, iAtom)
@@ -510,32 +510,32 @@ contains
 
 end program ChargeMigrationFT
 
-!!!!!this are notes and aspirations .. :]
-!*** THE FT OF THE DIPOLE FOR LARGE TIME STILL DOES NOT WORK
+!this are notes and aspirations .. :]
+! THE FT OF THE DIPOLE FOR LARGE TIME STILL DOES NOT WORK
 !     DipoleFTplus = Z0
-!!$     call ComputeDipoleFTplus( L0_Eval, L0_LEvec, L0_REvec, &
-!!$          OmegaVec, zStatRho0, DipoleFTplus, StepTime, StepWidth )
-!!$     !
-!!$     !*** MUST GO TO A SEPARATE SUBROUTINE
-!!$     !.. Save Dipole FT File
-!!$     open(newunit = uid_dipoleFT, &
-!!$          file    ="DipoleFT+"//trim(Simulation_tagv(iSim)), &
-!!$          form    ="formatted", &
-!!$          status  ="unknown"  , &
-!!$          action  ="write"    )
-!!$     do iOmega = 1, nOmegas
-!!$        w = OmegaVec( iOmega )
-!!$        write(uid_dipoleFT,"(i4,*(x,E24.16))") iOmega, w, &
-!!$             ((dble(DipoleFTplus(iPol,iOmega)),aimag(DipoleFTplus(iPol,iOmega))),iPol=1,3)
-!!$     end do
-!!$     close( uid_dipoleFT )
+!     call ComputeDipoleFTplus( L0_Eval, L0_LEvec, L0_REvec, &
+!          OmegaVec, zStatRho0, DipoleFTplus, StepTime, StepWidth )
+!     !
+!     !*** MUST GO TO A SEPARATE SUBROUTINE
+!     !.. Save Dipole FT File
+!     open(newunit = uid_dipoleFT, &
+!          file    ="DipoleFT+"//trim(Simulation_tagv(iSim)), &
+!          form    ="formatted", &
+!          status  ="unknown"  , &
+!          action  ="write"    )
+!     do iOmega = 1, nOmegas
+!        w = OmegaVec( iOmega )
+!        write(uid_dipoleFT,"(i4,*(x,E24.16))") iOmega, w, &
+!             ((dble(DipoleFTplus(iPol,iOmega)),aimag(DipoleFTplus(iPol,iOmega))),iPol=1,3)
+!     end do
+!     close( uid_dipoleFT )
 
 
 !     DipoleFTtotal = DipoleFTminus + DipoleFTplus
 
 
 
-!!*** APPARENTLY, IT IS NOT WORKING YET!
+! APPARENTLY, IT IS NOT WORKING YET!
 !    subroutine ComputeDipoleFTplus(&
 !            L0_Eval, L0_LEvec, L0_REvec, &
 !            OmegaVec, zStatRho0, DipoleFTplus, &
