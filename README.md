@@ -221,6 +221,45 @@ generated looks like:
 }
 ```
 
+```commandline
+ Loading Energies
+2023-12-20T03:54:06.993796Z [INFO] Charge_Migration: State Energies
+2023-12-20T03:54:06.993840Z [INFO] Charge_Migration: 1  -246.525708599498
+2023-12-20T03:54:06.993878Z [INFO] Charge_Migration: 2  -246.344501818203
+2023-12-20T03:54:06.993913Z [INFO] Charge_Migration: 3  -246.189490935279
+2023-12-20T03:54:06.993947Z [INFO] Charge_Migration: 4  -246.047815060530
+2023-12-20T03:54:06.993979Z [INFO] Charge_Migration: 
+2023-12-20T03:54:06.994015Z [INFO] Charge_Migration: Loading Transition Density Matrix
+2023-12-20T03:54:06.994100Z [INFO] Charge_Migration: Number of Active Orbitals: 4
+2023-12-20T03:54:06.994459Z [INFO] Charge_Migration: Loading Dipole Matrices for XYZ components
+2023-12-20T03:54:06.994520Z [INFO] Charge_Migration: 
+2023-12-20T03:54:06.994554Z [INFO] Charge_Migration: NMA_output/X_DIPOLE.csv
+2023-12-20T03:54:06.994596Z [INFO] Charge_Migration: 0.347947E+00   0.456999E-06   0.992338E+00   0.274939E+00
+2023-12-20T03:54:06.994632Z [INFO] Charge_Migration: 0.456999E-06   0.215518E+00   0.113281E-05  -0.165158E-05
+2023-12-20T03:54:06.994667Z [INFO] Charge_Migration: 0.992338E+00   0.113281E-05   0.172030E+01   0.273282E+00
+2023-12-20T03:54:06.994703Z [INFO] Charge_Migration: 0.274939E+00  -0.165158E-05   0.273282E+00   0.809354E+00
+2023-12-20T03:54:06.994757Z [INFO] Charge_Migration: 
+2023-12-20T03:54:06.994790Z [INFO] Charge_Migration: NMA_output/Y_DIPOLE.csv
+2023-12-20T03:54:06.994830Z [INFO] Charge_Migration: -0.111155E+01  -0.668804E-06  -0.921473E+00   0.112078E+01
+2023-12-20T03:54:06.994866Z [INFO] Charge_Migration: -0.668804E-06  -0.560969E+00  -0.143667E-05   0.850321E-06
+2023-12-20T03:54:06.994899Z [INFO] Charge_Migration: -0.921473E+00  -0.143667E-05  -0.205932E+01   0.188877E+00
+2023-12-20T03:54:06.994932Z [INFO] Charge_Migration: 0.112078E+01   0.850321E-06   0.188877E+00  -0.203919E+01
+2023-12-20T03:54:06.994981Z [INFO] Charge_Migration: 
+2023-12-20T03:54:06.995014Z [INFO] Charge_Migration: NMA_output/Z_DIPOLE.csv
+2023-12-20T03:54:06.995053Z [INFO] Charge_Migration: 0.585080E-05   0.683533E-01   0.103946E-05   0.630551E-06
+2023-12-20T03:54:06.995087Z [INFO] Charge_Migration: 0.683533E-01   0.501887E-05   0.268546E-01  -0.723624E-01
+2023-12-20T03:54:06.995121Z [INFO] Charge_Migration: 0.103946E-05   0.268546E-01   0.677975E-05   0.545977E-06
+2023-12-20T03:54:06.995156Z [INFO] Charge_Migration: 0.630551E-06  -0.723624E-01   0.545977E-06   0.613159E-05
+2023-12-20T03:54:06.995200Z [INFO] Charge_Migration: Loading Geometry
+2023-12-20T03:54:06.995274Z [INFO] Charge_Migration: nAtoms          12
+2023-12-20T03:54:06.995307Z [INFO] Charge_Migration: Loading Grid
+2023-12-20T03:54:34.251353Z [INFO] Charge_Migration: Loading Orbitals
+2023-12-20T03:54:46.280446Z [INFO] Charge_Migration: Computing Weights
+2023-12-20T03:55:26.524639Z [INFO] Charge_Migration: Writing Weights to File
+2023-12-20T03:57:24.469582Z [INFO] Charge_Migration: Computing Barycenters of the Atomic Charges
+2023-12-20T03:57:40.215674Z [INFO] Charge_Migration: Computing Becke's Matrix
+...
+```
 #TODO EXTEND DOCUMENTATION FOR THESE STEPS
 #TODO PARAMSEARCH goes here too
 After running the pipeline we can visualize the results using the `plot` command and expect (although changing)
