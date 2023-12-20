@@ -11,7 +11,7 @@ DEFAULT_CONFIG_CONTENT = {
             21
         ],
         "Molcas Output Directory": "NMA_output",
-        "Experiment Directory": "test_sim"
+        "Experiment Directory": "example_sim"
     },
     "GRID settings": {
         "Number of Points X axis": 250,
