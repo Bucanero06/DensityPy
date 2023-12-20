@@ -220,8 +220,6 @@ generated looks like:
     }
 }
 ```
-Things to keep in mind: 
-    
 
 #TODO EXTEND DOCUMENTATION FOR THESE STEPS
 #TODO PARAMSEARCH goes here too
@@ -279,6 +277,8 @@ python -m densitypy.autodocumentation_fortran
         --graphs True --remove_old_files
 ```
 
+![Screenshot from 2023-12-19 22-33-54.png](docs%2Fimages%2FScreenshot%20from%202023-12-19%2022-33-54.png)
+![Screenshot from 2023-12-19 22-32-06.png](docs%2Fimages%2FScreenshot%20from%202023-12-19%2022-32-06.png)
 The documentation can handle
 
 autodocumentation of docstrings for both modules and functions, handling markdown as well as latex and the generation 
