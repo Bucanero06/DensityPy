@@ -10,7 +10,7 @@ from densitypy.molcas.molcasscripts import create_help_input_file, copy_and_prep
     make_better_grid, \
     make_grid_coordinates, add_grid_it_to_manual_input_file, call_open_molcas, parse_project_grid_file, \
     load_project_rasscf_h5_file, write_grid_density_file
-from densitypy.molcas.selectionofactivespace import SelectionOfActiveSpace
+from densitypy.molcas.selectionofactivespace import deprecated_SelectionOfActiveSpace, SelectionOfActiveSpace
 from densitypy.post_processing.plotting_module import plot_2d_spectrum, plot_2d_spectrum_peak_analysis, \
     plot_pulses, plot_ft_pulses, plot_dipoles_v_time, \
     plot_atomic_dipoles_v_time, plot_ft_all_dipoles_v_time, plot_ft_all_atomic_dipoles_v_time
@@ -26,7 +26,7 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
                   run_charge_migration=False, run_charge_migration_ft=False,
                   run_spectrum_reconstruction=False,
                   field_file_help=False, molcas_input_help=False,
-                  scforbs=False, gridit: bool or str = True, write_charge_migration=None,
+                  scforbs=False, gridit: bool or str = True,autocas=False, write_charge_migration=None,
                   debug_mode=False, justh5=False, justgetdipoles=False, justgetdensity=False,
                   weights_file=None, givenfieldfile=None,
                   make_fortran=False, make_fortran_config=None,
@@ -104,10 +104,15 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
             Write_FieldHelp()
         if need_molcas_input or field_file_help:
             exit()
+        if autocas:
+            import os
+            occupation, orbitals, energy =SelectionOfActiveSpace(xyz_file=json_config['projectsettings']['xyzmoleculegeometry'])
+            print(f"n2 \ncas: {occupation} \norbs: {orbitals} \nenergy: {energy}")
 
+        exit()
         if scforbs:
             # Selection of Active Space using scforbs argument.
-            SelectionOfActiveSpace(json_config)  # todo need to update and most likely will switch programs
+            deprecated_SelectionOfActiveSpace(json_config)  # todo need to update and most likely will switch programs
 
         # Split JSON config into sections
         project_settings = json_config['projectsettings']

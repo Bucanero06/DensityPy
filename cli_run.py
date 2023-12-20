@@ -11,6 +11,7 @@ import click
 @click.option("--molcas_input_help", is_flag=True, help="Enable Molcas input help", default=False)
 @click.option("--scforbs", is_flag=True, help="Run SCF Orbital Calculations and plot", default=False)
 @click.option("--gridit", is_flag=True, help="Enable grid flag", default=False)
+@click.option("--autocas", is_flag=True, help="run autocas", default=False)
 @click.option("--write_charge_migration", is_flag=True, help="Write charge migration", default=False)
 @click.option("--debug_mode", is_flag=True, help="Enable debug mode", default=False)
 @click.option("--justh5", is_flag=True, help="Enable just h5", default=False)
@@ -25,6 +26,7 @@ import click
 @click.option("--plot", is_flag=True, help="Enable plotting", default=False)
 def cli_run(json_config_path, study_directory, molcas_input, run_charge_migration,
             run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, scforbs, gridit,
+autocas,
             write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file, givenfieldfile,
             make, make_directory, make_flags, plot):
     """
@@ -58,7 +60,9 @@ def cli_run(json_config_path, study_directory, molcas_input, run_charge_migratio
         plot=plot,
         #
         field_file_help=field_file_help, molcas_input_help=molcas_input_help,
-        scforbs=scforbs, gridit=gridit, write_charge_migration=write_charge_migration, debug_mode=debug_mode,
+        scforbs=scforbs, gridit=gridit, autocas=autocas,
+
+        write_charge_migration=write_charge_migration, debug_mode=debug_mode,
         justh5=justh5, justgetdipoles=justgetdipoles, justgetdensity=justgetdensity, weights_file=weights_file,
         givenfieldfile=givenfieldfile,
         make_fortran=make,
