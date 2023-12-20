@@ -7,7 +7,6 @@ ALL_PRGS = astraBuildOperator          \
            astraTest                   \
            ChargeMigration             \
            testBS_FEDVR                \
-	   Split3DGrid                 \
            TestIntegralsFullFullMatrix \
            ChargeMigrationFT		\
            SpectrumReconstruction           
@@ -20,6 +19,6 @@ ALL_PRGS = astraBuildOperator          \
            #tmp_FullFullMatrix          \
            #TestBsplines_Juan           \
            #ComputeSpectrum_H0_CCO      \
-           #ComputeScatteringStates 
+           #ComputeScatteringStates
 
 include etc/CompilerOptions.mk
