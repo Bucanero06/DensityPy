@@ -110,10 +110,89 @@
 <span class="kn">from</span> <span class="nn">project_utils.command_execution</span> <span class="kn">import</span> <span class="n">execute_command</span><span class="p">,</span> <span class="n">print_molcas_log_errors</span>
 <span class="kn">from</span> <span class="nn">project_utils.file_directory_ops</span> <span class="kn">import</span> <span class="n">find</span><span class="p">,</span> <span class="n">make_directory</span><span class="p">,</span> <span class="n">copy_to</span>
 
+<div class="viewcode-block" id="SelectionOfActiveSpace"><a class="viewcode-back" href="../../../molcas.selectionofactivespace.html#molcas.selectionofactivespace.SelectionOfActiveSpace">[docs]</a><span class="k">def</span> <span class="nf">SelectionOfActiveSpace</span><span class="p">(</span><span class="n">xyz_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Do ground state cas&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SelectionOfActiveSpace"><a class="viewcode-back" href="../../../molcas.selectionofactivespace.html#molcas.selectionofactivespace.SelectionOfActiveSpace">[docs]</a><span class="k">def</span> <span class="nf">SelectionOfActiveSpace</span><span class="p">(</span><span class="n">json_config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">xyz_file</span><span class="o">=</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">xyz_file</span><span class="p">)</span>
+    <span class="c1"># create a molecule</span>
+    <span class="kn">from</span> <span class="nn">autocas.scine_autocas.autocas_utils.molecule</span> <span class="kn">import</span> <span class="n">Molecule</span>
+    <span class="n">molecule</span> <span class="o">=</span> <span class="n">Molecule</span><span class="p">(</span><span class="n">xyz_file</span><span class="p">)</span>
+
+    <span class="c1"># initialize autoCAS and Molcas interface</span>
+    <span class="kn">from</span> <span class="nn">autocas.scine_autocas</span> <span class="kn">import</span> <span class="n">Autocas</span>
+    <span class="n">autocas</span> <span class="o">=</span> <span class="n">Autocas</span><span class="p">(</span><span class="n">molecule</span><span class="p">)</span>
+    <span class="kn">from</span> <span class="nn">autocas.scine_autocas.interfaces.molcas</span> <span class="kn">import</span> <span class="n">Molcas</span>
+    <span class="n">molcas</span> <span class="o">=</span> <span class="n">Molcas</span><span class="p">([</span><span class="n">molecule</span><span class="p">])</span>
+    <span class="c1"># make initial active space and evaluate initial DMRG calculation</span>
+    <span class="n">occ_initial</span><span class="p">,</span> <span class="n">index_initial</span> <span class="o">=</span> <span class="n">autocas</span><span class="o">.</span><span class="n">make_initial_active_space</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;occ_initial: </span><span class="si">{</span><span class="n">occ_initial</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;index_initial: </span><span class="si">{</span><span class="n">index_initial</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># setup interface</span>
+    <span class="n">molcas</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> <span class="s2">&quot;example&quot;</span>
+    <span class="c1"># molcas.settings.work_dir =</span>
+    <span class="c1"># molcas.environment.molcas_scratch_dir =</span>
+    <span class="n">molcas</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">xyz_file</span> <span class="o">=</span> <span class="n">xyz_file</span>
+
+
+
+    <span class="c1"># cas and hyphen do not matter for method names</span>
+    <span class="n">molcas</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;DMRGCI&quot;</span>
+
+    <span class="c1"># manually set dmrg sweeps and bond dmrg_bond_dimension to low number</span>
+    <span class="n">molcas</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">dmrg_bond_dimension</span> <span class="o">=</span> <span class="mi">250</span>
+    <span class="n">molcas</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">dmrg_sweeps</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="c1"># make initial active space and evaluate initial DMRG calculation</span>
+    <span class="n">occ_initial</span><span class="p">,</span> <span class="n">index_initial</span> <span class="o">=</span> <span class="n">autocas</span><span class="o">.</span><span class="n">make_initial_active_space</span><span class="p">()</span>
+
+    <span class="c1"># no input means HF calculation</span>
+    <span class="n">molcas</span><span class="o">.</span><span class="n">calculate</span><span class="p">()</span>
+
+    <span class="c1"># do cas calculation</span>
+    <span class="n">cas_results</span> <span class="o">=</span> <span class="n">molcas</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">occ_initial</span><span class="p">,</span> <span class="n">index_initial</span><span class="p">)</span>
+
+    <span class="c1"># energy = cas_results[0]</span>
+    <span class="n">s1_entropy</span> <span class="o">=</span> <span class="n">cas_results</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># s2_entropy = cas_results[2]</span>
+    <span class="n">mut_inf</span> <span class="o">=</span> <span class="n">cas_results</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="c1"># plot entanglement diagram</span>
+    <span class="kn">from</span> <span class="nn">autocas.scine_autocas.plots.entanglement_plot</span> <span class="kn">import</span> <span class="n">EntanglementPlot</span>
+    <span class="n">plot</span> <span class="o">=</span> <span class="n">EntanglementPlot</span><span class="p">()</span>
+    <span class="n">plt</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s1_entropy</span><span class="p">,</span> <span class="n">mut_inf</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">molcas</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">+</span> <span class="s2">&quot;/entang.pdf&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+    <span class="c1"># make active space based on single orbital entropies</span>
+    <span class="n">cas_occ</span><span class="p">,</span> <span class="n">cas_index</span> <span class="o">=</span> <span class="n">autocas</span><span class="o">.</span><span class="n">get_active_space</span><span class="p">(</span>
+        <span class="n">occ_initial</span><span class="p">,</span> <span class="n">s1_entropy</span>   <span class="c1"># type: ignore</span>
+    <span class="p">)</span>
+
+    <span class="c1"># cas and hyphen do not matter for method names</span>
+    <span class="n">molcas</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;dmrg-scf&quot;</span>
+
+    <span class="c1"># manually set dmrg sweeps and bond dmrg_bond_dimension to low number</span>
+    <span class="n">molcas</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">dmrg_bond_dimension</span> <span class="o">=</span> <span class="mi">2000</span>
+    <span class="n">molcas</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">dmrg_sweeps</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="c1"># Do a calculation with this CAS</span>
+    <span class="n">final_energy</span><span class="p">,</span> <span class="n">final_s1</span><span class="p">,</span> <span class="n">final_s2</span><span class="p">,</span> <span class="n">final_mut_inf</span> <span class="o">=</span> <span class="n">molcas</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">cas_occ</span><span class="p">,</span> <span class="n">cas_index</span><span class="p">)</span>
+
+    <span class="c1"># use results</span>
+    <span class="n">n_electrons</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">cas_occ</span><span class="p">)</span>
+    <span class="n">n_orbitals</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cas_occ</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;final energy:      </span><span class="si">{</span><span class="n">final_energy</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;final CAS(e, o):  (</span><span class="si">{</span><span class="n">n_electrons</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">n_orbitals</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;final cas indices: </span><span class="si">{</span><span class="n">cas_index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;final occupation:  </span><span class="si">{</span><span class="n">cas_occ</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;final s1:          </span><span class="si">{</span><span class="n">final_s1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;final s2: </span><span class="se">\n</span><span class="si">{</span><span class="n">final_s2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;final mut_inf: </span><span class="se">\n</span><span class="si">{</span><span class="n">final_mut_inf</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cas_occ</span><span class="p">,</span> <span class="n">cas_index</span><span class="p">,</span> <span class="n">final_energy</span></div>
+
+<div class="viewcode-block" id="deprecated_SelectionOfActiveSpace"><a class="viewcode-back" href="../../../molcas.selectionofactivespace.html#molcas.selectionofactivespace.deprecated_SelectionOfActiveSpace">[docs]</a><span class="k">def</span> <span class="nf">deprecated_SelectionOfActiveSpace</span><span class="p">(</span><span class="n">json_config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    (DEPRECATED) This function is used to select the active space using Luscus GUI (DEPRECATED)</span>
+<span class="sd">    (DEPRECATED) This function is used to select the active space using Pegamoid GUI (DEPRECATED)</span>
 
 <span class="sd">    :param ini_file:</span>
 <span class="sd">    :return:</span>
@@ -139,7 +218,6 @@
     <span class="n">copy_to</span><span class="p">(</span><span class="n">xyz_geometry_path</span><span class="p">,</span> <span class="n">molcas_output_directory</span><span class="p">)</span>
     <span class="n">temp_project_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;selecting_space_</span><span class="si">{</span><span class="n">project_name</span><span class="si">}</span><span class="s1">&#39;</span>
     <span class="n">molcas_input_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">molcas_output_directory</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">temp_project_name</span><span class="si">}</span><span class="s1">.input&#39;</span><span class="p">)</span>
-
 
     <span class="c1"># Write/Prepare input file used to select Active Space using luscus</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">molcas_input_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pyinput</span><span class="p">:</span>

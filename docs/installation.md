@@ -22,5 +22,10 @@ source /opt/intel/oneapi/setvars.sh --force
 
 ### OpenMolcas installation:
 ...
+sudo apt-get install libgsl-dev
+sudo apt-get install libboost-program-options-dev libboost-filesystem-dev libboost-system-dev libboost-serialization-dev libboost-thread-dev
+sudo apt-get install liblapack-dev libblas-dev
+cmake ../OpenMolcas/ -DDMRG=ON -DNEVPT2=ON ...
+
 
 
