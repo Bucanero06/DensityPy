@@ -265,6 +265,8 @@ generated looks like:
 After running the pipeline we can visualize the results using the `plot` command and expect (although changing)
 something along the ball park of:
 
+[Screencast from 12-19-2023 10:45:37 PM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/d69aa1d2-4a6a-44c6-bced-553b41aaaf1a)
+
 
 
 The Options are:
