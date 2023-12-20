@@ -82,6 +82,9 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
                     molcas_input_help, justh5, justgetdensity, justgetdipoles, field_file_help,
                     run_spectrum_reconstruction, plot]
 
+    study_directory = path.abspath(study_directory.rstrip('/'))
+
+
     # Change directory to study_directory and back to original directory when done or if crashes
     with change_directory_manager(study_directory):
         # Load Values # todo fixup the json_config and runnable command behavior, is ugly
