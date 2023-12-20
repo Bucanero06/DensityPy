@@ -84,8 +84,7 @@ def plot_pulses(study_directory, experiment_directory, time_delays, min_time, ma
         output_file = file_path.replace('.csv', '.png')
         output_file = output_file if output_file != file_path else f'{file_path}.png'
         plt.savefig(output_file)
-
-    # plt.clf()
+        plt.close('all')
 
 
 def plot_ft_pulses(study_directory, experiment_directory, time_delays, plot_all=False):
@@ -171,9 +170,7 @@ def plot_ft_pulses(study_directory, experiment_directory, time_delays, plot_all=
         output_file = file_path.replace('.csv', '.png')
         output_file = output_file if output_file != file_path else f'{file_path}.png'
         plt.savefig(output_file)
-
-    # Clear the plot
-    # plt.clf()
+        plt.close('all')
 
 
 '''Dipoles VS Time'''
@@ -229,6 +226,7 @@ def plot_dipoles_v_time(study_directory, experiment_directory, time_delays, min_
     import matplotlib.pyplot as plt
 
     for time_delay in ['XUV'] + time_delays_to_plot:
+        # Force close all plots
         file_path = f'{study_directory}/{experiment_directory}/Dipole/DipolePP{time_delay}.csv' if time_delay != 'XUV' else f'{study_directory}/{experiment_directory}/Dipole/DipoleXUV.csv'
 
         try:
@@ -304,8 +302,7 @@ def plot_dipoles_v_time(study_directory, experiment_directory, time_delays, min_
         output_file = file_path.replace('.csv', '.png')
         output_file = output_file if output_file != file_path else f'{file_path}.png'
         plt.savefig(output_file)
-
-        # plt.clf()
+        plt.close('all')
 
 
 def plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delays, min_time, max_time,
@@ -416,8 +413,7 @@ def plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delay
         output_file = file_path.replace('.csv', '.png')
         output_file = output_file if output_file != file_path else f'{file_path}.png'
         plt.savefig(output_file)
-
-        # plt.clf()
+        plt.close('all')
 
 
 def difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delays, min_time,
@@ -489,8 +485,7 @@ def difference_between_dipole_and_atomic_charges_v_time(study_directory, experim
     # plt.show()
     output_file = f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeXUV_vs_DipoleXUV.png'
     plt.savefig(output_file)
-
-    # plt.clf()
+    plt.close('all')
 
 
 '''Dipoles(FT) VS Time & Frequency'''
@@ -565,7 +560,7 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
     plt.tight_layout()
     # plt.show()
     plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL_Components_vs_central_time_2.png')
-    # plt.clf()
+    plt.close('all')
 
     """
     Average FT Dipole Magnitude: 
@@ -626,7 +621,7 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
     plt.tight_layout()
     # plt.show()
     plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_vs_OmegaVec.png')
-    # plt.clf()
+    plt.close('all')
 
     if try_color_maps:
         color_maps = ['viridis', 'seismic', 'inferno', 'twilight_shifted']
@@ -707,7 +702,7 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
         plt.tight_layout()
         # plt.show()
         plt.savefig(f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL_Alternative_{color_map}_Plots.png')
-        # plt.clf()
+        plt.close('all')
 
 
 def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
@@ -786,7 +781,7 @@ def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dep
     # plt.show()
     plt.savefig(
         f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFT_ALL_Components_vs_central_time_2.png')
-    # plt.clf()
+    plt.close('all')
 
     # Calculating the average of the squared magnitudes of the FT dipole components
     sum_of_squares = 0
@@ -855,7 +850,7 @@ def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dep
     plt.tight_layout()
     # plt.show()
     plt.savefig(f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFT_vs_OmegaVec.png')
-    # plt.clf()
+    plt.close('all')
 
     ############
     """
@@ -957,7 +952,7 @@ def plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dep
             # plt.show()
             plt.savefig(
                 f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFT_ALL_Alternative_{color_map}_Plots_{_atom_name}.png')
-            # plt.clf()
+            plt.close('all')
 
 
 '''Dipolar 2D Spectra'''
@@ -1153,116 +1148,19 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
         output_file = output_file.replace('.png', f'_Alternative_Plots.png')
         plt.savefig(output_file)
         # plt.show()
+        plt.close('all')
 
 
 
 
-
-'''Becke Plots'''
-
-
-def plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path, weights_file):
-    # "x","y","z","Atom_O_ChargeDensity","Atom_N_ChargeDensity","Atom_C_ChargeDensity","Atom_C_ChargeDensity",
-    # "Atom_C_ChargeDensity","Atom_H_ChargeDensity","Atom_H_ChargeDensity","Atom_H_ChargeDensity",
-    # "Atom_H_ChargeDensity","Atom_H_ChargeDensity","Atom_H_ChargeDensity","Atom_H_ChargeDensity"
-    if weights_file == None:
-        # Use the expected default from the ChargeMigration/Becke code
-        weights_file = f'{study_directory}/{experiment_directory}/Weights_File_{experiment_directory}.csv'
-
-    # Read the XYZ file to get the number of atoms, the name of the atom and the atom names
-    # (this is the order in which the atoms are listed in the CSV file)
-    xyz_file_content = read_xyz(xyz_geometry_path)
-    number_of_atoms = xyz_file_content['n_atoms']
-    name_of_molecule = xyz_file_content['title']
-    atoms = xyz_file_content['atoms']
-    ATOMIC_FT_COL_NAMES = __generate_becke_atomic_weghts_column_names(xyz_geometry_path)
-
-    print(f'{number_of_atoms = }')
-    print(f'{ATOMIC_FT_COL_NAMES = }')
-
-    assert number_of_atoms == len(
-        ATOMIC_FT_COL_NAMES), f'{number_of_atoms = } != {len(ATOMIC_FT_COL_NAMES) = } check read_xyz and __generate_becke_atomic_weghts_column_names'
-
-    # Load the CSV file
-    logger.info(f'Plotting {weights_file}')
-    data = pd.read_csv(weights_file)
-
-    # Displaying the first few rows of the file to understand its structure
-    # all columns
-    pd.set_option('display.max_columns', None)
-    print(data.head())
-    logger.debug(f'Length of Weight data: {len(data)} points')
-
-    # Create a 3d plot of the weights with each atom/column as a different color scaled by the density/value of the point
-    # Plotting
-    import plotly.graph_objects as go
-
-    for col in data.columns[3:]:
-        print(f'{col} = {data[col].sum()}')
-        if data[col].min() != 0:
-            logger.warning(f'{col} has a min value of {data[col].min()} rather than 0')
-        if data[col].max() != 1:
-            logger.warning(f'{col} has a max value of {data[col].max()} rather than 1')
-
-    # Plot only one atom type for debugging
-    fig = go.Figure(data=go.Scatter3d(
-        x=data['x'],
-        y=data['y'],
-        z=data['z'],
-        mode='markers',
-        marker=dict(
-            size=3,
-            color=data['Atom_H_ChargeDensity.4'],  # Replace with the correct column name
-            colorscale='Viridis',
-            opacity=0.5
-        )
-    ))
-
-    fig.update_layout(title='3D Scatter Plot for Atom_H_ChargeDensity.4')
-    fig.show()
-    exit()
-
-    # Given the content of the file, let's create a DataFrame manually and plot it
-
-    import plotly.graph_objects as go
-
-    R_el_bc = pd.read_csv(f'{study_directory}/{experiment_directory}/R_el_bc.csv')
-    # Create the figure
-    fig = go.Figure()
-
-    # Add a trace for each unique atom type
-    for atom_name in R_el_bc['Atom_Name'].unique():
-        atom_data = R_el_bc[R_el_bc['Atom_Name'] == atom_name]
-        fig.add_trace(
-            go.Scatter3d(
-                x=atom_data['X_Position'],
-                y=atom_data['Y_Position'],
-                z=atom_data['Z_Position'],
-                mode='markers',
-                marker=dict(size=5, opacity=0.8),
-                name=atom_name,
-            )
-        )
-
-    # Update the layout
-    fig.update_layout(
-        title='3D Scatter Plot of Atoms',
-        scene=dict(
-            xaxis_title='X Position',
-            yaxis_title='Y Position',
-            zaxis_title='Z Position'
-        ),
-        margin=dict(l=0, r=0, b=0, t=0)
-    )
-
-    # Display the plot
-    fig.show()
 
 
 '''__helper_functions__'''
 
 
 def _plot_contour_map(x, y, z, title, x_label, y_label, output_file, contour_kwargs=None):
+    if contour_kwargs is None:
+        contour_kwargs = {}
     # Creating an interactive plot using Plotly
     import plotly.graph_objects as go
     fig = go.Figure(data=go.Contour(z=z, x=x, y=y, **contour_kwargs))
@@ -1366,6 +1264,107 @@ def __generate_becke_atomic_weghts_column_names(xyz_geometry_path):
         atom_name_counts[_name] += 1
 
     return column_names
+
+'''Becke Plots'''
+
+
+def plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path, weights_file):
+    # "x","y","z","Atom_O_ChargeDensity","Atom_N_ChargeDensity","Atom_C_ChargeDensity","Atom_C_ChargeDensity",
+    # "Atom_C_ChargeDensity","Atom_H_ChargeDensity","Atom_H_ChargeDensity","Atom_H_ChargeDensity",
+    # "Atom_H_ChargeDensity","Atom_H_ChargeDensity","Atom_H_ChargeDensity","Atom_H_ChargeDensity"
+    if weights_file == None:
+        # Use the expected default from the ChargeMigration/Becke code
+        weights_file = f'{study_directory}/{experiment_directory}/Weights_File_{experiment_directory}.csv'
+
+    # Read the XYZ file to get the number of atoms, the name of the atom and the atom names
+    # (this is the order in which the atoms are listed in the CSV file)
+    xyz_file_content = read_xyz(xyz_geometry_path)
+    number_of_atoms = xyz_file_content['n_atoms']
+    name_of_molecule = xyz_file_content['title']
+    atoms = xyz_file_content['atoms']
+    ATOMIC_FT_COL_NAMES = __generate_becke_atomic_weghts_column_names(xyz_geometry_path)
+
+    print(f'{number_of_atoms = }')
+    print(f'{ATOMIC_FT_COL_NAMES = }')
+
+    assert number_of_atoms == len(
+        ATOMIC_FT_COL_NAMES), f'{number_of_atoms = } != {len(ATOMIC_FT_COL_NAMES) = } check read_xyz and __generate_becke_atomic_weghts_column_names'
+
+    # Load the CSV file
+    logger.info(f'Plotting {weights_file}')
+    data = pd.read_csv(weights_file)
+
+    # Displaying the first few rows of the file to understand its structure
+    # all columns
+    pd.set_option('display.max_columns', None)
+    print(data.head())
+    logger.debug(f'Length of Weight data: {len(data)} points')
+
+    # Create a 3d plot of the weights with each atom/column as a different color scaled by the density/value of the point
+    # Plotting
+    import plotly.graph_objects as go
+
+    for col in data.columns[3:]:
+        print(f'{col} = {data[col].sum()}')
+        if data[col].min() != 0:
+            logger.warning(f'{col} has a min value of {data[col].min()} rather than 0')
+        if data[col].max() != 1:
+            logger.warning(f'{col} has a max value of {data[col].max()} rather than 1')
+
+    # Plot only one atom type for debugging
+    fig = go.Figure(data=go.Scatter3d(
+        x=data['x'],
+        y=data['y'],
+        z=data['z'],
+        mode='markers',
+        marker=dict(
+            size=3,
+            color=data['Atom_H_ChargeDensity.4'],  # Replace with the correct column name
+            colorscale='Viridis',
+            opacity=0.5
+        )
+    ))
+
+    fig.update_layout(title='3D Scatter Plot for Atom_H_ChargeDensity.4')
+    fig.show()
+    exit()
+
+    # Given the content of the file, let's create a DataFrame manually and plot it
+
+    import plotly.graph_objects as go
+
+    R_el_bc = pd.read_csv(f'{study_directory}/{experiment_directory}/R_el_bc.csv')
+    # Create the figure
+    fig = go.Figure()
+
+    # Add a trace for each unique atom type
+    for atom_name in R_el_bc['Atom_Name'].unique():
+        atom_data = R_el_bc[R_el_bc['Atom_Name'] == atom_name]
+        fig.add_trace(
+            go.Scatter3d(
+                x=atom_data['X_Position'],
+                y=atom_data['Y_Position'],
+                z=atom_data['Z_Position'],
+                mode='markers',
+                marker=dict(size=5, opacity=0.8),
+                name=atom_name,
+            )
+        )
+
+    # Update the layout
+    fig.update_layout(
+        title='3D Scatter Plot of Atoms',
+        scene=dict(
+            xaxis_title='X Position',
+            yaxis_title='Y Position',
+            zaxis_title='Z Position'
+        ),
+        margin=dict(l=0, r=0, b=0, t=0)
+    )
+
+    # Display the plot
+    fig.show()
+
 
 # def Dipole_Charge_Comparison(dipole_file, charge_file, output_file):
 #     """DEPRECATED - NEEDS TO BE UPDATED TO WORK WITH NEW FORMAT"""
