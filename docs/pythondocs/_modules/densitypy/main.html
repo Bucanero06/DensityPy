@@ -205,14 +205,13 @@
         <span class="k">if</span> <span class="n">need_molcas_input</span> <span class="ow">or</span> <span class="n">field_file_help</span><span class="p">:</span>
             <span class="n">exit</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">autocas</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">os</span>
             <span class="n">occupation</span><span class="p">,</span> <span class="n">orbitals</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span><span class="n">SelectionOfActiveSpace</span><span class="p">(</span><span class="n">xyz_file</span><span class="o">=</span><span class="n">json_config</span><span class="p">[</span><span class="s1">&#39;projectsettings&#39;</span><span class="p">][</span><span class="s1">&#39;xyzmoleculegeometry&#39;</span><span class="p">])</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n2 </span><span class="se">\n</span><span class="s2">cas: </span><span class="si">{</span><span class="n">occupation</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">orbs: </span><span class="si">{</span><span class="n">orbitals</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">energy: </span><span class="si">{</span><span class="n">energy</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="n">exit</span><span class="p">()</span>
+            <span class="c1">#TODO</span>
+            <span class="n">exit</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">scforbs</span><span class="p">:</span>
             <span class="c1"># Selection of Active Space using scforbs argument.</span>
-            <span class="n">deprecated_SelectionOfActiveSpace</span><span class="p">(</span><span class="n">json_config</span><span class="p">)</span>  <span class="c1"># todo need to update and most likely will switch programs</span>
+            <span class="n">deprecated_SelectionOfActiveSpace</span><span class="p">(</span><span class="n">json_config</span><span class="p">)</span>
 
         <span class="c1"># Split JSON config into sections</span>
         <span class="n">project_settings</span> <span class="o">=</span> <span class="n">json_config</span><span class="p">[</span><span class="s1">&#39;projectsettings&#39;</span><span class="p">]</span>
