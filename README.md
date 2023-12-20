@@ -160,9 +160,9 @@ generated looks like:
         "Experiment Directory": "example_sim"
     },
     "GRID settings": {
-        "Number of Points X axis": 250,
-        "Number of Points Y axis": 250,
-        "Number of Points Z axis": 250,
+        "Number of Points X axis": 100,
+        "Number of Points Y axis": 100,
+        "Number of Points Z axis": 100,
         "X MIN": -6,
         "X MAX": 7,
         "Y MIN": -5,
@@ -220,6 +220,11 @@ generated looks like:
     }
 }
 ```
+We can started with very conservative parameters to quickly iterate over settings and get a feel for the system. For example, 
+we can change the number of points and size of the grid, the polarization
+of the pump and probe pulses, the number of states, the number of times, omegas, ... as well as other Fourier Transform parameters; 
+all which should be considered in order to minimize artifacts and maximize the accuracy of the results. More importantly, 
+dephasing & relaxation factors can be changed to account for the environment and the system's dynamics. #TODO search here
 
 ```commandline
  Loading Energies
@@ -258,6 +263,7 @@ generated looks like:
 2023-12-20T03:55:26.524639Z [INFO] Charge_Migration: Writing Weights to File
 2023-12-20T03:57:24.469582Z [INFO] Charge_Migration: Computing Barycenters of the Atomic Charges
 2023-12-20T03:57:40.215674Z [INFO] Charge_Migration: Computing Becke's Matrix
+...
 ...
 ```
 #TODO EXTEND DOCUMENTATION FOR THESE STEPS

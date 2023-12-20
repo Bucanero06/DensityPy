@@ -14,9 +14,9 @@ DEFAULT_CONFIG_CONTENT = {
         "Experiment Directory": "example_sim"
     },
     "GRID settings": {
-        "Number of Points X axis": 250,
-        "Number of Points Y axis": 250,
-        "Number of Points Z axis": 250,
+        "Number of Points X axis": 100,
+        "Number of Points Y axis": 100,
+        "Number of Points Z axis": 100,
         "X MIN": -6,
         "X MAX": 7,
         "Y MIN": -5,
