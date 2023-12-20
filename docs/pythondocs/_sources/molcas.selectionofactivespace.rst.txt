@@ -6,8 +6,8 @@ molcas.selectionofactivespace
     :undoc-members:
     :show-inheritance:
 
-... click:: molcas.selectionofactivespace
-    :prog: densitypy
+.. click:: molcas.selectionofactivespace:cli_run
+    :prog: CLI for DensityPy
     :nested: full
 
 .. inheritance-diagram:: molcas.selectionofactivespace

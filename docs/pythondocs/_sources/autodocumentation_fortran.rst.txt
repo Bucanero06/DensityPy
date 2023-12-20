@@ -6,8 +6,8 @@ autodocumentation_fortran
     :undoc-members:
     :show-inheritance:
 
-... click:: autodocumentation_fortran
-    :prog: densitypy
+.. click:: autodocumentation_fortran:cli_run
+    :prog: CLI for DensityPy
     :nested: full
 
 .. inheritance-diagram:: autodocumentation_fortran

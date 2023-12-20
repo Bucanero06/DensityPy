@@ -6,8 +6,8 @@ molcas.molcasscripts
     :undoc-members:
     :show-inheritance:
 
-... click:: molcas.molcasscripts
-    :prog: densitypy
+.. click:: molcas.molcasscripts:cli_run
+    :prog: CLI for DensityPy
     :nested: full
 
 .. inheritance-diagram:: molcas.molcasscripts

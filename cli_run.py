@@ -28,8 +28,6 @@ def cli_run(json_config_path, study_directory, molcas_input, run_charge_migratio
             write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file, givenfieldfile,
             make, make_directory, make_flags, plot):
     """
-    CLI for DensityPy
-
     This CLI is engineered to facilitate computational chemistry simulations with OpenMolcas and the ASTRA-ChargeMigration Fortran code.
 
     Functionality and Scope:

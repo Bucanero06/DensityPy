@@ -6,8 +6,8 @@ Default_Settings.default_config
     :undoc-members:
     :show-inheritance:
 
-... click:: Default_Settings.default_config
-    :prog: densitypy
+.. click:: Default_Settings.default_config:cli_run
+    :prog: CLI for DensityPy
     :nested: full
 
 .. inheritance-diagram:: Default_Settings.default_config

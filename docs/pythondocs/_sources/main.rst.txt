@@ -6,8 +6,8 @@ main
     :undoc-members:
     :show-inheritance:
 
-... click:: main
-    :prog: densitypy
+.. click:: main:cli_run
+    :prog: CLI for DensityPy
     :nested: full
 
 .. inheritance-diagram:: main

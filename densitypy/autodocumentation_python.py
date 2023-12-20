@@ -96,17 +96,15 @@ def update_conf_py(documentation_dir, source_dir):
 
 def create_module_rst_files(modules, rst_dir):
     for module in modules:
-        print(f'{module = }')
-
         with open(os.path.join(rst_dir, f'{module}.rst'), 'w') as f:
             f.write(
                 f"{module}\n{'=' * len(module)}\n\n"
                 f".. automodule:: {module}\n"
                 f"    :members:\n"
                 f"    :undoc-members:\n"
-                f"    :show-inheritance:\n\n."
-                f".. click:: {module}\n"
-                f"    :prog: densitypy\n"
+                f"    :show-inheritance:\n\n"
+                f".. click:: {module}:cli_run\n" # TODO: Fix this to be more general
+                f"    :prog: CLI for DensityPy\n"
                 f"    :nested: full\n\n"
                 f".. inheritance-diagram:: {module}\n"
                 f"    :parts: 1\n\n"
@@ -153,8 +151,6 @@ def build_sphinx_docs(documentation_dir):
 
 def rename_files_and_replace_top_level_package_names(directory, top_level_package_name=None):
     logger.info(f'Renaming files and replacing top level package name in {directory}')
-
-    directory = '/home/ruben/PycharmProjects/DensityPy/docs/pythondocs/build/html'
 
     targeted_remove = f'{top_level_package_name}.'
     # Walk through all files and folders within the directory

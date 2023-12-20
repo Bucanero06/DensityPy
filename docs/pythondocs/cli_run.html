@@ -50,7 +50,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">cli_run</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">cli_run</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cli-for-densitypy">CLI for DensityPy</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Default_Settings.default_config.html">Default_Settings.default_config</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autodocumentation_fortran.html">autodocumentation_fortran</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autodocumentation_python.html">autodocumentation_python</a></li>
@@ -102,17 +105,155 @@
              
   <section id="module-cli_run">
 <span id="cli-run"></span><h1>cli_run<a class="headerlink" href="#module-cli_run" title="Permalink to this heading"></a></h1>
+<section id="cli-for-densitypy">
+<h2>CLI for DensityPy<a class="headerlink" href="#cli-for-densitypy" title="Permalink to this heading"></a></h2>
+<p>This CLI is engineered to facilitate computational chemistry simulations with OpenMolcas and the ASTRA-ChargeMigration Fortran code.</p>
 <dl class="simple">
-<dt>… click:: cli_run</dt><dd><dl class="field-list simple">
-<dt class="field-odd">prog<span class="colon">:</span></dt>
-<dd class="field-odd"><p>densitypy</p>
+<dt>Functionality and Scope:</dt><dd><p>Molcas Integration: Incorporates Molcas for quantum chemical calculations, essential for accurate modeling of electronic structures.
+Charge Migration Analysis: Executes both standard and Fourier-transformed charge migration simulations, offering deep insights into molecular dynamics.
+Data Visualization and Analysis: Provides tools for generating plots and graphs, crucial for interpreting complex simulation data.
+Configurable Workflow: Leverages a JSON-based configuration system, allowing for flexible and detailed setup of simulation parameters.</p>
 </dd>
-<dt class="field-even">nested<span class="colon">:</span></dt>
-<dd class="field-even"><p>full</p>
+<dt>Parameters</dt><dd><p>json_config_path: String, path to the JSON configuration file.
+study_directory: String, directory path for output and intermediate files.
+molcas_input: String, optional path to the Molcas input file.
+Additional flags and options to control specific features and modes of operation.</p>
+</dd>
+<dt>Usage:</dt><dd><p>python cli_v1.py configuration_help.json /home/ruben/PycharmProjects/DensityPy/Studies/cluttertest/ –make –make_directory=densityfort –make_flags=’all’ –run_charge_migration –run_charge_migration_ft –run_spectrum_reconstruction –plot</p>
 </dd>
 </dl>
-</dd>
-</dl>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>CLI<span class="w"> </span><span class="k">for</span><span class="w"> </span>DensityPy<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>STUDY_DIRECTORY<span class="w"> </span>JSON_CONFIG_PATH
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-molcas_input">
+<span class="sig-name descname"><span class="pre">--molcas_input</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;molcas_input&gt;</span></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-molcas_input" title="Permalink to this definition"></a></dt>
+<dd><p>Path to the Molcas input file, this enables molcas execution</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-run_charge_migration">
+<span class="sig-name descname"><span class="pre">--run_charge_migration</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-run_charge_migration" title="Permalink to this definition"></a></dt>
+<dd><p>Enable charge migration</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-run_charge_migration_ft">
+<span class="sig-name descname"><span class="pre">--run_charge_migration_ft</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-run_charge_migration_ft" title="Permalink to this definition"></a></dt>
+<dd><p>Enable charge migration FT</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-run_spectrum_reconstruction">
+<span class="sig-name descname"><span class="pre">--run_spectrum_reconstruction</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-run_spectrum_reconstruction" title="Permalink to this definition"></a></dt>
+<dd><p>Enable spectrum reconstruction</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-field_file_help">
+<span class="sig-name descname"><span class="pre">--field_file_help</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-field_file_help" title="Permalink to this definition"></a></dt>
+<dd><p>Enable field file help</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-molcas_input_help">
+<span class="sig-name descname"><span class="pre">--molcas_input_help</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-molcas_input_help" title="Permalink to this definition"></a></dt>
+<dd><p>Enable Molcas input help</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-scforbs">
+<span class="sig-name descname"><span class="pre">--scforbs</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-scforbs" title="Permalink to this definition"></a></dt>
+<dd><p>Run SCF Orbital Calculations and plot</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-gridit">
+<span class="sig-name descname"><span class="pre">--gridit</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-gridit" title="Permalink to this definition"></a></dt>
+<dd><p>Enable grid flag</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-write_charge_migration">
+<span class="sig-name descname"><span class="pre">--write_charge_migration</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-write_charge_migration" title="Permalink to this definition"></a></dt>
+<dd><p>Write charge migration</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-debug_mode">
+<span class="sig-name descname"><span class="pre">--debug_mode</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-debug_mode" title="Permalink to this definition"></a></dt>
+<dd><p>Enable debug mode</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-justh5">
+<span class="sig-name descname"><span class="pre">--justh5</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-justh5" title="Permalink to this definition"></a></dt>
+<dd><p>Enable just h5</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-justgetdipoles">
+<span class="sig-name descname"><span class="pre">--justgetdipoles</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-justgetdipoles" title="Permalink to this definition"></a></dt>
+<dd><p>Enable just get dipoles</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-justgetdensity">
+<span class="sig-name descname"><span class="pre">--justgetdensity</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-justgetdensity" title="Permalink to this definition"></a></dt>
+<dd><p>Enable just get density</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-weights_file">
+<span class="sig-name descname"><span class="pre">--weights_file</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;weights_file&gt;</span></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-weights_file" title="Permalink to this definition"></a></dt>
+<dd><p>Path to the weights file</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-givenfieldfile">
+<span class="sig-name descname"><span class="pre">--givenfieldfile</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;givenfieldfile&gt;</span></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-givenfieldfile" title="Permalink to this definition"></a></dt>
+<dd><p>Path to the given field file</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-make">
+<span class="sig-name descname"><span class="pre">--make</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-make" title="Permalink to this definition"></a></dt>
+<dd><p>Enable Fortran compilation</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-make_directory">
+<span class="sig-name descname"><span class="pre">--make_directory</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;make_directory&gt;</span></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-make_directory" title="Permalink to this definition"></a></dt>
+<dd><p>Path to the Fortran compilation directory</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-make_flags">
+<span class="sig-name descname"><span class="pre">--make_flags</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;make_flags&gt;</span></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-make_flags" title="Permalink to this definition"></a></dt>
+<dd><p>Path to the Fortran compilation make flags</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-plot">
+<span class="sig-name descname"><span class="pre">--plot</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-plot" title="Permalink to this definition"></a></dt>
+<dd><p>Enable plotting</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-arg-STUDY_DIRECTORY">
+<span class="sig-name descname"><span class="pre">STUDY_DIRECTORY</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-arg-STUDY_DIRECTORY" title="Permalink to this definition"></a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-CLI-for-DensityPy-arg-JSON_CONFIG_PATH">
+<span class="sig-name descname"><span class="pre">JSON_CONFIG_PATH</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-CLI-for-DensityPy-arg-JSON_CONFIG_PATH" title="Permalink to this definition"></a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+</section>
 </section>
 
 

@@ -6,8 +6,8 @@ cli_run
     :undoc-members:
     :show-inheritance:
 
-... click:: cli_run
-    :prog: densitypy
+.. click:: cli_run:cli_run
+    :prog: CLI for DensityPy
     :nested: full
 
 .. inheritance-diagram:: cli_run

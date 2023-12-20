@@ -6,8 +6,8 @@ charge_migration.chargemigratonscripts
     :undoc-members:
     :show-inheritance:
 
-... click:: charge_migration.chargemigratonscripts
-    :prog: densitypy
+.. click:: charge_migration.chargemigratonscripts:cli_run
+    :prog: CLI for DensityPy
     :nested: full
 
 .. inheritance-diagram:: charge_migration.chargemigratonscripts

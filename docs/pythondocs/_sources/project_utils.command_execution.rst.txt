@@ -6,8 +6,8 @@ project_utils.command_execution
     :undoc-members:
     :show-inheritance:
 
-... click:: project_utils.command_execution
-    :prog: densitypy
+.. click:: project_utils.command_execution:cli_run
+    :prog: CLI for DensityPy
     :nested: full
 
 .. inheritance-diagram:: project_utils.command_execution

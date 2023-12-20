@@ -98,7 +98,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for post_processing.plotting_module</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colors</span>
 <span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">gaussian_filter</span>
@@ -617,7 +619,7 @@
     <span class="c1">#   &quot;carrier_envelope_phase_...&quot;, &quot;intensity_...&quot;, &quot;amplitude_...&quot;, &quot;period_...&quot;, &quot;iOmega&quot;, &quot;OmegaVec&quot;, &quot;FTDipoleX_Re&quot;,</span>
     <span class="c1">#   &quot;FTDipoleX_Im&quot;, &quot;FTDipoleY_Re&quot;, &quot;FTDipoleY_Im&quot;, &quot;FTDipoleZ_Re&quot;, &quot;FTDipoleZ_Im&quot;</span>
 
-    <span class="n">FILE_PATH</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s1">/Dipole/DipoleFT_ALL.csv&#39;</span>
+    <span class="n">FILE_PATH</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">study_directory</span><span class="p">,</span><span class="n">experiment_directory</span><span class="p">)</span><span class="si">}</span><span class="s1">/Dipole/DipoleFT_ALL.csv&#39;</span>
 
     <span class="c1"># Pump Settings</span>
     <span class="n">type_of_pulse_pump</span> <span class="o">=</span> <span class="n">pump_settings</span><span class="p">[</span><span class="s1">&#39;typeofpulse&#39;</span><span class="p">]</span>

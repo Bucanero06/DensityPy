@@ -6,8 +6,8 @@ autodocumentation_python
     :undoc-members:
     :show-inheritance:
 
-... click:: autodocumentation_python
-    :prog: densitypy
+.. click:: autodocumentation_python:cli_run
+    :prog: CLI for DensityPy
     :nested: full
 
 .. inheritance-diagram:: autodocumentation_python

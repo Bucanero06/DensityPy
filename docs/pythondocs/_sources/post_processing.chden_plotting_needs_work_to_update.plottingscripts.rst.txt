@@ -6,8 +6,8 @@ post_processing.chden_plotting_needs_work_to_update.plottingscripts
     :undoc-members:
     :show-inheritance:
 
-... click:: post_processing.chden_plotting_needs_work_to_update.plottingscripts
-    :prog: densitypy
+.. click:: post_processing.chden_plotting_needs_work_to_update.plottingscripts:cli_run
+    :prog: CLI for DensityPy
     :nested: full
 
 .. inheritance-diagram:: post_processing.chden_plotting_needs_work_to_update.plottingscripts
