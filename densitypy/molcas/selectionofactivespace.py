@@ -10,10 +10,89 @@ from densitypy.molcas.pegamoid import run_pegamoid
 from densitypy.project_utils.command_execution import execute_command, print_molcas_log_errors
 from densitypy.project_utils.file_directory_ops import find, make_directory, copy_to
 
+def SelectionOfActiveSpace(xyz_file: str):
+    """Do ground state cas"""
 
-def SelectionOfActiveSpace(json_config, **kwargs):
+    xyz_file=path.abspath(xyz_file)
+    # create a molecule
+    from densitypy.autocas.scine_autocas.autocas_utils.molecule import Molecule
+    molecule = Molecule(xyz_file)
+
+    # initialize autoCAS and Molcas interface
+    from densitypy.autocas.scine_autocas import Autocas
+    autocas = Autocas(molecule)
+    from densitypy.autocas.scine_autocas.interfaces.molcas import Molcas
+    molcas = Molcas([molecule])
+    # make initial active space and evaluate initial DMRG calculation
+    occ_initial, index_initial = autocas.make_initial_active_space()
+    print(f"occ_initial: {occ_initial}")
+    print(f"index_initial: {index_initial}")
+
+    # setup interface
+    molcas.project_name = "example"
+    # molcas.settings.work_dir =
+    # molcas.environment.molcas_scratch_dir =
+    molcas.settings.xyz_file = xyz_file
+
+
+
+    # cas and hyphen do not matter for method names
+    molcas.settings.method = "DMRGCI"
+
+    # manually set dmrg sweeps and bond dmrg_bond_dimension to low number
+    molcas.settings.dmrg_bond_dimension = 250
+    molcas.settings.dmrg_sweeps = 5
+
+    # make initial active space and evaluate initial DMRG calculation
+    occ_initial, index_initial = autocas.make_initial_active_space()
+
+    # no input means HF calculation
+    molcas.calculate()
+
+    # do cas calculation
+    cas_results = molcas.calculate(occ_initial, index_initial)
+
+    # energy = cas_results[0]
+    s1_entropy = cas_results[1]
+    # s2_entropy = cas_results[2]
+    mut_inf = cas_results[3]
+
+    # plot entanglement diagram
+    from densitypy.autocas.scine_autocas.plots.entanglement_plot import EntanglementPlot
+    plot = EntanglementPlot()
+    plt = plot.plot(s1_entropy, mut_inf)  # type: ignore
+    plt.savefig(molcas.settings.work_dir + "/entang.pdf")  # type: ignore
+
+    # make active space based on single orbital entropies
+    cas_occ, cas_index = autocas.get_active_space(
+        occ_initial, s1_entropy   # type: ignore
+    )
+
+    # cas and hyphen do not matter for method names
+    molcas.settings.method = "dmrg-scf"
+
+    # manually set dmrg sweeps and bond dmrg_bond_dimension to low number
+    molcas.settings.dmrg_bond_dimension = 2000
+    molcas.settings.dmrg_sweeps = 20
+
+    # Do a calculation with this CAS
+    final_energy, final_s1, final_s2, final_mut_inf = molcas.calculate(cas_occ, cas_index)
+
+    # use results
+    n_electrons = sum(cas_occ)
+    n_orbitals = len(cas_occ)
+    print(f"final energy:      {final_energy}")
+    print(f"final CAS(e, o):  ({n_electrons}, {n_orbitals})")
+    print(f"final cas indices: {cas_index}")
+    print(f"final occupation:  {cas_occ}")
+    print(f"final s1:          {final_s1}")
+    print(f"final s2: \n{final_s2}")
+    print(f"final mut_inf: \n{final_mut_inf}")
+    return cas_occ, cas_index, final_energy
+
+def deprecated_SelectionOfActiveSpace(json_config, **kwargs):
     """
-    (DEPRECATED) This function is used to select the active space using Luscus GUI (DEPRECATED)
+    (DEPRECATED) This function is used to select the active space using Pegamoid GUI (DEPRECATED)
 
     :param ini_file:
     :return:
@@ -39,7 +118,6 @@ def SelectionOfActiveSpace(json_config, **kwargs):
     copy_to(xyz_geometry_path, molcas_output_directory)
     temp_project_name = f'selecting_space_{project_name}'
     molcas_input_path = path.join(molcas_output_directory, f'{temp_project_name}.input')
-
 
     # Write/Prepare input file used to select Active Space using luscus
     with open(molcas_input_path, "w") as pyinput:
