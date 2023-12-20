@@ -18,9 +18,10 @@ Functionality and Scope:
 * [Configurable Workflow](densitypy%2Fproject_utils%2Fconfiguration_parser.py): Leverages a [JSON-based configuration](densitypy%2FDefault_Settings%2Fdefault_config.py) system, allowing for flexible and detailed setup of simulation parameters.
 * [Environment Management](densitypy%2Fproject_utils): Implements efficient directory and environment management, crucial for handling extensive simulations.
 * [Logging](densitypy%2Fproject_utils%2Flogger.py) and [Debugging](densitypy%2Fproject_utils%2Ffortran_compilation_handler.py): Includes comprehensive logging for monitoring simulation progress and facilitating debugging.
-* [Fortran Compatibility](densitypy%2Fproject_utils%2Ffortran_compilation_handler.py): Features integration with Fortran for [performance-critical components](densityfort) of the simulations, often parallelized for optimal performance.
+* [Fortran Compatibility](densitypy%2Fproject_utils%2Ffortran_compilation_handler.py): Uses Fortran for [performance-critical components](densityfort) of the simulations, often parallelized for optimal performance.
 * [AutoDocumentation](Documentation): Using both [Sphinx](https://www.sphinx-doc.org/en/master/) and [FORD](forddocs.readthedocs.io/en/latest/), allowing for easy navigation and understanding of the codebase.
 
+*all the processes above have plenty of room for improvement*
 
 Usage:
 ```python
@@ -124,7 +125,8 @@ generate any of the following files in order to visualize the orbitals and selec
 
 To do this we can run the `scforbs` command:
 ```bash
-python cli_run.py Studies/ExampleStudy/ nma_configuration.json --scforbs
+python cli_run.py Studies/ExampleStudy/ nma_configuration.json --scforbs 
+  # --autocas --> automates active-orbital-space selection step in multi-configurational calculations using autocas 
 ```
 This will, among others, generate a h5 containing information about each orbital which will then be loaded and 
 visualized. 
@@ -133,7 +135,7 @@ visualized.
 
 ![Screenshot from 2023-12-17 23-41-13](https://github.com/Bucanero06/DensityPy/assets/60953006/0e2a9550-5d0b-44ed-8d5b-ed29bb68deed)
 
-We can then select (basic-autocas-pending) the orbitals we want to include in our initial active space. For this 
+We can then select the orbitals we want to include in our initial active space. For this 
 example, to compute the ground and excited states of molecules such as formamide and NMA, let's perform a 
 `RAS-SCF` calculation using a `6-31G$^{**}` basis. This basis choice is effective for organic compounds as it 
 includes polarization functions on all atoms and adds diffuse functions on heavy atoms. In our calculations, 
@@ -143,7 +145,7 @@ and valence orbitals. Although this selection can lead to large and computationa
 a more focused approach considering only valence orbitals can simplify the problem. We'll include key unoccupied 
 orbitals, like the σ* and π* orbitals, in our active space. This strategy not only makes the calculations more 
 manageable but also allows for the inclusion of additional relevant occupied orbitals, such as another lone pair 
-on oxygen, thus providing a comprehensive yet efficient (very-cheap except for GRIDIT) and targeted computational run.
+on oxygen, thus providing a comprehensive yet efficient and targeted computational run.
 
 ```bash
 python cli_run.py Studies/ExampleStudy/ nma_configuration.json 
@@ -296,6 +298,7 @@ After finishing, the pipeline can be visualized (although changing) through inte
 
 [Screencast from 12-19-2023 10:45:37 PM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/d69aa1d2-4a6a-44c6-bced-553b41aaaf1a)
 
+![dipole-heatmap.png](docs%2Fimages%2Fdipole-heatmap.png)
 
 `I am currently having difficulties with my knight's email`, please reach out to me here, `Github`, otherwise either 
 `ruben.fernandez.carbon@gmail.com` or `ruben@carbonyl.org` to DM me.
@@ -338,3 +341,7 @@ of inheritance diagrams.
 
 ![Screenshot from 2023-12-20 13-15-46.png](docs%2Fimages%2FScreenshot%20from%202023-12-20%2013-15-46.png)
 ![Screenshot from 2023-12-20 13-14-44.png](..%2F..%2FPictures%2FScreenshots%2FScreenshot%20from%202023-12-20%2013-14-44.png)
+
+Notes:
+The most convenient way to install a patched PySCF together with Block is to use the build script [PySCF_Block.sh](PySCF_Block.sh)
+
