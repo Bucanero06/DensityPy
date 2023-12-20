@@ -2,12 +2,13 @@
 
 
 Click CLI found in [`cli_run.py`](cli_run.py) and function [`run_densitypy`](densitypy%2Fmain.py) are the entry Way to 
-DensityPy. This cli/function is engineered to facilitate computational chemistry simulations with OpenMolcas and the 
-ASTRA-ChargeMigration Fortran code.
+DensityPy. This cli/function facilitates computational chemistry simulations with OpenMolcas and the 
+ASTRA-ChargeMigration Fortran code. Integration with other frameworks has been experimented with, but is not
+currently supported out of the box.
+
 <p align="center">
   <img src="https://github.com/Bucanero06/Bucanero06/assets/60953006/e9e8a290-9e74-4d45-96ae-4114e423f637" width="400" />
  <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/07edfb34-672b-4151-bb4b-14560f44fac7" height="248" />
-
 </p>
 
 Functionality and Scope:
@@ -45,11 +46,6 @@ python cli_v1.py ~/DensityPy/Studies/ExampleStudy/ configuration_help.json \
   --run_charge_migration --run_charge_migration_ft --run_spectrum_reconstruction --plot
 ```
 
-I am currently having difficulties with my knight's email, please reach out to me here, Github, otherwise either ruben.fernandez.carbon@gmail.org or ruben@carbonyl.org to DM me.
-
-This is a part of a larger codebase, currently still undergoing a code review and refactoring along the manuscript and 
-thesis writing process. Threat this codebase as a proof of concept, and not as final; there are still bugs and discrepancies.
-
 ## Quick Start
 You are welcome to deviate from this quick start guide, but this may be a great place to start prior to diving into the
 codebase. Note that DensityPy leverages OpenMolcas (and soon ASTRA) for quantum chemical calculations, essential for 
@@ -57,6 +53,32 @@ accurate modeling of electronic structures,
 please [install](https://molcas.gitlab.io/OpenMolcas/sphinx/installation.guide/ig.html) and make sure h5 and 
 GridIt(*on its way out*) configurations are enabled.
 
+### The Command Line Options are:
+```
+Options:
+  --molcas_input TEXT            Path to the Molcas input file, this enables molcas execution
+  --run_charge_migration         Enable charge migration
+  --run_charge_migration_ft      Enable charge migration FT
+  --run_spectrum_reconstruction  Enable spectrum reconstruction
+  --field_file_help              Enable field file help
+  --molcas_input_help            Enable Molcas input help
+  --scforbs                      Run SCF Orbital Calculations and plot
+  --gridit                       Enable grid flag
+  --write_charge_migration       Write charge migration
+  --debug_mode                   Enable debug mode
+  --justh5                       Enable just h5
+  --justgetdipoles               Enable just get dipoles
+  --justgetdensity               Enable just get density
+  --weights_file TEXT            Path to the weights file
+  --givenfieldfile TEXT          Path to the given field file
+  --make                         Enable Fortran compilation
+  --make_directory TEXT          Path to the Fortran compilation directory
+  --make_flags TEXT              Path to the Fortran compilation make flags
+  --plot                         Enable plotting
+  --help                         Show this message and exit.
+```
+
+### Configuring the Study Directory
 ![Screenshot from 2023-12-17 20-41-16](https://github.com/Bucanero06/DensityPy/assets/60953006/9e90fce9-b7d0-40f5-b09c-63f088a1cce0)
 We can begin from a single `.xyz` file, which contains the molecular geometry of the system of
 interest. Let our model system be n-methylacetamide (NMA), which has the following geometry:
@@ -104,7 +126,7 @@ To do this we can run the `scforbs` command:
 ```bash
 python cli_run.py Studies/ExampleStudy/ nma_configuration.json --scforbs
 ```
-This will among others generate a quick h5 containing information about each orbital which will then be loaded and 
+This will, among others, generate a h5 containing information about each orbital which will then be loaded and 
 visualized. 
 
 [Screencast from 12-17-2023 11:47:17 PM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/fdc60b98-4231-49ee-9d94-5747cb7f711b)
@@ -266,45 +288,30 @@ dephasing & relaxation factors can be changed to account for the environment and
 ...
 ...
 ```
+
 #TODO EXTEND DOCUMENTATION FOR THESE STEPS
 #TODO PARAMSEARCH goes here too
-After running the pipeline we can visualize the results using the `plot` command and expect (although changing)
-something along the ball park of:
+After finishing, the pipeline can be visualized (although changing) through interactive and png plots like: 
+#TODO ADD PLOTS --placeholder->
 
 [Screencast from 12-19-2023 10:45:37 PM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/d69aa1d2-4a6a-44c6-bced-553b41aaaf1a)
 
 
+`I am currently having difficulties with my knight's email`, please reach out to me here, `Github`, otherwise either 
+`ruben.fernandez.carbon@gmail.com` or `ruben@carbonyl.org` to DM me.
 
-The Options are:
-```
-Options:
-  --molcas_input TEXT            Path to the Molcas input file, this enables molcas execution
-  --run_charge_migration         Enable charge migration
-  --run_charge_migration_ft      Enable charge migration FT
-  --run_spectrum_reconstruction  Enable spectrum reconstruction
-  --field_file_help              Enable field file help
-  --molcas_input_help            Enable Molcas input help
-  --scforbs                      Run SCF Orbital Calculations and plot
-  --gridit                       Enable grid flag
-  --write_charge_migration       Write charge migration
-  --debug_mode                   Enable debug mode
-  --justh5                       Enable just h5
-  --justgetdipoles               Enable just get dipoles
-  --justgetdensity               Enable just get density
-  --weights_file TEXT            Path to the weights file
-  --givenfieldfile TEXT          Path to the given field file
-  --make                         Enable Fortran compilation
-  --make_directory TEXT          Path to the Fortran compilation directory
-  --make_flags TEXT              Path to the Fortran compilation make flags
-  --plot                         Enable plotting
-  --help                         Show this message and exit.
-```
+This is a part of a larger codebase, currently still undergoing a code review and refactoring along the manuscript and 
+thesis writing process. Threat this codebase as a proof of concept, and not as final; there are still bugs and discrepancies.
+
+With modifications, the outputs from OpenMolcas, PySCF, GAMES, and NWChem have been tested and are 
+compatible with the Fortran codebase, documentation as it stands is available 
+[here](https://bucanero06.github.io/DensityPy) and will be regularly updated as the codebase is refactored.
+Right now the python documentation is not showing up as intended on github pages, but it is available locally.
 
 
-
-## AutoDocumentation
+## Documentation
 The documentation is currently being updated, but you can find the latest version 
-[here](https://bucanero06.github.io/DensityPy/) [GITHUBPAGES-PENDING]. 
+[here]() [GITHUBPAGES-PENDING]. 
 Running the following command will generate the documentation locally using Sphinx and FORD for 
 [python](densitypy%2Fautodocumentation_python.py) and [fortran](densitypy%2Fautodocumentation_fortran.py) respectively:
 
@@ -326,8 +333,8 @@ python -m densitypy.autodocumentation_fortran
 
 ![Screenshot from 2023-12-19 22-33-54.png](docs%2Fimages%2FScreenshot%20from%202023-12-19%2022-33-54.png)
 ![Screenshot from 2023-12-19 22-32-06.png](docs%2Fimages%2FScreenshot%20from%202023-12-19%2022-32-06.png)
-The documentation can handle
-
-autodocumentation of docstrings for both modules and functions, handling markdown as well as latex and the generation 
+The documentation can be generated from docstrings for both modules and functions, handling markdown as well as latex and the generation 
 of inheritance diagrams.
 
+![Screenshot from 2023-12-20 13-15-46.png](docs%2Fimages%2FScreenshot%20from%202023-12-20%2013-15-46.png)
+![Screenshot from 2023-12-20 13-14-44.png](..%2F..%2FPictures%2FScreenshots%2FScreenshot%20from%202023-12-20%2013-14-44.png)
