@@ -105,14 +105,13 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
         if need_molcas_input or field_file_help:
             exit()
         if autocas:
-            import os
             occupation, orbitals, energy =SelectionOfActiveSpace(xyz_file=json_config['projectsettings']['xyzmoleculegeometry'])
             print(f"n2 \ncas: {occupation} \norbs: {orbitals} \nenergy: {energy}")
-
-        exit()
+            #TODO
+            exit()
         if scforbs:
             # Selection of Active Space using scforbs argument.
-            deprecated_SelectionOfActiveSpace(json_config)  # todo need to update and most likely will switch programs
+            deprecated_SelectionOfActiveSpace(json_config)
 
         # Split JSON config into sections
         project_settings = json_config['projectsettings']
