@@ -244,11 +244,11 @@ if __name__ == '__main__':
     @click.option('--source_dir', '-s', help='Source directory', required=True)
     @click.option('--documentation_dir', '-d', help='Documentation directory', required=True)
     @click.option('--exclude_dirs', '-e', help='Directories to exclude', default=None)
-    @click.option('--remove_top_package_names', '-t', help='Top level package names to remove', default=None)
+    @click.option('--remove_top_package_name', '-t', help='Top level package names to remove', default=None)
     @click.option('--remove_old_files', '-r', is_flag=True, help='Remove old files', default=False)
-    def main_cli(project_name, author_name, source_dir, documentation_dir, exclude_dirs, remove_top_package_names,
+    def main_cli(project_name, author_name, source_dir, documentation_dir, exclude_dirs, remove_top_package_name,
                  remove_old_files):
-        main(project_name, author_name, source_dir, documentation_dir, exclude_dirs, remove_top_package_names,
+        main(project_name, author_name, source_dir, documentation_dir, exclude_dirs, remove_top_package_name,
              remove_old_files)
 
 
