@@ -330,8 +330,8 @@ python -m densitypy.autodocumentation_fortran
         --project_name "Charge Migration" --project_description {...} 
         --source_dirs "densityfort/ChargeMigration,densityfort/ChargeMigrationFT,densityfort/SpectrumReconstruction" 
         --documentation_dir "docs/fortrandocs" 
-        --exclude_dirs "densityfort/ChargeMigration/src/future_reconstruction_using_ci_work,densityfort/ChargeMigrationFT/src/future_reconstruction_using_ci_work" 
         --graphs True --remove_old_files
+        --exclude_dirs "densityfort/ChargeMigration/src/future_reconstruction_using_ci_work,densityfort/ChargeMigrationFT/src/future_reconstruction_using_ci_work" 
 ```
 
 ![Screenshot from 2023-12-19 22-33-54.png](docs%2Fimages%2FScreenshot%20from%202023-12-19%2022-33-54.png)
