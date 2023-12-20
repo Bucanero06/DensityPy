@@ -1,0 +1,15 @@
+autodocumentation_fortran
+===================================
+
+.. automodule:: autodocumentation_fortran
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+... click:: autodocumentation_fortran
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: autodocumentation_fortran
+    :parts: 1
+

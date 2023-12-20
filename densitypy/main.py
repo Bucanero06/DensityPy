@@ -33,7 +33,7 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
                   plot=True  # todo usage to be changed, here for testing
                   ):
     """
-    Entry Way to DensityPy. This function is engineered to facilitate computational chemistry simulations with OpenMolcas and the ASTRA-ChargeMigration Fortran code.
+    Entry Way to DensityPy. This function facilitates computational chemistry simulations with OpenMolcas and the ASTRA-ChargeMigration Fortran code.
 
     Functionality and Scope:
         Molcas Integration: Incorporates Molcas for quantum chemical calculations, essential for accurate modeling of electronic structures.

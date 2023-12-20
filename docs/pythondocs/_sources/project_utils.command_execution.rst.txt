@@ -1,0 +1,15 @@
+project_utils.command_execution
+=========================================
+
+.. automodule:: project_utils.command_execution
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+... click:: project_utils.command_execution
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: project_utils.command_execution
+    :parts: 1
+

@@ -1,0 +1,15 @@
+molcas.pegamoid
+=========================
+
+.. automodule:: molcas.pegamoid
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+... click:: molcas.pegamoid
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: molcas.pegamoid
+    :parts: 1
+

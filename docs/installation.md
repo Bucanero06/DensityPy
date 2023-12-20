@@ -21,4 +21,6 @@ source /opt/intel/oneapi/setvars.sh --force
         2. Changed MKL_PATH and MKL_INCLUDE to reflect the OneAPI installation
 
 ### OpenMolcas installation:
+...
+
 

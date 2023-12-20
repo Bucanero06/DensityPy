@@ -1,0 +1,15 @@
+project_utils.file_directory_ops
+==========================================
+
+.. automodule:: project_utils.file_directory_ops
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+... click:: project_utils.file_directory_ops
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: project_utils.file_directory_ops
+    :parts: 1
+

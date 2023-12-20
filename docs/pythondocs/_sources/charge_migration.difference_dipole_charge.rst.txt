@@ -1,0 +1,15 @@
+charge_migration.difference_dipole_charge
+===================================================
+
+.. automodule:: charge_migration.difference_dipole_charge
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+... click:: charge_migration.difference_dipole_charge
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: charge_migration.difference_dipole_charge
+    :parts: 1
+

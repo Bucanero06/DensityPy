@@ -7830,28 +7830,29 @@ class BGColorDialog(QDialog):
         self.DColorButton.set_color(def_background_color['D'])
 
 
-def run_pegamoid():
+def run_pegamoid(f1=None,f2=None):
     app = QApplication(sys.argv)
     win = MainWindow()
-    f1 = None
-    f2 = None
+
     try:
-        f1 = os.path.abspath(sys.argv[1])
+        f1 = os.path.abspath(f1)
         try:
-            f2 = os.path.abspath(sys.argv[2])
-        except IndexError:
-            pass
+            if (f2):
+                if h5py.is_hdf5(f2):
+                    win.filename = f2
+                    win.otherfile = f1
+                else:
+                    win.filename = f1
+                    win.otherfile = f2
+                f2 = os.path.abspath(f2)
+            else:
+                win.filename = f1
+        except Exception as e:
+            print(e)
+            win.filename = f1
     except IndexError:
         pass
-    if (f2):
-        if h5py.is_hdf5(f2):
-            win.filename = f2
-            win.otherfile = f1
-        else:
-            win.filename = f1
-            win.otherfile = f2
-    else:
-        win.filename = f1
+
     rc = app.exec_()
     # orderly cleanup
     del win
@@ -7859,5 +7860,4 @@ def run_pegamoid():
     sys.exit(rc)
 
 
-if __name__ == "__main__":
-    run_pegamoid()
+

@@ -1,0 +1,15 @@
+project_utils.logger
+==============================
+
+.. automodule:: project_utils.logger
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+... click:: project_utils.logger
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: project_utils.logger
+    :parts: 1
+

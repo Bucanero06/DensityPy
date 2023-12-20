@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>main &mdash; DensityPy 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=eafc0fe6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=f6245a2f"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="molcas.DipolesLogParser" href="molcas.DipolesLogParser.html" />
+    <link rel="prev" title="charge_migration.difference_dipole_charge" href="charge_migration.difference_dipole_charge.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            DensityPy
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cli_run.html">cli_run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Default_Settings.default_config.html">Default_Settings.default_config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autodocumentation_fortran.html">autodocumentation_fortran</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autodocumentation_python.html">autodocumentation_python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="charge_migration.chargemigratonscripts.html">charge_migration.chargemigratonscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="charge_migration.difference_dipole_charge.html">charge_migration.difference_dipole_charge</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">main</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main.run_densitypy"><code class="docutils literal notranslate"><span class="pre">run_densitypy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="molcas.DipolesLogParser.html">molcas.DipolesLogParser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="molcas.molcasscripts.html">molcas.molcasscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="molcas.pegamoid.html">molcas.pegamoid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="molcas.selectionofactivespace.html">molcas.selectionofactivespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="post_processing.chden_plotting_needs_work_to_update.plotdensity.html">post_processing.chden_plotting_needs_work_to_update.plotdensity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="post_processing.chden_plotting_needs_work_to_update.plottingscripts.html">post_processing.chden_plotting_needs_work_to_update.plottingscripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="post_processing.chden_plotting_needs_work_to_update.rpoints2vtk.html">post_processing.chden_plotting_needs_work_to_update.rpoints2vtk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="post_processing.plotting_module.html">post_processing.plotting_module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project_utils.command_execution.html">project_utils.command_execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project_utils.configuration_parser.html">project_utils.configuration_parser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project_utils.data_processing_utils.html">project_utils.data_processing_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project_utils.file_directory_ops.html">project_utils.file_directory_ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project_utils.file_parsing.html">project_utils.file_parsing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project_utils.fortran_compilation_handler.html">project_utils.fortran_compilation_handler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project_utils.logger.html">project_utils.logger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project_utils.string_dict_utils.html">project_utils.string_dict_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs.pythondocs.source.conf.html">docs.pythondocs.source.conf</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DensityPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">main</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-main">
+<span id="densitypy-main"></span><h1>main<a class="headerlink" href="#module-main" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="main.run_densitypy">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">run_densitypy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">study_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_config_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molcas_input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_charge_migration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_charge_migration_ft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_spectrum_reconstruction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_file_help</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molcas_input_help</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scforbs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gridit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_charge_migration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">justh5</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">justgetdipoles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">justgetdensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">givenfieldfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_fortran</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_fortran_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/densitypy/main.html#run_densitypy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.run_densitypy" title="Permalink to this definition"></a></dt>
+<dd><p>Entry Way to DensityPy. This function is engineered to facilitate computational chemistry simulations with OpenMolcas and the ASTRA-ChargeMigration Fortran code.</p>
+<dl class="simple">
+<dt>Functionality and Scope:</dt><dd><p>Molcas Integration: Incorporates Molcas for quantum chemical calculations, essential for accurate modeling of electronic structures.
+Charge Migration Analysis: Executes both standard and Fourier-transformed charge migration simulations, offering deep insights into molecular dynamics.
+Data Visualization and Analysis: Provides tools for generating plots and graphs, crucial for interpreting complex simulation data.
+Configurable Workflow: Leverages a JSON-based configuration system, allowing for flexible and detailed setup of simulation parameters.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>json_config_path</strong> – String, path to the JSON configuration file.</p></li>
+<li><p><strong>study_directory</strong> – String, directory path for output and intermediate files.</p></li>
+<li><p><strong>molcas_input</strong> – String, optional path to the Molcas input file.</p></li>
+<li><p><strong>operation.</strong> (<em>Additional flags and options to control specific features and modes of</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Usage:</dt><dd><dl class="simple">
+<dt>run_densitypy(</dt><dd><p>json_config_path=”xy_polarized_config.json”,
+study_directory=”Studies/ExampleStudy”,
+molcas_input=’molcas_input_help.input’,
+run_charge_migration=True,
+run_charge_migration_ft=True,
+run_spectrum_reconstruction=True,
+plot=True,
+field_file_help=False, molcas_input_help=False,
+scforbs=False, gridit=True, write_charge_migration=None, debug_mode=False,
+justh5=False, justgetdipoles=False, justgetdensity=False, weights_file=None, givenfieldfile=None,
+make_fortran=False, make_fortran_config={‘directory’: ‘/home/ruben/PycharmProjects/DensityPy/densityfort’,’make_flags’: ‘all DEB_FLAG=d’})</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="simple">
+<dt>… click:: main</dt><dd><dl class="field-list simple">
+<dt class="field-odd">prog<span class="colon">:</span></dt>
+<dd class="field-odd"><p>densitypy</p>
+</dd>
+<dt class="field-even">nested<span class="colon">:</span></dt>
+<dd class="field-even"><p>full</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="charge_migration.difference_dipole_charge.html" class="btn btn-neutral float-left" title="charge_migration.difference_dipole_charge" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="molcas.DipolesLogParser.html" class="btn btn-neutral float-right" title="molcas.DipolesLogParser" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ruben Fernandez Carbon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

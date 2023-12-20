@@ -1,0 +1,15 @@
+molcas.molcasscripts
+==============================
+
+.. automodule:: molcas.molcasscripts
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+... click:: molcas.molcasscripts
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: molcas.molcasscripts
+    :parts: 1
+

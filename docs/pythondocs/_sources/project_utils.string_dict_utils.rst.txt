@@ -1,0 +1,15 @@
+project_utils.string_dict_utils
+=========================================
+
+.. automodule:: project_utils.string_dict_utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+... click:: project_utils.string_dict_utils
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: project_utils.string_dict_utils
+    :parts: 1
+

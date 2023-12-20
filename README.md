@@ -111,13 +111,129 @@ visualized.
 
 ![Screenshot from 2023-12-17 23-41-13](https://github.com/Bucanero06/DensityPy/assets/60953006/0e2a9550-5d0b-44ed-8d5b-ed29bb68deed)
 
-We can then select the orbitals we want to include in our active space, and then run the code again 
+We can then select (basic-autocas-pending) the orbitals we want to include in our initial active space. For this 
+example, to compute the ground and excited states of molecules such as formamide and NMA, let's perform a 
+`RAS-SCF` calculation using a `6-31G$^{**}` basis. This basis choice is effective for organic compounds as it 
+includes polarization functions on all atoms and adds diffuse functions on heavy atoms. In our calculations, 
+we'll focus on critical orbitals, including the highest occupied orbitals, which are typically lone pairs on 
+oxygen, and the highest π orbitals. Our active space will also encompass several important unoccupied Rydberg 
+and valence orbitals. Although this selection can lead to large and computationally challenging active spaces, 
+a more focused approach considering only valence orbitals can simplify the problem. We'll include key unoccupied 
+orbitals, like the σ* and π* orbitals, in our active space. This strategy not only makes the calculations more 
+manageable but also allows for the inclusion of additional relevant occupied orbitals, such as another lone pair 
+on oxygen, thus providing a comprehensive yet efficient (very-cheap except for GRIDIT) and targeted computational run.
+
+```bash
+python cli_run.py Studies/ExampleStudy/ nma_configuration.json 
+    --molcas_input Studies/ExampleStudy/molcas_input_help.input --gridit 
+```
+
+The above command adds the gridcoordinates to the provided file, runs OpenMolcas, and finally extracts the nessesary 
+content from the logs and h5 files, preparing them for the charge migration modules.
+
+Until this point, we have been relying on the default configuration file, which is a JSON file that contains the 
+parameters for controlling simulations, including molcas. You could have ran the entire pipeline as followed:
+
+```bash
+python cli_run.py Studies/ExampleStudy/ nma_configuration.json 
+    --molcas_input Studies/ExampleStudy/molcas_input_help.input --gridit   
+    --run_charge_migration --run_charge_migration_ft --run_spectrum_reconstruction --plot
+```
+
+But this would be inappropriate for any other case, as we would want to change the parameters based on the characteristics
+of the states and even conduct multiple geometry optimizations. For reference, this is what the configuration file we 
+generated looks like:
+
+```json
+{
+    "Project settings": {
+        "project_name": "NMA",
+        "XYZ Molecule Geometry": "NMA.xyz",
+        "Number of States": 4,
+        "List_of_Active_Orbitals": [
+            18,
+            19,
+            20,
+            21
+        ],
+        "Molcas Output Directory": "NMA_output",
+        "Experiment Directory": "example_sim"
+    },
+    "GRID settings": {
+        "Number of Points X axis": 250,
+        "Number of Points Y axis": 250,
+        "Number of Points Z axis": 250,
+        "X MIN": -6,
+        "X MAX": 7,
+        "Y MIN": -5,
+        "Y MAX": 6,
+        "Z MIN": -5,
+        "Z MAX": 5,
+        "Step Size": 0.008,
+        "Boundary": 6
+    },
+    "Charge Migration settings": {
+        "Field File": "field_file",
+        "Number of Times": 9001,
+        "Min Time": -5000,
+        "Max Time": 13000,
+        "Bath Temperature": 3000,
+        "Dephasing Factor": 0.0012,
+        "Relaxation Factor": 0.0048
+    },
+    "Pump Pulses settings": {
+        "Type of Pulse": "G",
+        "start_time": 0,
+        "Pump Central Frequency": 0.41,
+        "Pump Periods": 2,
+        "Pump Phase": 0,
+        "Pump Intensity": 0.12,
+        "Pump Polarization": [
+            90,
+            90
+        ]
+    },
+    "Probe Pulses settings": {
+        "Type of Pulse": "G",
+        "Time Delay Start": -200,
+        "Time Delay Stop": 800,
+        "Number Of PP": 120,
+        "Time Delay Weight Factor": 0.5,
+        "Probe Central Frequency": 0.073, 
+        "Probe Periods": 2,
+        "Probe Phase": 0,
+        "Probe Intensity": 0.12,
+        "Probe Polarization": [
+            90,
+            90
+        ]
+    },
+    "Charge Migration FT settings": {
+        "Number of Omegas": 120,
+        "Min Omega": 0.18,
+        "Max Omega": 0.68,
+        "Number of TauOmegas": 120,
+        "Min TauOmega": -0.25,
+        "Max TauOmega": 0.25,
+        "FT TimeStep": 5000,
+        "FT WidthStep": 350
+    }
+}
+```
+Things to keep in mind: 
+    
+
+#TODO EXTEND DOCUMENTATION FOR THESE STEPS
+#TODO PARAMSEARCH goes here too
+After running the pipeline we can visualize the results using the `plot` command and expect (although changing)
+something along the ball park of:
+
+
 
 The Options are:
 ```
 Options:
-  --molcas_input TEXT            Path to the Molcas input file, this enables
-                                 molcas execution
+  --molcas_input TEXT            Path to the Molcas input file, this enables molcas execution
   --run_charge_migration         Enable charge migration
   --run_charge_migration_ft      Enable charge migration FT
   --run_spectrum_reconstruction  Enable spectrum reconstruction
@@ -140,11 +256,13 @@ Options:
 ```
 
 
-## Documentation
+
+## AutoDocumentation
 The documentation is currently being updated, but you can find the latest version 
 [here](https://bucanero06.github.io/DensityPy/) [GITHUBPAGES-PENDING]. 
 Running the following command will generate the documentation locally using Sphinx and FORD for 
 [python](densitypy%2Fautodocumentation_python.py) and [fortran](densitypy%2Fautodocumentation_fortran.py) respectively:
+
 ```bash
 bash update_documentation.sh
 ```
@@ -160,6 +278,7 @@ python -m densitypy.autodocumentation_fortran
         --exclude_dirs "densityfort/ChargeMigration/src/future_reconstruction_using_ci_work,densityfort/ChargeMigrationFT/src/future_reconstruction_using_ci_work" 
         --graphs True --remove_old_files
 ```
+
 The documentation can handle
 
 autodocumentation of docstrings for both modules and functions, handling markdown as well as latex and the generation 

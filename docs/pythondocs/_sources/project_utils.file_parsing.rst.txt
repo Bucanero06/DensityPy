@@ -1,0 +1,15 @@
+project_utils.file_parsing
+====================================
+
+.. automodule:: project_utils.file_parsing
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+... click:: project_utils.file_parsing
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: project_utils.file_parsing
+    :parts: 1
+

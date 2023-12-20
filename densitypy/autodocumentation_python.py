@@ -2,7 +2,7 @@ import os
 
 from densitypy.project_utils.command_execution import execute_command
 from densitypy.project_utils.file_directory_ops import change_directory_manager, validate_directory_and_get_full_path, \
-    make_directory, copy_to
+    make_directory, copy_to, delete_files_or_directories
 from densitypy.project_utils.logger import setup_logger
 
 logger = setup_logger('autodocumentation_python')
@@ -31,8 +31,6 @@ def find_python_modules(start_path, ignore_folders=None):
 
     modules = []
     for root, dirs, files in os.walk(start_path):
-        logger.info(f'{dirs = }')
-
         # Exclude the specified directories and their subdirectories
         dirs[:] = [d for d in dirs if os.path.join(root, d) not in exclude_paths]
 
@@ -107,7 +105,7 @@ def create_module_rst_files(modules, rst_dir):
                 f"    :members:\n"
                 f"    :undoc-members:\n"
                 f"    :show-inheritance:\n\n."
-                f". click:: {module}:cli_run\n"
+                f".. click:: {module}\n"
                 f"    :prog: densitypy\n"
                 f"    :nested: full\n\n"
                 f".. inheritance-diagram:: {module}\n"
@@ -153,30 +151,35 @@ def build_sphinx_docs(documentation_dir):
         execute_command(f"make html")
 
 
-def rename_files_and_replace_top_level_package_name(directory, top_level_package_name):
+def rename_files_and_replace_top_level_package_names(directory, top_level_package_name=None):
     logger.info(f'Renaming files and replacing top level package name in {directory}')
-    target_prefix = top_level_package_name + '.'
+
+    directory = '/home/ruben/PycharmProjects/DensityPy/docs/pythondocs/build/html'
+
+    targeted_remove = f'{top_level_package_name}.'
     # Walk through all files and folders within the directory
     for root, dirs, files in os.walk(directory):
+
         for file in files:
-            logger.info(f'{file = }')
             file_path = os.path.join(root, file)
 
-            # Check if the file name starts with target_prefix and rename it
-            should_replace_name = file.endswith('.html') or file.endswith('.txt') or file.endswith(
-                '.js') or file.endswith('.rst')
-            if should_replace_name:
-                if file.startswith(target_prefix):
-                    new_file_name = file.replace(target_prefix, '')
+            check_to_replace_name = (file.endswith('.html') or file.endswith('.txt')
+                                     or file.endswith('.js') or file.endswith('.rst'))
+            check_to_replace_name = check_to_replace_name
+
+            if check_to_replace_name:
+
+                if file.startswith(targeted_remove):
+                    new_file_name = file.replace(targeted_remove, '')
                     new_file_path = os.path.join(root, new_file_name)
                     os.rename(file_path, new_file_path)
-                    file_path = new_file_path  # Update file_path to the new file name
+                    file_path = new_file_path
 
-                # Read the file and replace target_prefix with ''
+                # Read the file and replace targeted_remove with ''
                 with open(file_path, 'r') as f:
                     filedata = f.read()
 
-                filedata = filedata.replace(target_prefix, '')
+                filedata = filedata.replace(targeted_remove, '')
 
                 # Write the file out again
                 with open(file_path, 'w') as f:
@@ -184,18 +187,20 @@ def rename_files_and_replace_top_level_package_name(directory, top_level_package
 
 def clean_up_and_exit(documentation_dir):
     try:
+        delete_files_or_directories(f'{documentation_dir}_original', ignore_errors=True)
         execute_command(f"mv {documentation_dir} {documentation_dir}_original")
         make_directory(f'{documentation_dir}', delete_if_exists=True)  # New directory
         copy_to(f'{documentation_dir}_original/build/html/*', f'{documentation_dir}/', True)
 
     except Exception as e:
         logger.warning(f'Failed to clean up {documentation_dir}: {e}')
-        execute_command(f"rm -r {documentation_dir}")
-        execute_command(f"mv {documentation_dir}_original {documentation_dir}")
     finally:
-        execute_command(f"rm -r {documentation_dir}_original")
+        delete_files_or_directories(f'{documentation_dir}_original', ignore_errors=True)
         exit()
-def main(project_name, author_name, source_dir, documentation_dir, exclude_dirs=None, delete_old_files=False):
+
+
+def main(project_name, author_name, source_dir, documentation_dir, exclude_dirs=None, remove_top_package_name=None,
+         delete_old_files=False):
     source_dir = validate_directory_and_get_full_path(source_dir)
     documentation_dir = documentation_dir.strip()
 
@@ -205,9 +210,6 @@ def main(project_name, author_name, source_dir, documentation_dir, exclude_dirs=
     if isinstance(exclude_dirs, str):
         exclude_dirs = exclude_dirs.split(',')
         exclude_dirs = [exclude_dir.strip() for exclude_dir in exclude_dirs]
-
-    if not exclude_dirs:
-        exclude_dirs = []
 
     if delete_old_files and os.path.exists(documentation_dir):
         from densitypy.project_utils.file_directory_ops import delete_files_or_directories
@@ -226,10 +228,8 @@ def main(project_name, author_name, source_dir, documentation_dir, exclude_dirs=
     # Move the source files into the source directory
     execute_command(f"mv {documentation_dir}/*.rst {documentation_dir}/source/")
     build_sphinx_docs(documentation_dir)
-    rename_files_and_replace_top_level_package_name(os.path.join(documentation_dir, 'build', 'html'),
-                                                    top_level_package_name=source_dir.split(os.path.sep)[-1])
-
-
+    rename_files_and_replace_top_level_package_names(os.path.join(documentation_dir, 'build', 'html'),
+                                                     top_level_package_name=remove_top_package_name)
 
     clean_up_and_exit(documentation_dir)
 
@@ -244,9 +244,12 @@ if __name__ == '__main__':
     @click.option('--source_dir', '-s', help='Source directory', required=True)
     @click.option('--documentation_dir', '-d', help='Documentation directory', required=True)
     @click.option('--exclude_dirs', '-e', help='Directories to exclude', default=None)
+    @click.option('--remove_top_package_names', '-t', help='Top level package names to remove', default=None)
     @click.option('--remove_old_files', '-r', is_flag=True, help='Remove old files', default=False)
-    def main_cli(project_name, author_name, source_dir, documentation_dir, exclude_dirs, remove_old_files):
-        main(project_name, author_name, source_dir, documentation_dir, exclude_dirs, remove_old_files)
+    def main_cli(project_name, author_name, source_dir, documentation_dir, exclude_dirs, remove_top_package_names,
+                 remove_old_files):
+        main(project_name, author_name, source_dir, documentation_dir, exclude_dirs, remove_top_package_names,
+             remove_old_files)
 
 
     main_cli()

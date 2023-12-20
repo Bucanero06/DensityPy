@@ -1,0 +1,15 @@
+project_utils.configuration_parser
+============================================
+
+.. automodule:: project_utils.configuration_parser
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+... click:: project_utils.configuration_parser
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: project_utils.configuration_parser
+    :parts: 1
+

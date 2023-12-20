@@ -1,0 +1,15 @@
+charge_migration.chargemigratonscripts
+================================================
+
+.. automodule:: charge_migration.chargemigratonscripts
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+... click:: charge_migration.chargemigratonscripts
+    :prog: densitypy
+    :nested: full
+
+.. inheritance-diagram:: charge_migration.chargemigratonscripts
+    :parts: 1
+

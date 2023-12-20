@@ -6,7 +6,7 @@ docs.pythondocs.source.conf
     :undoc-members:
     :show-inheritance:
 
-.. click:: docs.pythondocs.source.conf:cli_run
+... click:: docs.pythondocs.source.conf
     :prog: densitypy
     :nested: full
 
