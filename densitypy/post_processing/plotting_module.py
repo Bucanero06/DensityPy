@@ -1,3 +1,5 @@
+import os.path
+
 import numpy as np
 import pandas as pd
 from matplotlib import colors
@@ -517,7 +519,7 @@ def plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_
     #   "carrier_envelope_phase_...", "intensity_...", "amplitude_...", "period_...", "iOmega", "OmegaVec", "FTDipoleX_Re",
     #   "FTDipoleX_Im", "FTDipoleY_Re", "FTDipoleY_Im", "FTDipoleZ_Re", "FTDipoleZ_Im"
 
-    FILE_PATH = f'{study_directory}/{experiment_directory}/Dipole/DipoleFT_ALL.csv'
+    FILE_PATH = f'{os.path.join(study_directory,experiment_directory)}/Dipole/DipoleFT_ALL.csv'
 
     # Pump Settings
     type_of_pulse_pump = pump_settings['typeofpulse']
