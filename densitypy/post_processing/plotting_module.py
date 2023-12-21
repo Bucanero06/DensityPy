@@ -1121,29 +1121,31 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
                         color='blue')
         axes[0, 0].plot(omega_values[peaks_negative], averaged_density_grid.max(axis=0)[peaks_negative], "x",
                         color='red')
-        axes[0, 0].set_title("Adjusted Peak Analysis")
-
-        # Adjusted Normalized Density
-        plt.colorbar(axes[0, 1].contourf(omega_grid + tauomega_grid, omega_grid, averaged_density_grid,
-                                         levels=100, cmap='viridis',
-                                         norm=colors.Normalize(vmin=percentile_min, vmax=percentile_max)
-                                         ), ax=axes[0, 1])
-        axes[0, 1].set_title("Adjusted Normalized Density (0.01% and 99.9% Percentiles)")
-
-        # Adjusted First Derivative
-        plt.colorbar(axes[1, 0].contourf(omega_grid + tauomega_grid, omega_grid, first_derivative,
-                                         levels=100,
-                                         vmin=-derivative_abs_max, vmax=derivative_abs_max,
-                                         cmap='viridis'), ax=axes[1, 0])
-        axes[1, 0].set_title("Adjusted First Derivative")
+        axes[0, 0].set_title("Peak Analysis" + "\n" + "Blue: Positive Peaks, Red: Negative Peaks")
 
         # Integrated Density
         scaler = MinMaxScaler()
         normalized_density = scaler.fit_transform(averaged_density_grid)
         integrated_density = np.trapz(normalized_density, axis=0)  # integrating along tauomega
         # The plot for integrated density remains unchanged
-        axes[1, 1].plot(omega_values, integrated_density)
-        axes[1, 1].set_title("Integrated Density")
+        axes[0, 1].plot(omega_values, integrated_density)
+        axes[0, 1].set_title("Integrated Density")
+
+        # Adjusted First Derivative
+        plt.colorbar(axes[1, 0].contourf(omega_grid + tauomega_grid, omega_grid, first_derivative,
+                                         levels=100,
+                                         vmin=-derivative_abs_max, vmax=derivative_abs_max,
+                                         cmap='viridis'), ax=axes[1, 0])
+        axes[1, 0].set_title("First Derivative")
+
+        # Adjusted Normalized Density
+        plt.colorbar(axes[1, 1].contourf(omega_grid + tauomega_grid, omega_grid, averaged_density_grid,
+                                         levels=100, cmap='viridis',
+                                         norm=colors.Normalize(vmin=percentile_min, vmax=percentile_max)
+                                         ), ax=axes[0, 1])
+        axes[1, 1].set_title("Normalized Density (0.01% and 99.9% Percentiles)")
+
+
 
         plt.tight_layout()
         output_file = file_path.replace('.csv', '.png')
