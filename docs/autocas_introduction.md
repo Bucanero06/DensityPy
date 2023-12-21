@@ -1,0 +1,9 @@
+# [AutoCAS](https://scine.ethz.ch/static/download/documentation/autocas/v2.1.0/py/index.html)
+
+In the simulation of active spaces for molecular systems, the process begins with the selection of an initial active space, usually based on the valence space of the molecule of interest. This step involves the evaluation of single orbital entropies to determine the suitability of the chosen space. Once these entropies are analyzed, a final active space is determined, relying heavily on the initial entropy assessments. This fundamental procedure requires only the molecular data and the calculated single orbital entropies.
+
+For more complex scenarios, such as when dealing with large active spaces exceeding 100 orbitals, a more advanced protocol is adopted. This involves dividing the active space into smaller, manageable occupied and virtual sub-spaces. These sub-spaces are then analyzed individually using techniques like Density Matrix Renormalization Group (DMRG), and the resulting s1-entropies from each are combined to approximate the entropy for the larger active space.
+
+Additionally, when considering excited states, the approach changes slightly to accommodate the unique requirements of each state. Separate active spaces are selected for each excited state and later merged into a master active space, ensuring it's suitable for all the states under consideration. This methodology allows for the simultaneous handling of large active spaces and the specific needs of excited state calculations.
+
+![Screenshot from 2023-12-21 11-13-16.png](images%2FScreenshot%20from%202023-12-21%2011-13-16.png)
