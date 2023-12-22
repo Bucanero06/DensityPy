@@ -244,7 +244,7 @@ generated looks like:
     }
 }
 ```
-We can started with very conservative parameters to quickly iterate over settings and get a feel for the system. For example, 
+We started with very conservative parameters to quickly iterate over settings and get a feel for the system. For example, 
 we can change the number of points and size of the grid, the polarization
 of the pump and probe pulses, the number of states, the number of times, omegas, ... as well as other Fourier Transform parameters; 
 all which should be considered in order to minimize artifacts and maximize the accuracy of the results. More importantly, 
@@ -306,7 +306,7 @@ After finishing, the pipeline can be visualized (although changing) through inte
 `ruben.fernandez.carbon@gmail.com` or `ruben@carbonyl.org` to DM me.
 
 This is a part of a larger codebase, currently still undergoing a code review and refactoring along the manuscript and 
-thesis writing process. Threat this codebase as a proof of concept, and not as final; there are still bugs and discrepancies.
+thesis writing process. Treat this codebase as a proof of concept, and not as final; there are still bugs and discrepancies.
 
 With modifications, the outputs from OpenMolcas, PySCF, GAMES, and NWChem have been tested and are 
 compatible with the Fortran codebase, documentation as it stands is available 
