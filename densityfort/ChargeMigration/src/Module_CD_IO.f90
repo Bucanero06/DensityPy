@@ -659,7 +659,7 @@ contains
         enddo
         close(uid)
         write(*, *) "MOVec check:", sum(abs(MOVec))
-        write(*, "(a,*(x,i4))") "ivOrb:", ivOrb
+        write(*, "(a,*(x,i8))") "ivOrb:", ivOrb
 
         allocate(dBufv(nAO))
         allocate(MuOrb(number_of_orbitals, number_of_orbitals))
@@ -732,7 +732,7 @@ contains
         ! Write Data
         do it = 1, n_times
             t = t_min + dt * dble(it - 1)
-            write(uid_dipole, "(i4,6(',',E24.16),',',E24.16)") &
+            write(uid_dipole, "(i8,6(',',E24.16),',',E24.16)") &
                     it, t, &
                     dble(Dipole(1, it)), aimag(Dipole(1, it)), &
                     dble(Dipole(2, it)), aimag(Dipole(2, it)), &
@@ -776,7 +776,7 @@ contains
         do it = 1, n_times
             t = t_min + dt * dble(it - 1)
             ! Write initial data: iteration number, time, and the sum of charges at that time step.
-            write(uid_AtomicCharge, "(i4,2(',',E24.16))", advance = 'no') it, t, sum(Charge(:, :, it))
+            write(uid_AtomicCharge, "(i8,2(',',E24.16))", advance = 'no') it, t, sum(Charge(:, :, it))
             ! For the first atom in each time step, skip the comma.
             write(uid_AtomicCharge, "(',', E24.16, ',', E24.16, ',', E24.16)", advance = "no") &
                     Charge(1, 1, it), Charge(2, 1, it), Charge(3, 1, it)

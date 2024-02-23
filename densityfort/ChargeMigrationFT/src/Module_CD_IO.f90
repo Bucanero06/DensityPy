@@ -307,7 +307,7 @@ contains
 
         do iOmega = 1, nOmegas
             w = OmegaVec(iOmega)
-            write(uid_dipoleFT, "(i4,',',*(x,E24.16,','))", advance = "no")  iOmega, w, &
+            write(uid_dipoleFT, "(i8,',',*(x,E24.16,','))", advance = "no")  iOmega, w, &
                     dble(DipoleFTtotal(1, iOmega)), aimag(DipoleFTtotal(1, iOmega)), &
                     dble(DipoleFTtotal(2, iOmega)), aimag(DipoleFTtotal(2, iOmega))
             write(uid_dipoleFT, "(E24.16,',',E24.16)") &
@@ -392,7 +392,7 @@ contains
             call Write_Pulse_Columns(train(iSim), uid_dipoleALLFT)
             w = OmegaVec(iOmega)
             !
-            write(uid_dipoleALLFT, "(i4,',',*(x,E24.16,','))", advance = "no")  iOmega, w, &
+            write(uid_dipoleALLFT, "(i8,',',*(x,E24.16,','))", advance = "no")  iOmega, w, &
                     dble(DipoleFTtotal(1, iOmega)), aimag(DipoleFTtotal(1, iOmega)), &
                     dble(DipoleFTtotal(2, iOmega)), aimag(DipoleFTtotal(2, iOmega))
             write(uid_dipoleALLFT, "(E24.16,',',E24.16)") &
@@ -439,7 +439,7 @@ contains
 
         do iOmega = 1, nOmegas
             w = OmegaVec(iOmega)
-            write(uid_AtomicChargeFT, "(i4,',',*(x,E24.16,','))", advance = "no") iOmega, w
+            write(uid_AtomicChargeFT, "(i8,',',*(x,E24.16,','))", advance = "no") iOmega, w
             do iAtom = 1, nAtoms - 1
                 write(uid_AtomicChargeFT, "(*(x,e24.16,','))", advance = "no") &
                         dble(AtomicChargeFT(1,iOmega, iAtom)), &
@@ -515,7 +515,7 @@ contains
         do iOmega = 1, nOmegas
             call Write_Pulse_Columns(train(iSim), uid_AtomicChargeFT)
             w = OmegaVec(iOmega)
-            write(uid_AtomicChargeFT, "(i4,',',*(x,E24.16,','))", advance = "no") iOmega, w
+            write(uid_AtomicChargeFT, "(i8,',',*(x,E24.16,','))", advance = "no") iOmega, w
             do iAtom = 1, nAtoms - 1
                 write(uid_AtomicChargeFT, "(*(x,e24.16,','))", advance = "no") &
                         dble(AtomicChargeFT_new(1, iOmega, iAtom)), &
