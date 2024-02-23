@@ -88,6 +88,7 @@ def SelectionOfActiveSpace(xyz_file: str):
     print(f"final s1:          {final_s1}")
     print(f"final s2: \n{final_s2}")
     print(f"final mut_inf: \n{final_mut_inf}")
+
     return cas_occ, cas_index, final_energy
 
 def deprecated_SelectionOfActiveSpace(json_config, **kwargs):
