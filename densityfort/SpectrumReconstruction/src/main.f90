@@ -99,8 +99,8 @@ program SpectrumReconstruction
     end do
     close(uid)
 
-    !>Load Dipole and Charge ww
-    call LoadBidimentioal_Dipole_Spectrum(OutDir // "/Dipole/DipoleFT_ww.csv", DipoleFTww, TauOmegaVec, OmegaVec, nTauOmegas, nOmegas)
+!    >Load Dipole and Charge ww
+!    call LoadBidimentioal_Dipole_Spectrum(OutDir // "/Dipole/DipoleFT_ww.csv", DipoleFTww, TauOmegaVec, OmegaVec, nTauOmegas, nOmegas)
 
     call Load_BidimentionalChargeFTww(OutDir // "/AtomicCharge/AtomicChargeFT_ww.csv", ChargeFTww_new, TauOmegaVec, OmegaVec, nTauOmegas, nOmegas, nAtoms)
 
@@ -131,12 +131,15 @@ contains
                                 Reconstructed_Dipole(iPol, iOmega, iOmegaTau) + &
                                         ChargeFTww_new(iPol, iOmega, iOmegaTau, iAtom) !* &
                                         !R_el_bc(iPol, iAtom)
-
                     end do
                 end do
             end do
         end do
 
+        ! Write to screen the sum of theReal part of the X component of the reconstructed dipole
+        WRITE(*, *) "Sum of the Real part of the X component of the reconstructed dipole: ", sum(real(Reconstructed_Dipole(1, :, :)))
+        WRITE(*, *) "Sum of the Real part of the Y component of the reconstructed dipole: ", sum(real(Reconstructed_Dipole(2, :, :)))
+        WRITE(*, *) "Sum of the Real part of the Z component of the reconstructed dipole: ", sum(real(Reconstructed_Dipole(3, :, :)))
     end subroutine ReconstructDipole_from_AtomicCharge_times_XYZ
 
 
