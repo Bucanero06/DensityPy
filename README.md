@@ -302,6 +302,13 @@ After finishing, the pipeline can be visualized (although changing) through inte
 
 *caption: Dipole and reconstructed Dipole from Atomic Charges, left and right figures respectively.*
 
+<p align="center">
+  <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/9e07f8bf-f922-41a2-bc1b-0d2018bdf595" height="400" />
+ <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/e5144cf3-660f-4c27-85b1-bd6c6ec1006f" height="400" />
+</p>
+
+
+
 `I am currently having difficulties with my knight's email`, please reach out to me here, `Github`, otherwise either 
 `ruben.fernandez.carbon@gmail.com` or `ruben@carbonyl.org` to DM me.
 
