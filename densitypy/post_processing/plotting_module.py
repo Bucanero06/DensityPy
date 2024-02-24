@@ -999,6 +999,7 @@ def plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, re
 
         # Calculating the average of all polarizations
         data['AveragedDensity'] = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
+        # data['AveragedDensity'] = sum(data[col] ** 2 for col in FEATURES_COL_NAMES)
 
         # Adding the averaged density to the DataFrame
         if 'DipoleFT_ww_reconstructed' in file_path:
@@ -1071,8 +1072,8 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
         logger.debug(f'Length of data: {len(data)}')
 
         # Calculating the average of all polarizations
-        data['AveragedDensity'] = sum(data[col] ** 2 for col in FEATURES_COL_NAMES) ** 0.5
-        # data['AveragedDensity'] = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
+        # data['AveragedDensity'] = sum(data[col] ** 2 for col in FEATURES_COL_NAMES)
+        data['AveragedDensity'] = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
 
         if 'DipoleFT_ww_reconstructed' in file_path:
             # FIXME Flip accross the frequency axis but keep the same index (idk why this bug exists)
@@ -1145,8 +1146,6 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
                                          ), ax=axes[0, 1])
         axes[1, 1].set_title("Normalized Density (0.01% and 99.9% Percentiles)")
 
-
-
         plt.tight_layout()
         output_file = file_path.replace('.csv', '.png')
         output_file = output_file if output_file != file_path else f'{file_path}.png'
@@ -1159,7 +1158,7 @@ def plot_2d_spectrum_peak_analysis(study_directory, experiment_directory):
 '''__helper_functions__'''
 
 
-def _plot_contour_map(x, y, z, title, x_label, y_label, output_file,add_diagonal_line=False, contour_kwargs=None):
+def _plot_contour_map(x, y, z, title, x_label, y_label, output_file, add_diagonal_line=False, contour_kwargs=None):
     if contour_kwargs is None:
         contour_kwargs = {}
     # Creating an interactive plot using Plotly
@@ -1167,7 +1166,6 @@ def _plot_contour_map(x, y, z, title, x_label, y_label, output_file,add_diagonal
     fig = go.Figure(data=go.Contour(z=z, x=x, y=y,
                                     **contour_kwargs))
     fig.update_layout(title=title, xaxis_title=x_label, yaxis_title=y_label)
-
 
     if add_diagonal_line:
         fig.add_shape(
@@ -1384,16 +1382,133 @@ def plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path,
     # Display the plot
     fig.show()
 
-# def Dipole_Charge_Comparison(dipole_file, charge_file, output_file):
-#     """DEPRECATED - NEEDS TO BE UPDATED TO WORK WITH NEW FORMAT"""
-#     from densitypy.project_utils.file_directory_ops import delete_files_or_directories
-#     from os import system
-#     delete_files_or_directories(output_file, ignore_errors=True)
-#     system('cat ' + str(
-#         dipole_file) + ' | awk \'{print $1\" \"$2\" \"$3**2+$4**2\" \"$5**2+$6**2\" \"$7**2+$8**2}\' > temp_dipole')
-#     system('cat ' + str(charge_file) + ' | awk \'{print $3**2+$4**2\" \"$5**2+$6**2\" \"$7**2+$8**2}\' > temp_charge')
-#     system(
-#         'paste temp_dipole temp_charge| awk \'{print $1\" \"$2\" \"$3\" \"$4\" \"$5\" \"$6\" \"$7\" \"$8\" \"$3-$6\" \"$4-$7\" \"$5-$8}\' > temp_difference')
-#
-#     system("perl -pe \"s/0 0 0 0 0 0   0 0 0/ /g\" temp_difference>" + str(output_file))
-#     system('rm temp_charge temp_dipole temp_difference')
+
+'''Correlation Graphs'''
+
+
+def plot_dipole_correlation_maps(study_directory, experiment_directory):
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+
+    '''FT WW'''
+    atomic_ft_ww = pd.read_csv(f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFT_ww.csv')
+    plt.figure(figsize=(12, 12))
+    atomic_ft_ww_real = atomic_ft_ww[[col for col in atomic_ft_ww.columns if '_Re' in col]]
+    sns.heatmap(atomic_ft_ww_real.corr(), annot=True, cmap='viridis', vmin=-1, vmax=1, center=0, square=True,
+                linewidths=.5, cbar_kws={"shrink": .5}, )
+    plt.title('Atomic Charge FT ww Correlation Matrix')
+    plt.tight_layout()
+    plt.savefig(f'{study_directory}/{experiment_directory}/AtomicChargeFT_ww_CorrelationMatrix_Real.png')
+
+    '''FT ALL'''
+    atomic_ft_all = pd.read_csv(f'{study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFT_ALL.csv')
+    plt.figure(figsize=(12, 12))
+    atomic_ft_all_real = atomic_ft_all[[col for col in atomic_ft_all.columns if '_Re' in col]]
+
+    sns.heatmap(atomic_ft_all_real.corr(), annot=True, cmap='viridis', vmin=-1, vmax=1, center=0,  square=True,
+                linewidths=.5, cbar_kws={"shrink": .5},  )
+    plt.title('Atomic Charge FT ALL Correlation Matrix')
+    plt.tight_layout()
+    plt.savefig(f'{study_directory}/{experiment_directory}/AtomicChargeFT_ALL_CorrelationMatrix_Real.png')
+
+    '''Dipole FT WW and Dipole FT WW Reconstructed'''
+    OMEGA_TAUOMEGA_FILE_NAMES = [
+        'Dipole/DipoleFT_ww.csv',
+        'Dipole/DipoleFT_ww_reconstructed.csv',
+    ]
+    OMEGA_TAUOMEGA_FILE_PATHS = [f'{study_directory}/{experiment_directory}/{file_name}' for file_name in
+                                 OMEGA_TAUOMEGA_FILE_NAMES]
+
+    length_of_data_to_match = None
+    FEATURES_COL_NAMES = [
+        '2DDipoleX_Re',
+        '2DDipoleX_Im',
+        '2DDipoleY_Re',
+        '2DDipoleY_Im',
+        '2DDipoleZ_Re',
+        '2DDipoleZ_Im'
+    ]
+    datas = []  # Make sure to vary the names by adding _reconstructed
+    suffix_names = []
+    for file_path in OMEGA_TAUOMEGA_FILE_PATHS:
+        suffix_name = file_path.split('/')[-1].replace('.csv', '')
+        suffix_names.append(suffix_name)
+
+        # Load the CSV file
+        logger.info(f'Plotting {file_path}')
+        data = pd.read_csv(file_path)
+
+        if length_of_data_to_match is None:
+            length_of_data_to_match = len(data)
+        else:
+            assert length_of_data_to_match == len(
+                data), f'Length of {file_path} is not the same as the previous file'
+
+        # Displaying the first few rows of the file to understand its structure
+        logger.debug(data.head())
+        logger.debug(f'Length of data: {len(data)}')
+
+        # Calculating the average of all polarizations
+        # data['AveragedDensity'] = sum(data[col] ** 2 for col in FEATURES_COL_NAMES)
+        data['AveragedDensity'] = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5
+
+        if 'DipoleFT_ww_reconstructed' in file_path:
+            # FIXME Flip accross the frequency axis but keep the same index (idk why this bug exists)
+            data['AveragedDensity'] = pd.Series(data['AveragedDensity'].values[::-1],
+                                                index=data['AveragedDensity'].index)
+
+        datas.append(data)
+
+    plt.figure(
+        # Two figures
+        figsize=(20, 10)
+    )
+
+    for i, data in enumerate(datas):
+        # Drop the omega columns
+        plot_data = data.drop(columns=['OmegaVec', 'TauOmegaVec', 'AveragedDensity'])
+        plt.subplot(1, 2, i + 1)
+        plt.title('Correlation Matrix ' + suffix_names[i])
+        sns.heatmap(plot_data.corr(),
+                    annot=True, cmap='viridis', vmin=-1, vmax=1, center=0,
+                    square=True, linewidths=.5, cbar_kws={"shrink": .5},
+                    # limit how many decimal places are shown
+                    fmt='.1f'
+
+                    )
+
+    plt.tight_layout()
+    plt.savefig(f'{study_directory}/{experiment_directory}/2DDipoleCorrelationMatrix.png')
+
+
+
+def plot_cm_correlation_maps(study_directory, experiment_directory):
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+
+    '''FT WW'''
+    atomic_cm = pd.read_csv(f'{study_directory}/{experiment_directory}/ChargeDensity/ChDenSimPP-200/ChDen54.3465.csv')
+    plt.figure(figsize=(12, 12))
+    # Remove the axis columns
+    plot_atomic_cm = atomic_cm.drop(columns=['x', 'y', 'z'])
+    sns.heatmap(plot_atomic_cm.corr(), annot=True,
+                # We are plotting the correlation matrix thus i need a diverging color map but better than viridis
+                # cmap='viridis',
+                # cmap='seismic',
+                # cmap='coolwarm',
+                # cmap='twilight_shifted',
+                cmap='vlag',
+                 vmin=-1, vmax=1, center=0, square=True,
+                linewidths=.5, cbar_kws={"shrink": .5},
+                )
+    plt.title('Charge Density Correlation Matrix')
+    plt.tight_layout()
+    plt.savefig(f'{study_directory}/{experiment_directory}/ChargeDensity_CorrelationMatrix.png')
+    # plt.show()
+
+    # exit()
+    # sns.pairplot(plot_atomic_cm)
+    # plt.savefig(f'{study_directory}/{experiment_directory}/ChargeDensity_PairPlot.png')
+
+    # sns.jointplot(data=plot_atomic_cm)
+    # plt.savefig(f'{study_directory}/{experiment_directory}/ChargeDensity_JointPlot.png')
