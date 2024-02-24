@@ -11,9 +11,7 @@ from densitypy.molcas.molcasscripts import create_help_input_file, copy_and_prep
     make_grid_coordinates, add_grid_it_to_manual_input_file, call_open_molcas, parse_project_grid_file, \
     load_project_rasscf_h5_file, write_grid_density_file
 from densitypy.molcas.selectionofactivespace import deprecated_SelectionOfActiveSpace, SelectionOfActiveSpace
-from densitypy.post_processing.plotting_module import plot_2d_spectrum, plot_2d_spectrum_peak_analysis, \
-    plot_pulses, plot_ft_pulses, plot_dipoles_v_time, \
-    plot_atomic_dipoles_v_time, plot_ft_all_dipoles_v_time, plot_ft_all_atomic_dipoles_v_time
+from densitypy.post_processing.plotting_module import plot_dipole_correlation_maps, plot_cm_correlation_maps
 from densitypy.project_utils.configuration_parser import parse_configuration_file
 from densitypy.project_utils.file_directory_ops import change_directory_manager, make_directory, copy_to, \
     file_lenth, find
@@ -26,11 +24,12 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
                   run_charge_migration=False, run_charge_migration_ft=False,
                   run_spectrum_reconstruction=False,
                   field_file_help=False, molcas_input_help=False,
-                  scforbs=False, gridit: bool or str = True,autocas=False, write_charge_migration=None,
+                  scforbs=False, gridit: bool or str = True, autocas=False, write_charge_migration=None,
                   debug_mode=False, justh5=False, justgetdipoles=False, justgetdensity=False,
                   weights_file=None, givenfieldfile=None,
                   make_fortran=False, make_fortran_config=None,
-                  plot=True  # todo usage to be changed, here for testing
+                  plot=True,  # todo usage to be changed, here for testing
+                  tidy_up_experiment_dir=False, compress_study_directory=False
                   ):
     """
     Entry Way to DensityPy. This function facilitates computational chemistry simulations with OpenMolcas and the ASTRA-ChargeMigration Fortran code.
@@ -62,7 +61,6 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
               make_fortran=False, make_fortran_config={'directory': '/home/ruben/PycharmProjects/DensityPy/densityfort','make_flags': 'all DEB_FLAG=d'})
     """
 
-
     if make_fortran:
         from densitypy.project_utils.fortran_compilation_handler import compile_ifort_fortran_code
         return_code, compiler_output_df = compile_ifort_fortran_code(**make_fortran_config)
@@ -80,10 +78,9 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
     # TODO too explicit, does not allow for new args to be added easily
     COMMAND_ARGS = [molcas_input, scforbs, run_charge_migration, run_charge_migration_ft,
                     molcas_input_help, justh5, justgetdensity, justgetdipoles, field_file_help,
-                    run_spectrum_reconstruction, plot]
+                    run_spectrum_reconstruction, plot, tidy_up_experiment_dir, compress_study_directory]
 
     study_directory = path.abspath(study_directory.rstrip('/'))
-
 
     # Change directory to study_directory and back to original directory when done or if crashes
     with change_directory_manager(study_directory):
@@ -105,9 +102,10 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
         if need_molcas_input or field_file_help:
             exit()
         if autocas:
-            occupation, orbitals, energy =SelectionOfActiveSpace(xyz_file=json_config['projectsettings']['xyzmoleculegeometry'])
+            occupation, orbitals, energy = SelectionOfActiveSpace(
+                xyz_file=json_config['projectsettings']['xyzmoleculegeometry'])
             print(f"n2 \ncas: {occupation} \norbs: {orbitals} \nenergy: {energy}")
-            #TODO
+            # TODO
             exit()
         if scforbs:
             # Selection of Active Space using scforbs argument.
@@ -329,18 +327,35 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
             # #                                                     min_time, max_time, xyz_geometry_path)
             #
             # # Lets plot the Dipolar Reponse vs Time (t) in the Frequency Domain (w)
-            plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
-                                       pump_settings, probe_settings, charge_migration_ft_settings,
-                                       try_color_maps=False)
-            plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dephasing_factor,
-                                              relaxation_factor,
-                                              pump_settings, probe_settings, charge_migration_ft_settings,
-                                              xyz_geometry_path, try_color_maps=False)
+            # plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
+            #                            pump_settings, probe_settings, charge_migration_ft_settings,
+            #                            try_color_maps=False)
+            # plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dephasing_factor,
+            #                                   relaxation_factor,
+            #                                   pump_settings, probe_settings, charge_migration_ft_settings,
+            #                                   xyz_geometry_path, try_color_maps=False)
 
             # Lets plot the 2D Spectrum
-            plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
-                             pump_settings, probe_settings, charge_migration_ft_settings, match_scales=False)
-            plot_2d_spectrum_peak_analysis(study_directory, experiment_directory)
+            # plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
+            #                  pump_settings, probe_settings, charge_migration_ft_settings, match_scales=False)
+            # plot_2d_spectrum_peak_analysis(study_directory, experiment_directory)
+
+            # Correlation Plots
+            # plot_dipole_correlation_maps(study_directory, experiment_directory)
+            plot_cm_correlation_maps(study_directory, experiment_directory)
+
+    if compress_study_directory:
+        # Compress the study directory
+        system(f"tar -czvf {study_directory}.tar.gz {study_directory}")
+        system(f"rm -rf {study_directory}")
+        logger.info(f"Compressed {study_directory} to {study_directory}.tar.gz")
+
+    if tidy_up_experiment_dir:
+        system(f"rm {study_directory}/{experiment_directory}/AtomicCharge/AtomicChargeFTPP*")
+        system(f"rm {study_directory}/{experiment_directory}/AtomicCharge/AtomicChargePP*")
+        system(f"rm {study_directory}/{experiment_directory}/Dipole/DipolePP*")
+        system(f"rm {study_directory}/{experiment_directory}/Dipole/DipoleFTPP*")
+        system(f"rm -r {study_directory}/{experiment_directory}/Pulses")
 
 
 if __name__ == "__main__":
@@ -351,8 +366,8 @@ if __name__ == "__main__":
 
     run_densitypy(
         study_directory="/home/ruben/PycharmProjects/DensityPy/Studies/ExampleStudy",
-        json_config_path="xy_polarized_config.json",
-        # json_config_path="test_sim3.json",
+        # json_config_path="nma_configuration.json",
+        json_config_path="cm_plot_configuration.json",
         molcas_input=False,  # 'molcas_input_help.input', # False just means not running molcas
         run_charge_migration=False,
         run_charge_migration_ft=False,
@@ -360,8 +375,9 @@ if __name__ == "__main__":
         plot=True,
         #
         field_file_help=False, molcas_input_help=False,
-        lus=False, gridit=True, write_charge_migration=None, debug_mode=False,
+        gridit=True, write_charge_migration=None, debug_mode=False,
         justh5=False, justgetdipoles=False, justgetdensity=False, weights_file=None, givenfieldfile=None,
+        tidy_up_experiment_dir=False, compress_study_directory=False,
         make_fortran=False, make_fortran_config=make_fortran_config
     )
 
