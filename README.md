@@ -6,7 +6,8 @@ DensityPy. This cli/function facilitates computational chemistry simulations wit
 ASTRA-ChargeMigration Fortran code; simulating the charge migration of a molecule from MCSCF calculations and generating plots from the observables of pump-probe experiments. Integration with other frameworks has been experimented with, but is not currently supported out of the box.
 
 <p align="center">
-  <img src="https://github.com/Bucanero06/Bucanero06/assets/60953006/e9e8a290-9e74-4d45-96ae-4114e423f637" width="400" />
+  <img src="https://github.com/Bucanero06/Bucanero06/assets/60953006/e9e8a290-9e74-4d45-96ae-4114e423f637" height="248" />
+  <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/1f1e78b5-f571-4ed5-9088-fa3540f069fc" height="248" />
  <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/190c733a-d935-44e8-9e9e-280d8010714b" height="248" />
 </p>
 
