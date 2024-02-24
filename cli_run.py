@@ -1,5 +1,6 @@
 import click
 
+
 @click.command()
 @click.argument("study_directory")
 @click.argument("json_config_path")
@@ -24,11 +25,16 @@ import click
 @click.option("--make_flags", help="Path to the Fortran compilation make flags", required=False,
               default="all DEB_FLAG=d")
 @click.option("--plot", is_flag=True, help="Enable plotting", default=False)
+@click.option("--tidy_up_experiment_dir", is_flag=True, help="Cleans up experiment directory by "
+                                                                    "deleting PP, FTPP files in AtomicCharge & Dipole, "
+                                                                    "also removes directory Pulses", default=False)
+@click.option("--compress_study_directory", is_flag=True,
+              help="Compress study directory `tar -czvf {study_directory}.tar.gz {study_directory}`", default=False)
 def cli_run(json_config_path, study_directory, molcas_input, run_charge_migration,
             run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, scforbs, gridit,
-autocas,
+            autocas,
             write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file, givenfieldfile,
-            make, make_directory, make_flags, plot):
+            make, make_directory, make_flags, plot, tidy_up_experiment_dir, compress_study_directory):
     """
     This CLI is engineered to facilitate computational chemistry simulations with OpenMolcas and the ASTRA-ChargeMigration Fortran code.
 
@@ -67,7 +73,8 @@ autocas,
         givenfieldfile=givenfieldfile,
         make_fortran=make,
         make_fortran_config=dict(directory=make_directory, make_flags=make_flags),
-
+        tidy_up_experiment_dir=tidy_up_experiment_dir,
+        compress_study_directory=compress_study_directory
     )
 
 
