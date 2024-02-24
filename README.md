@@ -3,8 +3,7 @@
 
 Click CLI found in [`cli_run.py`](cli_run.py) and function [`run_densitypy`](densitypy%2Fmain.py) are the entry Way to 
 DensityPy. This cli/function facilitates computational chemistry simulations with OpenMolcas and the 
-ASTRA-ChargeMigration Fortran code. Integration with other frameworks has been experimented with, but is not
-currently supported out of the box.
+ASTRA-ChargeMigration Fortran code; simulating the charge migration of a molecule from MCSCF calculations and generating plots from the observables of pump-probe experiments. Integration with other frameworks has been experimented with, but is not currently supported out of the box.
 
 <p align="center">
   <img src="https://github.com/Bucanero06/Bucanero06/assets/60953006/e9e8a290-9e74-4d45-96ae-4114e423f637" width="400" />
@@ -52,7 +51,7 @@ You are welcome to deviate from this quick start guide, but this may be a great 
 codebase. Note that DensityPy leverages OpenMolcas (and soon ASTRA) for quantum chemical calculations, essential for 
 accurate modeling of electronic structures, 
 please [install](https://molcas.gitlab.io/OpenMolcas/sphinx/installation.guide/ig.html) and make sure h5 and 
-GridIt(*on its way out*) configurations are enabled.
+GridIt(*deprecated*) configurations are enabled.
 
 ### The Command Line Options are:
 ```
