@@ -1,8 +1,10 @@
+
 import os
+from difflib import get_close_matches
 
 from densitypy.project_utils.command_execution import execute_command
-from densitypy.project_utils.file_directory_ops import change_directory_manager, validate_directory_and_get_full_path, \
-    make_directory, copy_to, delete_files_or_directories
+from densitypy.project_utils.file_directory_ops import change_directory_manager, delete_files_or_directories, \
+    make_directory, copy_to, validate_directory_and_get_full_path
 from densitypy.project_utils.logger import setup_logger
 
 logger = setup_logger('autodocumentation_python')
@@ -11,7 +13,8 @@ logger = setup_logger('autodocumentation_python')
 def initialize_sphinx(source_dir, project_name, author_name, version='0.0.1'):
     # Run sphinx-quickstart automatically
     with change_directory_manager(source_dir):
-        execute_command(f"sphinx-quickstart --quiet "
+        execute_command(f"sphinx-quickstart"
+                        f" --quiet "
                         f"--project '{project_name}' "
                         f"--author '{author_name}' "
                         f"--language en "
@@ -40,17 +43,43 @@ def find_python_modules(start_path, ignore_folders=None):
                 module_name = os.path.relpath(module_path, start_path).replace(os.path.sep, '.').rstrip('.py')
                 modules.append(module_name)
 
-    # FIXME HOTFIX for plotdensity file, not sure where the error is coming from but is only this module
-    for i, module_path in enumerate(modules):
-        if 'chden_plotting_needs_work_to_update.plotdensit' in module_path:
-            if 'chden_plotting_needs_work_to_update.plotdensity' in module_path:
-                print('plotdensity in modules')
-            else:
-                # Replace with plotdensity
-                logger.warning(f'plotdensit in modules, replacing with plotdensity\n'
-                               f'Original module path: {module_path}')
-                module_path = module_path.replace('plotdensit', 'plotdensity')
-                modules[i] = module_path
+
+    # Check that each path is real, for some reason some paths are missing letters from the end of the name
+    modules_to_fix = []
+    for module in modules:
+        module_path = module.replace('.', os.path.sep) + '.py'
+        if not os.path.exists(module_path):
+            logger.warning(f'Failed to find module: {module}')
+            modules_to_fix.append(module)
+
+    # Search the path and find the closest match for the file name and switch it out
+    for module_to_fix in modules_to_fix:
+        base_path, module_file = os.path.split(module_to_fix.replace('.', os.path.sep))
+        full_base_path = os.path.join(start_path, base_path)
+
+        # Get list of files in the directory where the module should be
+        try:
+            files_in_dir = os.listdir(full_base_path)
+        except FileNotFoundError:
+            logger.error(f'Directory not found: {full_base_path}')
+            continue
+
+        # Find closest match to the expected module file name
+        closest_matches = get_close_matches(module_file + '.py', files_in_dir, n=1, cutoff=0.6)
+
+        if closest_matches:
+            correct_module_file = closest_matches[0]
+            correct_module_path = os.path.join(base_path, correct_module_file).replace(os.path.sep, '.').replace('.py', '')
+
+            print(f'Found close match: {module_file} -> {correct_module_file} as module {correct_module_path}')
+            index_in_modules = modules.index(module_to_fix)
+            modules[index_in_modules] = correct_module_path # not replacing ...
+
+        else:
+            logger.error(f'No close match found for: {module_file} in {full_base_path}')
+
+    if not modules:
+        logger.error(f'Failed to find any modules in {start_path}')
 
     return modules
 
@@ -86,7 +115,7 @@ def update_conf_py(documentation_dir, source_dir):
                 "    'sphinx.ext.autosectionlabel',\n"
                 "    'sphinx.ext.autodoc.typehints',\n"
                 "    'sphinx.ext.inheritance_diagram',\n"
-                "    'sphinx_click',\n"
+                # "    'sphinx_click',\n"
                 "]\n")
         f.write("\ntodo_include_todos = True\n")
     # Just in case copy the conf.py file to the source directory
@@ -103,9 +132,9 @@ def create_module_rst_files(modules, rst_dir):
                 f"    :members:\n"
                 f"    :undoc-members:\n"
                 f"    :show-inheritance:\n\n"
-                f".. click:: {module}:cli_run\n" # TODO: Fix this to be more general
-                f"    :prog: CLI for DensityPy\n"
-                f"    :nested: full\n\n"
+                # f".. click:: {module}:cli_run\n"  # TODO: Fix this to be more general
+                # f"    :prog: CLI for DensityPy\n"
+                # f"    :nested: full\n\n"
                 f".. inheritance-diagram:: {module}\n"
                 f"    :parts: 1\n\n"
             )
@@ -181,6 +210,7 @@ def rename_files_and_replace_top_level_package_names(directory, top_level_packag
                 with open(file_path, 'w') as f:
                     f.write(filedata)
 
+
 def clean_up_and_exit(documentation_dir):
     try:
         delete_files_or_directories(f'{documentation_dir}_original', ignore_errors=True)
@@ -192,6 +222,9 @@ def clean_up_and_exit(documentation_dir):
         logger.warning(f'Failed to clean up {documentation_dir}: {e}')
     finally:
         delete_files_or_directories(f'{documentation_dir}_original', ignore_errors=True)
+        # Create an empty .nojekyll file to prevent GitHub Pages from ignoring files that begin with an underscore
+        execute_command(f"touch {documentation_dir}/.nojekyll")
+        logger.info(f'Finished creating documentation in {documentation_dir}')
         exit()
 
 
@@ -208,7 +241,6 @@ def main(project_name, author_name, source_dir, documentation_dir, exclude_dirs=
         exclude_dirs = [exclude_dir.strip() for exclude_dir in exclude_dirs]
 
     if delete_old_files and os.path.exists(documentation_dir):
-        from densitypy.project_utils.file_directory_ops import delete_files_or_directories
         delete_files_or_directories(documentation_dir)
 
     if not os.path.exists(documentation_dir):
