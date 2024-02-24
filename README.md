@@ -35,6 +35,7 @@ run_densitypy(json_config_path="xy_polarized_config.json",
               field_file_help=False, molcas_input_help=False,
               lus=False, gridit=True, write_charge_migration=None, debug_mode=False,
               justh5=False, justgetdipoles=False, justgetdensity=False, weights_file=None, givenfieldfile=None,
+              tidy_up_experiment_dir=False, compress_study_directory=False
               make_fortran=False, make_fortran_config={'directory': '~/DensityPy/densityfort',
                                                        'make_flags': 'all DEB_FLAG=d'} 
               )
@@ -75,6 +76,8 @@ Options:
   --make_directory TEXT          Path to the Fortran compilation directory
   --make_flags TEXT              Path to the Fortran compilation make flags
   --plot                         Enable plotting
+  --tidy_up_experiment_dir       Removes Pulses dir and eletes  PP/FTPP files in AtomicCharge & Dipole
+  --compress_study_directory     Compress study directory `tar -czvf {study_directory}.tar.gz {study_directory}`
   --help                         Show this message and exit.
 ```
 
