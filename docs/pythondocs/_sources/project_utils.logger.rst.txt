@@ -6,10 +6,6 @@ project_utils.logger
     :undoc-members:
     :show-inheritance:
 
-.. click:: project_utils.logger:cli_run
-    :prog: CLI for DensityPy
-    :nested: full
-
 .. inheritance-diagram:: project_utils.logger
     :parts: 1
 

@@ -6,10 +6,6 @@ project_utils.file_directory_ops
     :undoc-members:
     :show-inheritance:
 
-.. click:: project_utils.file_directory_ops:cli_run
-    :prog: CLI for DensityPy
-    :nested: full
-
 .. inheritance-diagram:: project_utils.file_directory_ops
     :parts: 1
 

@@ -1099,6 +1099,7 @@
 
         <span class="c1"># Calculating the average of all polarizations</span>
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;AveragedDensity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">FEATURES_COL_NAMES</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="c1"># data[&#39;AveragedDensity&#39;] = sum(data[col] ** 2 for col in FEATURES_COL_NAMES)</span>
 
         <span class="c1"># Adding the averaged density to the DataFrame</span>
         <span class="k">if</span> <span class="s1">&#39;DipoleFT_ww_reconstructed&#39;</span> <span class="ow">in</span> <span class="n">file_path</span><span class="p">:</span>
@@ -1171,8 +1172,8 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Length of data: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="c1"># Calculating the average of all polarizations</span>
-        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;AveragedDensity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">FEATURES_COL_NAMES</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
-        <span class="c1"># data[&#39;AveragedDensity&#39;] = (sum(data[col] ** 2 for col in FEATURES_COL_NAMES) / 3) ** 0.5</span>
+        <span class="c1"># data[&#39;AveragedDensity&#39;] = sum(data[col] ** 2 for col in FEATURES_COL_NAMES)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;AveragedDensity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">FEATURES_COL_NAMES</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
 
         <span class="k">if</span> <span class="s1">&#39;DipoleFT_ww_reconstructed&#39;</span> <span class="ow">in</span> <span class="n">file_path</span><span class="p">:</span>
             <span class="c1"># FIXME Flip accross the frequency axis but keep the same index (idk why this bug exists)</span>
@@ -1221,29 +1222,29 @@
                         <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
         <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">omega_values</span><span class="p">[</span><span class="n">peaks_negative</span><span class="p">],</span> <span class="n">averaged_density_grid</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="n">peaks_negative</span><span class="p">],</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
                         <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
-        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Adjusted Peak Analysis&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Adjusted Normalized Density</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">omega_grid</span> <span class="o">+</span> <span class="n">tauomega_grid</span><span class="p">,</span> <span class="n">omega_grid</span><span class="p">,</span> <span class="n">averaged_density_grid</span><span class="p">,</span>
-                                         <span class="n">levels</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span>
-                                         <span class="n">norm</span><span class="o">=</span><span class="n">colors</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">percentile_min</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">percentile_max</span><span class="p">)</span>
-                                         <span class="p">),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Adjusted Normalized Density (0.01</span><span class="si">% a</span><span class="s2">nd 99.9% Percentiles)&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Adjusted First Derivative</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">omega_grid</span> <span class="o">+</span> <span class="n">tauomega_grid</span><span class="p">,</span> <span class="n">omega_grid</span><span class="p">,</span> <span class="n">first_derivative</span><span class="p">,</span>
-                                         <span class="n">levels</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-                                         <span class="n">vmin</span><span class="o">=-</span><span class="n">derivative_abs_max</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">derivative_abs_max</span><span class="p">,</span>
-                                         <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Adjusted First Derivative&quot;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Peak Analysis&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;Blue: Positive Peaks, Red: Negative Peaks&quot;</span><span class="p">)</span>
 
         <span class="c1"># Integrated Density</span>
         <span class="n">scaler</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">()</span>
         <span class="n">normalized_density</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">averaged_density_grid</span><span class="p">)</span>
         <span class="n">integrated_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">normalized_density</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># integrating along tauomega</span>
         <span class="c1"># The plot for integrated density remains unchanged</span>
-        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">omega_values</span><span class="p">,</span> <span class="n">integrated_density</span><span class="p">)</span>
-        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Integrated Density&quot;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">omega_values</span><span class="p">,</span> <span class="n">integrated_density</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Integrated Density&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Adjusted First Derivative</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">omega_grid</span> <span class="o">+</span> <span class="n">tauomega_grid</span><span class="p">,</span> <span class="n">omega_grid</span><span class="p">,</span> <span class="n">first_derivative</span><span class="p">,</span>
+                                         <span class="n">levels</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                                         <span class="n">vmin</span><span class="o">=-</span><span class="n">derivative_abs_max</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">derivative_abs_max</span><span class="p">,</span>
+                                         <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;First Derivative&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Adjusted Normalized Density</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">omega_grid</span> <span class="o">+</span> <span class="n">tauomega_grid</span><span class="p">,</span> <span class="n">omega_grid</span><span class="p">,</span> <span class="n">averaged_density_grid</span><span class="p">,</span>
+                                         <span class="n">levels</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span>
+                                         <span class="n">norm</span><span class="o">=</span><span class="n">colors</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">percentile_min</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">percentile_max</span><span class="p">)</span>
+                                         <span class="p">),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Normalized Density (0.01</span><span class="si">% a</span><span class="s2">nd 99.9% Percentiles)&quot;</span><span class="p">)</span>
 
         <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
         <span class="n">output_file</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;.png&#39;</span><span class="p">)</span>
@@ -1257,7 +1258,7 @@
 <span class="sd">&#39;&#39;&#39;__helper_functions__&#39;&#39;&#39;</span>
 
 
-<span class="k">def</span> <span class="nf">_plot_contour_map</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">x_label</span><span class="p">,</span> <span class="n">y_label</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span><span class="n">add_diagonal_line</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">contour_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_plot_contour_map</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">x_label</span><span class="p">,</span> <span class="n">y_label</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">add_diagonal_line</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">contour_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">contour_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">contour_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="c1"># Creating an interactive plot using Plotly</span>
@@ -1265,7 +1266,6 @@
     <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">go</span><span class="o">.</span><span class="n">Contour</span><span class="p">(</span><span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
                                     <span class="o">**</span><span class="n">contour_kwargs</span><span class="p">))</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">xaxis_title</span><span class="o">=</span><span class="n">x_label</span><span class="p">,</span> <span class="n">yaxis_title</span><span class="o">=</span><span class="n">y_label</span><span class="p">)</span>
-
 
     <span class="k">if</span> <span class="n">add_diagonal_line</span><span class="p">:</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">add_shape</span><span class="p">(</span>
@@ -1482,19 +1482,136 @@
     <span class="c1"># Display the plot</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
-<span class="c1"># def Dipole_Charge_Comparison(dipole_file, charge_file, output_file):</span>
-<span class="c1">#     &quot;&quot;&quot;DEPRECATED - NEEDS TO BE UPDATED TO WORK WITH NEW FORMAT&quot;&quot;&quot;</span>
-<span class="c1">#     from project_utils.file_directory_ops import delete_files_or_directories</span>
-<span class="c1">#     from os import system</span>
-<span class="c1">#     delete_files_or_directories(output_file, ignore_errors=True)</span>
-<span class="c1">#     system(&#39;cat &#39; + str(</span>
-<span class="c1">#         dipole_file) + &#39; | awk \&#39;{print $1\&quot; \&quot;$2\&quot; \&quot;$3**2+$4**2\&quot; \&quot;$5**2+$6**2\&quot; \&quot;$7**2+$8**2}\&#39; &gt; temp_dipole&#39;)</span>
-<span class="c1">#     system(&#39;cat &#39; + str(charge_file) + &#39; | awk \&#39;{print $3**2+$4**2\&quot; \&quot;$5**2+$6**2\&quot; \&quot;$7**2+$8**2}\&#39; &gt; temp_charge&#39;)</span>
-<span class="c1">#     system(</span>
-<span class="c1">#         &#39;paste temp_dipole temp_charge| awk \&#39;{print $1\&quot; \&quot;$2\&quot; \&quot;$3\&quot; \&quot;$4\&quot; \&quot;$5\&quot; \&quot;$6\&quot; \&quot;$7\&quot; \&quot;$8\&quot; \&quot;$3-$6\&quot; \&quot;$4-$7\&quot; \&quot;$5-$8}\&#39; &gt; temp_difference&#39;)</span>
-<span class="c1">#</span>
-<span class="c1">#     system(&quot;perl -pe \&quot;s/0 0 0 0 0 0   0 0 0/ /g\&quot; temp_difference&gt;&quot; + str(output_file))</span>
-<span class="c1">#     system(&#39;rm temp_charge temp_dipole temp_difference&#39;)</span>
+
+<span class="sd">&#39;&#39;&#39;Correlation Graphs&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="plot_dipole_correlation_maps"><a class="viewcode-back" href="../../../post_processing.plotting_module.html#post_processing.plotting_module.plot_dipole_correlation_maps">[docs]</a><span class="k">def</span> <span class="nf">plot_dipole_correlation_maps</span><span class="p">(</span><span class="n">study_directory</span><span class="p">,</span> <span class="n">experiment_directory</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;FT WW&#39;&#39;&#39;</span>
+    <span class="n">atomic_ft_ww</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s1">/AtomicCharge/AtomicChargeFT_ww.csv&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+    <span class="n">atomic_ft_ww_real</span> <span class="o">=</span> <span class="n">atomic_ft_ww</span><span class="p">[[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">atomic_ft_ww</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="s1">&#39;_Re&#39;</span> <span class="ow">in</span> <span class="n">col</span><span class="p">]]</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">atomic_ft_ww_real</span><span class="o">.</span><span class="n">corr</span><span class="p">(),</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">linewidths</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shrink&quot;</span><span class="p">:</span> <span class="mf">.5</span><span class="p">},</span> <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Atomic Charge FT ww Correlation Matrix&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s1">/AtomicChargeFT_ww_CorrelationMatrix_Real.png&#39;</span><span class="p">)</span>
+
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;FT ALL&#39;&#39;&#39;</span>
+    <span class="n">atomic_ft_all</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s1">/AtomicCharge/AtomicChargeFT_ALL.csv&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+    <span class="n">atomic_ft_all_real</span> <span class="o">=</span> <span class="n">atomic_ft_all</span><span class="p">[[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">atomic_ft_all</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="s1">&#39;_Re&#39;</span> <span class="ow">in</span> <span class="n">col</span><span class="p">]]</span>
+
+    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">atomic_ft_all_real</span><span class="o">.</span><span class="n">corr</span><span class="p">(),</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">linewidths</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shrink&quot;</span><span class="p">:</span> <span class="mf">.5</span><span class="p">},</span>  <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Atomic Charge FT ALL Correlation Matrix&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s1">/AtomicChargeFT_ALL_CorrelationMatrix_Real.png&#39;</span><span class="p">)</span>
+
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Dipole FT WW and Dipole FT WW Reconstructed&#39;&#39;&#39;</span>
+    <span class="n">OMEGA_TAUOMEGA_FILE_NAMES</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;Dipole/DipoleFT_ww.csv&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Dipole/DipoleFT_ww_reconstructed.csv&#39;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">OMEGA_TAUOMEGA_FILE_PATHS</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span>
+                                 <span class="n">OMEGA_TAUOMEGA_FILE_NAMES</span><span class="p">]</span>
+
+    <span class="n">length_of_data_to_match</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">FEATURES_COL_NAMES</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;2DDipoleX_Re&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;2DDipoleX_Im&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;2DDipoleY_Re&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;2DDipoleY_Im&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;2DDipoleZ_Re&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;2DDipoleZ_Im&#39;</span>
+    <span class="p">]</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Make sure to vary the names by adding _reconstructed</span>
+    <span class="n">suffix_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">OMEGA_TAUOMEGA_FILE_PATHS</span><span class="p">:</span>
+        <span class="n">suffix_name</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">suffix_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">suffix_name</span><span class="p">)</span>
+
+        <span class="c1"># Load the CSV file</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Plotting </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">length_of_data_to_match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">length_of_data_to_match</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">length_of_data_to_match</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;Length of </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s1"> is not the same as the previous file&#39;</span>
+
+        <span class="c1"># Displaying the first few rows of the file to understand its structure</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Length of data: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Calculating the average of all polarizations</span>
+        <span class="c1"># data[&#39;AveragedDensity&#39;] = sum(data[col] ** 2 for col in FEATURES_COL_NAMES)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;AveragedDensity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">FEATURES_COL_NAMES</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+        <span class="k">if</span> <span class="s1">&#39;DipoleFT_ww_reconstructed&#39;</span> <span class="ow">in</span> <span class="n">file_path</span><span class="p">:</span>
+            <span class="c1"># FIXME Flip accross the frequency axis but keep the same index (idk why this bug exists)</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;AveragedDensity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;AveragedDensity&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                                <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;AveragedDensity&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span>
+        <span class="c1"># Two figures</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">datas</span><span class="p">):</span>
+        <span class="c1"># Drop the omega columns</span>
+        <span class="n">plot_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OmegaVec&#39;</span><span class="p">,</span> <span class="s1">&#39;TauOmegaVec&#39;</span><span class="p">,</span> <span class="s1">&#39;AveragedDensity&#39;</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Correlation Matrix &#39;</span> <span class="o">+</span> <span class="n">suffix_names</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">plot_data</span><span class="o">.</span><span class="n">corr</span><span class="p">(),</span>
+                    <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shrink&quot;</span><span class="p">:</span> <span class="mf">.5</span><span class="p">},</span>
+                    <span class="c1"># limit how many decimal places are shown</span>
+                    <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;.1f&#39;</span>
+
+                    <span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s1">/2DDipoleCorrelationMatrix.png&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_cm_correlation_maps"><a class="viewcode-back" href="../../../post_processing.plotting_module.html#post_processing.plotting_module.plot_cm_correlation_maps">[docs]</a><span class="k">def</span> <span class="nf">plot_cm_correlation_maps</span><span class="p">(</span><span class="n">study_directory</span><span class="p">,</span> <span class="n">experiment_directory</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;FT WW&#39;&#39;&#39;</span>
+    <span class="n">atomic_cm</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s1">/ChargeDensity/ChDenSimPP-200/ChDen54.3465.csv&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+    <span class="c1"># Remove the axis columns</span>
+    <span class="n">plot_atomic_cm</span> <span class="o">=</span> <span class="n">atomic_cm</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">])</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">plot_atomic_cm</span><span class="o">.</span><span class="n">corr</span><span class="p">(),</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="c1"># We are plotting the correlation matrix thus i need a diverging color map but better than viridis</span>
+                <span class="c1"># cmap=&#39;viridis&#39;,</span>
+                <span class="c1"># cmap=&#39;seismic&#39;,</span>
+                <span class="c1"># cmap=&#39;coolwarm&#39;,</span>
+                <span class="c1"># cmap=&#39;twilight_shifted&#39;,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;vlag&#39;</span><span class="p">,</span>
+                 <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">linewidths</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shrink&quot;</span><span class="p">:</span> <span class="mf">.5</span><span class="p">},</span>
+                <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Charge Density Correlation Matrix&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s1">/ChargeDensity_CorrelationMatrix.png&#39;</span><span class="p">)</span></div>
+    <span class="c1"># plt.show()</span>
+
+    <span class="c1"># exit()</span>
+    <span class="c1"># sns.pairplot(plot_atomic_cm)</span>
+    <span class="c1"># plt.savefig(f&#39;{study_directory}/{experiment_directory}/ChargeDensity_PairPlot.png&#39;)</span>
+
+    <span class="c1"># sns.jointplot(data=plot_atomic_cm)</span>
+    <span class="c1"># plt.savefig(f&#39;{study_directory}/{experiment_directory}/ChargeDensity_JointPlot.png&#39;)</span>
 </pre></div>
 
            </div>
@@ -1504,7 +1621,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Ruben Fernandez Carbon.</p>
+    <p>&#169; Copyright 2024, Ruben Fernandez Carbon.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

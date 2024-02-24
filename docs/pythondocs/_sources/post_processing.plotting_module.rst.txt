@@ -6,10 +6,6 @@ post_processing.plotting_module
     :undoc-members:
     :show-inheritance:
 
-.. click:: post_processing.plotting_module:cli_run
-    :prog: CLI for DensityPy
-    :nested: full
-
 .. inheritance-diagram:: post_processing.plotting_module
     :parts: 1
 

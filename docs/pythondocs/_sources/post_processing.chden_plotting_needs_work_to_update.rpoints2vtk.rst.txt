@@ -6,10 +6,6 @@ post_processing.chden_plotting_needs_work_to_update.rpoints2vtk
     :undoc-members:
     :show-inheritance:
 
-.. click:: post_processing.chden_plotting_needs_work_to_update.rpoints2vtk:cli_run
-    :prog: CLI for DensityPy
-    :nested: full
-
 .. inheritance-diagram:: post_processing.chden_plotting_needs_work_to_update.rpoints2vtk
     :parts: 1
 

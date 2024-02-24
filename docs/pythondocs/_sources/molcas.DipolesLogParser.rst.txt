@@ -6,10 +6,6 @@ molcas.DipolesLogParser
     :undoc-members:
     :show-inheritance:
 
-.. click:: molcas.DipolesLogParser:cli_run
-    :prog: CLI for DensityPy
-    :nested: full
-
 .. inheritance-diagram:: molcas.DipolesLogParser
     :parts: 1
 

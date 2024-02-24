@@ -6,10 +6,6 @@ project_utils.fortran_compilation_handler
     :undoc-members:
     :show-inheritance:
 
-.. click:: project_utils.fortran_compilation_handler:cli_run
-    :prog: CLI for DensityPy
-    :nested: full
-
 .. inheritance-diagram:: project_utils.fortran_compilation_handler
     :parts: 1
 

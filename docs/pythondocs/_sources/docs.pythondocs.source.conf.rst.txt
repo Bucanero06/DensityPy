@@ -6,10 +6,6 @@ docs.pythondocs.source.conf
     :undoc-members:
     :show-inheritance:
 
-.. click:: docs.pythondocs.source.conf:cli_run
-    :prog: CLI for DensityPy
-    :nested: full
-
 .. inheritance-diagram:: docs.pythondocs.source.conf
     :parts: 1
 

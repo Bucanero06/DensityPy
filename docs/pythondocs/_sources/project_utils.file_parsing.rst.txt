@@ -6,10 +6,6 @@ project_utils.file_parsing
     :undoc-members:
     :show-inheritance:
 
-.. click:: project_utils.file_parsing:cli_run
-    :prog: CLI for DensityPy
-    :nested: full
-
 .. inheritance-diagram:: project_utils.file_parsing
     :parts: 1
 

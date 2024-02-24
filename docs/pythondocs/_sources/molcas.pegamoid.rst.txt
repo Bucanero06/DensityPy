@@ -6,10 +6,6 @@ molcas.pegamoid
     :undoc-members:
     :show-inheritance:
 
-.. click:: molcas.pegamoid:cli_run
-    :prog: CLI for DensityPy
-    :nested: full
-
 .. inheritance-diagram:: molcas.pegamoid
     :parts: 1
 

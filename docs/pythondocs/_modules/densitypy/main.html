@@ -111,9 +111,7 @@
     <span class="n">make_grid_coordinates</span><span class="p">,</span> <span class="n">add_grid_it_to_manual_input_file</span><span class="p">,</span> <span class="n">call_open_molcas</span><span class="p">,</span> <span class="n">parse_project_grid_file</span><span class="p">,</span> \
     <span class="n">load_project_rasscf_h5_file</span><span class="p">,</span> <span class="n">write_grid_density_file</span>
 <span class="kn">from</span> <span class="nn">molcas.selectionofactivespace</span> <span class="kn">import</span> <span class="n">deprecated_SelectionOfActiveSpace</span><span class="p">,</span> <span class="n">SelectionOfActiveSpace</span>
-<span class="kn">from</span> <span class="nn">post_processing.plotting_module</span> <span class="kn">import</span> <span class="n">plot_2d_spectrum</span><span class="p">,</span> <span class="n">plot_2d_spectrum_peak_analysis</span><span class="p">,</span> \
-    <span class="n">plot_pulses</span><span class="p">,</span> <span class="n">plot_ft_pulses</span><span class="p">,</span> <span class="n">plot_dipoles_v_time</span><span class="p">,</span> \
-    <span class="n">plot_atomic_dipoles_v_time</span><span class="p">,</span> <span class="n">plot_ft_all_dipoles_v_time</span><span class="p">,</span> <span class="n">plot_ft_all_atomic_dipoles_v_time</span>
+<span class="kn">from</span> <span class="nn">post_processing.plotting_module</span> <span class="kn">import</span> <span class="n">plot_dipole_correlation_maps</span><span class="p">,</span> <span class="n">plot_cm_correlation_maps</span>
 <span class="kn">from</span> <span class="nn">project_utils.configuration_parser</span> <span class="kn">import</span> <span class="n">parse_configuration_file</span>
 <span class="kn">from</span> <span class="nn">project_utils.file_directory_ops</span> <span class="kn">import</span> <span class="n">change_directory_manager</span><span class="p">,</span> <span class="n">make_directory</span><span class="p">,</span> <span class="n">copy_to</span><span class="p">,</span> \
     <span class="n">file_lenth</span><span class="p">,</span> <span class="n">find</span>
@@ -126,11 +124,12 @@
                   <span class="n">run_charge_migration</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">run_charge_migration_ft</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                   <span class="n">run_spectrum_reconstruction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                   <span class="n">field_file_help</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">molcas_input_help</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                  <span class="n">scforbs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">gridit</span><span class="p">:</span> <span class="nb">bool</span> <span class="ow">or</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span><span class="n">autocas</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write_charge_migration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">scforbs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">gridit</span><span class="p">:</span> <span class="nb">bool</span> <span class="ow">or</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">autocas</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write_charge_migration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">debug_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">justh5</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">justgetdipoles</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">justgetdensity</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                   <span class="n">weights_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">givenfieldfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">make_fortran</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">make_fortran_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                  <span class="n">plot</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># todo usage to be changed, here for testing</span>
+                  <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># todo usage to be changed, here for testing</span>
+                  <span class="n">tidy_up_experiment_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">compress_study_directory</span><span class="o">=</span><span class="kc">False</span>
                   <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Entry Way to DensityPy. This function facilitates computational chemistry simulations with OpenMolcas and the ASTRA-ChargeMigration Fortran code.</span>
@@ -162,7 +161,6 @@
 <span class="sd">              make_fortran=False, make_fortran_config={&#39;directory&#39;: &#39;/home/ruben/PycharmProjects/DensityPy/densityfort&#39;,&#39;make_flags&#39;: &#39;all DEB_FLAG=d&#39;})</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-
     <span class="k">if</span> <span class="n">make_fortran</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">project_utils.fortran_compilation_handler</span> <span class="kn">import</span> <span class="n">compile_ifort_fortran_code</span>
         <span class="n">return_code</span><span class="p">,</span> <span class="n">compiler_output_df</span> <span class="o">=</span> <span class="n">compile_ifort_fortran_code</span><span class="p">(</span><span class="o">**</span><span class="n">make_fortran_config</span><span class="p">)</span>
@@ -180,10 +178,9 @@
     <span class="c1"># TODO too explicit, does not allow for new args to be added easily</span>
     <span class="n">COMMAND_ARGS</span> <span class="o">=</span> <span class="p">[</span><span class="n">molcas_input</span><span class="p">,</span> <span class="n">scforbs</span><span class="p">,</span> <span class="n">run_charge_migration</span><span class="p">,</span> <span class="n">run_charge_migration_ft</span><span class="p">,</span>
                     <span class="n">molcas_input_help</span><span class="p">,</span> <span class="n">justh5</span><span class="p">,</span> <span class="n">justgetdensity</span><span class="p">,</span> <span class="n">justgetdipoles</span><span class="p">,</span> <span class="n">field_file_help</span><span class="p">,</span>
-                    <span class="n">run_spectrum_reconstruction</span><span class="p">,</span> <span class="n">plot</span><span class="p">]</span>
+                    <span class="n">run_spectrum_reconstruction</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">tidy_up_experiment_dir</span><span class="p">,</span> <span class="n">compress_study_directory</span><span class="p">]</span>
 
     <span class="n">study_directory</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">study_directory</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span>
-
 
     <span class="c1"># Change directory to study_directory and back to original directory when done or if crashes</span>
     <span class="k">with</span> <span class="n">change_directory_manager</span><span class="p">(</span><span class="n">study_directory</span><span class="p">):</span>
@@ -205,9 +202,10 @@
         <span class="k">if</span> <span class="n">need_molcas_input</span> <span class="ow">or</span> <span class="n">field_file_help</span><span class="p">:</span>
             <span class="n">exit</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">autocas</span><span class="p">:</span>
-            <span class="n">occupation</span><span class="p">,</span> <span class="n">orbitals</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span><span class="n">SelectionOfActiveSpace</span><span class="p">(</span><span class="n">xyz_file</span><span class="o">=</span><span class="n">json_config</span><span class="p">[</span><span class="s1">&#39;projectsettings&#39;</span><span class="p">][</span><span class="s1">&#39;xyzmoleculegeometry&#39;</span><span class="p">])</span>
+            <span class="n">occupation</span><span class="p">,</span> <span class="n">orbitals</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span> <span class="n">SelectionOfActiveSpace</span><span class="p">(</span>
+                <span class="n">xyz_file</span><span class="o">=</span><span class="n">json_config</span><span class="p">[</span><span class="s1">&#39;projectsettings&#39;</span><span class="p">][</span><span class="s1">&#39;xyzmoleculegeometry&#39;</span><span class="p">])</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n2 </span><span class="se">\n</span><span class="s2">cas: </span><span class="si">{</span><span class="n">occupation</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">orbs: </span><span class="si">{</span><span class="n">orbitals</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">energy: </span><span class="si">{</span><span class="n">energy</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="c1">#TODO</span>
+            <span class="c1"># TODO</span>
             <span class="n">exit</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">scforbs</span><span class="p">:</span>
             <span class="c1"># Selection of Active Space using scforbs argument.</span>
@@ -429,18 +427,35 @@
             <span class="c1"># #                                                     min_time, max_time, xyz_geometry_path)</span>
             <span class="c1">#</span>
             <span class="c1"># # Lets plot the Dipolar Reponse vs Time (t) in the Frequency Domain (w)</span>
-            <span class="n">plot_ft_all_dipoles_v_time</span><span class="p">(</span><span class="n">study_directory</span><span class="p">,</span> <span class="n">experiment_directory</span><span class="p">,</span> <span class="n">dephasing_factor</span><span class="p">,</span> <span class="n">relaxation_factor</span><span class="p">,</span>
-                                       <span class="n">pump_settings</span><span class="p">,</span> <span class="n">probe_settings</span><span class="p">,</span> <span class="n">charge_migration_ft_settings</span><span class="p">,</span>
-                                       <span class="n">try_color_maps</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">plot_ft_all_atomic_dipoles_v_time</span><span class="p">(</span><span class="n">study_directory</span><span class="p">,</span> <span class="n">experiment_directory</span><span class="p">,</span> <span class="n">dephasing_factor</span><span class="p">,</span>
-                                              <span class="n">relaxation_factor</span><span class="p">,</span>
-                                              <span class="n">pump_settings</span><span class="p">,</span> <span class="n">probe_settings</span><span class="p">,</span> <span class="n">charge_migration_ft_settings</span><span class="p">,</span>
-                                              <span class="n">xyz_geometry_path</span><span class="p">,</span> <span class="n">try_color_maps</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="c1"># plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,</span>
+            <span class="c1">#                            pump_settings, probe_settings, charge_migration_ft_settings,</span>
+            <span class="c1">#                            try_color_maps=False)</span>
+            <span class="c1"># plot_ft_all_atomic_dipoles_v_time(study_directory, experiment_directory, dephasing_factor,</span>
+            <span class="c1">#                                   relaxation_factor,</span>
+            <span class="c1">#                                   pump_settings, probe_settings, charge_migration_ft_settings,</span>
+            <span class="c1">#                                   xyz_geometry_path, try_color_maps=False)</span>
 
             <span class="c1"># Lets plot the 2D Spectrum</span>
-            <span class="n">plot_2d_spectrum</span><span class="p">(</span><span class="n">study_directory</span><span class="p">,</span> <span class="n">experiment_directory</span><span class="p">,</span> <span class="n">dephasing_factor</span><span class="p">,</span> <span class="n">relaxation_factor</span><span class="p">,</span>
-                             <span class="n">pump_settings</span><span class="p">,</span> <span class="n">probe_settings</span><span class="p">,</span> <span class="n">charge_migration_ft_settings</span><span class="p">,</span> <span class="n">match_scales</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">plot_2d_spectrum_peak_analysis</span><span class="p">(</span><span class="n">study_directory</span><span class="p">,</span> <span class="n">experiment_directory</span><span class="p">)</span></div>
+            <span class="c1"># plot_2d_spectrum(study_directory, experiment_directory, dephasing_factor, relaxation_factor,</span>
+            <span class="c1">#                  pump_settings, probe_settings, charge_migration_ft_settings, match_scales=False)</span>
+            <span class="c1"># plot_2d_spectrum_peak_analysis(study_directory, experiment_directory)</span>
+
+            <span class="c1"># Correlation Plots</span>
+            <span class="c1"># plot_dipole_correlation_maps(study_directory, experiment_directory)</span>
+            <span class="n">plot_cm_correlation_maps</span><span class="p">(</span><span class="n">study_directory</span><span class="p">,</span> <span class="n">experiment_directory</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">compress_study_directory</span><span class="p">:</span>
+        <span class="c1"># Compress the study directory</span>
+        <span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;tar -czvf </span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s2">.tar.gz </span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rm -rf </span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Compressed </span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s2">.tar.gz&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">tidy_up_experiment_dir</span><span class="p">:</span>
+        <span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rm </span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s2">/AtomicCharge/AtomicChargeFTPP*&quot;</span><span class="p">)</span>
+        <span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rm </span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s2">/AtomicCharge/AtomicChargePP*&quot;</span><span class="p">)</span>
+        <span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rm </span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s2">/Dipole/DipolePP*&quot;</span><span class="p">)</span>
+        <span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rm </span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s2">/Dipole/DipoleFTPP*&quot;</span><span class="p">)</span>
+        <span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rm -r </span><span class="si">{</span><span class="n">study_directory</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">experiment_directory</span><span class="si">}</span><span class="s2">/Pulses&quot;</span><span class="p">)</span></div>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -451,8 +466,8 @@
 
     <span class="n">run_densitypy</span><span class="p">(</span>
         <span class="n">study_directory</span><span class="o">=</span><span class="s2">&quot;/home/ruben/PycharmProjects/DensityPy/Studies/ExampleStudy&quot;</span><span class="p">,</span>
-        <span class="n">json_config_path</span><span class="o">=</span><span class="s2">&quot;xy_polarized_config.json&quot;</span><span class="p">,</span>
-        <span class="c1"># json_config_path=&quot;test_sim3.json&quot;,</span>
+        <span class="c1"># json_config_path=&quot;nma_configuration.json&quot;,</span>
+        <span class="n">json_config_path</span><span class="o">=</span><span class="s2">&quot;cm_plot_configuration.json&quot;</span><span class="p">,</span>
         <span class="n">molcas_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># &#39;molcas_input_help.input&#39;, # False just means not running molcas</span>
         <span class="n">run_charge_migration</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">run_charge_migration_ft</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -460,8 +475,9 @@
         <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="c1">#</span>
         <span class="n">field_file_help</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">molcas_input_help</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">lus</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">gridit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">write_charge_migration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">gridit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">write_charge_migration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">justh5</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">justgetdipoles</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">justgetdensity</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">weights_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">givenfieldfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">tidy_up_experiment_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">compress_study_directory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">make_fortran</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">make_fortran_config</span><span class="o">=</span><span class="n">make_fortran_config</span>
     <span class="p">)</span>
 
@@ -500,7 +516,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Ruben Fernandez Carbon.</p>
+    <p>&#169; Copyright 2024, Ruben Fernandez Carbon.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
