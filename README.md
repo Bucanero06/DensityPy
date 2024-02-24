@@ -326,7 +326,7 @@ Right now the python documentation is not showing up as intended on github pages
 
 ## Documentation
 The documentation is currently being updated, but you can find the latest version 
-[here]() [GITHUBPAGES-PENDING]. 
+[here.](https://bucanero06.github.io/DensityPy)
 Running the following command will generate the documentation locally using Sphinx and FORD for 
 [python](densitypy%2Fautodocumentation_python.py) and [fortran](densitypy%2Fautodocumentation_fortran.py) respectively:
 
