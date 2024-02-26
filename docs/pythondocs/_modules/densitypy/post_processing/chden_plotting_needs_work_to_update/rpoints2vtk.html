@@ -108,13 +108,9 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csv_file</span><span class="p">:</span>
         <span class="n">csv_reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">csv_file</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">csv_reader</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">()</span>
             <span class="n">data</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">)</span>
             <span class="n">data_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="n">data_points</span><span class="p">)</span>
-    <span class="n">exit</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">data_points</span></div>
 
 
@@ -143,7 +139,7 @@
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">csv_file</span> <span class="o">=</span> <span class="s2">&quot;/home/ruben/PycharmProjects/DensityPy/Studies/cluttertest/sim/ChargeDensity/ChDenSimPP-4000.0/ChDen1.4014.csv&quot;</span>
+    <span class="n">csv_file</span> <span class="o">=</span> <span class="s2">&quot;/home/ruben/PycharmProjects/DensityPy/Studies/ExampleStudy/cm_plot_sim/ChargeDensity/ChDenSimPP-200/ChDen0.0000.csv&quot;</span>
     <span class="n">vtk_file</span> <span class="o">=</span> <span class="s2">&quot;output.vtk&quot;</span>
 
     <span class="c1"># Define default fields</span>

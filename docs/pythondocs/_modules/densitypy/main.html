@@ -111,7 +111,7 @@
     <span class="n">make_grid_coordinates</span><span class="p">,</span> <span class="n">add_grid_it_to_manual_input_file</span><span class="p">,</span> <span class="n">call_open_molcas</span><span class="p">,</span> <span class="n">parse_project_grid_file</span><span class="p">,</span> \
     <span class="n">load_project_rasscf_h5_file</span><span class="p">,</span> <span class="n">write_grid_density_file</span>
 <span class="kn">from</span> <span class="nn">molcas.selectionofactivespace</span> <span class="kn">import</span> <span class="n">deprecated_SelectionOfActiveSpace</span><span class="p">,</span> <span class="n">SelectionOfActiveSpace</span>
-<span class="kn">from</span> <span class="nn">post_processing.plotting_module</span> <span class="kn">import</span> <span class="n">plot_dipole_correlation_maps</span><span class="p">,</span> <span class="n">plot_cm_correlation_maps</span>
+<span class="kn">from</span> <span class="nn">post_processing.plotting_module</span> <span class="kn">import</span> <span class="n">plot_3d_charge_density</span>
 <span class="kn">from</span> <span class="nn">project_utils.configuration_parser</span> <span class="kn">import</span> <span class="n">parse_configuration_file</span>
 <span class="kn">from</span> <span class="nn">project_utils.file_directory_ops</span> <span class="kn">import</span> <span class="n">change_directory_manager</span><span class="p">,</span> <span class="n">make_directory</span><span class="p">,</span> <span class="n">copy_to</span><span class="p">,</span> \
     <span class="n">file_lenth</span><span class="p">,</span> <span class="n">find</span>
@@ -423,8 +423,8 @@
             <span class="c1">#                     plot_all=False)</span>
             <span class="c1"># plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,</span>
             <span class="c1">#                            xyz_geometry_path, plot_all=False)</span>
-            <span class="c1"># # difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delay_range,</span>
-            <span class="c1"># #                                                     min_time, max_time, xyz_geometry_path)</span>
+            <span class="c1"># difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delay_range,</span>
+            <span class="c1">#                                                     min_time, max_time, xyz_geometry_path)</span>
             <span class="c1">#</span>
             <span class="c1"># # Lets plot the Dipolar Reponse vs Time (t) in the Frequency Domain (w)</span>
             <span class="c1"># plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,</span>
@@ -442,7 +442,9 @@
 
             <span class="c1"># Correlation Plots</span>
             <span class="c1"># plot_dipole_correlation_maps(study_directory, experiment_directory)</span>
-            <span class="n">plot_cm_correlation_maps</span><span class="p">(</span><span class="n">study_directory</span><span class="p">,</span> <span class="n">experiment_directory</span><span class="p">)</span>
+            <span class="c1"># fixme hardcoded</span>
+            <span class="c1"># plot_cm_correlation_maps_with_time(study_directory, experiment_directory, &#39;ChDenSimPP-200&#39;)</span>
+            <span class="n">plot_3d_charge_density</span><span class="p">(</span><span class="n">study_directory</span><span class="p">,</span> <span class="n">experiment_directory</span><span class="p">,</span> <span class="s1">&#39;ChDenSimPP-200&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">compress_study_directory</span><span class="p">:</span>
         <span class="c1"># Compress the study directory</span>
@@ -496,6 +498,7 @@
 <span class="c1">#   -Code Review for Lindblad Equation and Becke Weights</span>
 <span class="c1">#   -modularize the fortran codebase for Lindblad Equation and Becke Weights</span>
 <span class="c1">#   -Instead of using the second pulse as timedelay we should use the last pulse since that would be the probe</span>
+<span class="c1">#       currently as it stands the python and fortran codebases will specifically only work with Pump Probe.</span>
 <span class="c1">#   -update for C_i optimization and reconstruction</span>
 <span class="c1">#   -add parameter search for multiple runs with different settings optimizing use of resources, time, and visualization</span>
 <span class="c1">#   -Plot per polarization images too for a better breakdown of the data</span>
