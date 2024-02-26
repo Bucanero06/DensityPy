@@ -7,7 +7,6 @@ ASTRA-ChargeMigration Fortran code; simulating the charge migration of a molecul
 
 <p align="center">
   <img src="https://github.com/Bucanero06/Bucanero06/assets/60953006/e9e8a290-9e74-4d45-96ae-4114e423f637" height="248" />
-  <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/46fdf9fc-2a13-4836-98dc-3c81ffd279e5" height="248" />
  <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/190c733a-d935-44e8-9e9e-280d8010714b" height="248" />
 </p>
 
@@ -308,6 +307,8 @@ After finishing, the pipeline can be visualized (although changing) through inte
 <p align="center">
   <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/9e07f8bf-f922-41a2-bc1b-0d2018bdf595" height="400" />
  <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/e5144cf3-660f-4c27-85b1-bd6c6ec1006f" height="400" />
+  <video src="https://github.com/Bucanero06/DensityPy/assets/60953006/2feb4941-46af-4bd9-9001-a39a2d66bfc1" height="400" controls></video>
+  
 </p>
 
 
