@@ -49,6 +49,7 @@ DEFAULT_CONFIG_CONTENT = {
     },
     "Probe Pulses settings": {
         "Type of Pulse": "G",
+        "Time Delays": [],
         "Time Delay Start": -200,
         "Time Delay Stop": 800,
         "Number Of PP": 120,
