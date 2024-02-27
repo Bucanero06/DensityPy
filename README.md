@@ -1,14 +1,21 @@
 # DensityPy
 
+<p align="center">
+  <img src="https://github.com/Bucanero06/Bucanero06/assets/60953006/e9e8a290-9e74-4d45-96ae-4114e423f637" height="135" />
+ <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/190c733a-d935-44e8-9e9e-280d8010714b" height="135" />
+   <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/f17e8400-2a8a-4aef-a9c6-93ea2326cf07" height="135" />
+    <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/2189b3e4-e971-498c-94ba-be8a78cf387c" height="135" />
+</p>
+
 
 Click CLI found in [`cli_run.py`](cli_run.py) and function [`run_densitypy`](densitypy%2Fmain.py) are the entry Way to 
 DensityPy. This cli/function facilitates computational chemistry simulations with OpenMolcas and the 
 ASTRA-ChargeMigration Fortran code; simulating the charge migration of a molecule from MCSCF calculations and generating plots from the observables of pump-probe experiments.
 
-<p align="center">
-  <img src="https://github.com/Bucanero06/Bucanero06/assets/60953006/e9e8a290-9e74-4d45-96ae-4114e423f637" height="248" />
- <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/190c733a-d935-44e8-9e9e-280d8010714b" height="248" />
-</p>
+
+[Screencast from 02-27-2024 02:38:14 AM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/2205545f-2770-469a-9293-63e37f952ac9)
+
+
 
 Functionality and Scope:
 * [Molcas Integration](densitypy%2Fmolcas%2Fmolcasscripts.py): Incorporates Molcas for quantum chemical calculations, essential for accurate modeling of electronic structures.
@@ -298,17 +305,21 @@ dephasing & relaxation factors can be changed to account for the environment and
 After finishing, the pipeline can be visualized (although changing) through interactive and png plots like: 
 #TODO ADD PLOTS --placeholder->
 
-[Screencast from 12-20-2023 05:09:56 PM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/a1f04802-067d-4d8b-a596-5b06ed591aee)
-
-![Screenshot from 2023-12-20 17-16-45](https://github.com/Bucanero06/DensityPy/assets/60953006/69fee775-9d5f-4ead-a0fc-25bd6dcc4b16)
-
-*caption: Dipole and reconstructed Dipole from Atomic Charges, left and right figures respectively.*
+<p align="center">
+  <video src="https://github.com/Bucanero06/DensityPy/assets/60953006/a1f04802-067d-4d8b-a596-5b06ed591aee" height="400" controls></video>
+   <video src="https://github.com/Bucanero06/DensityPy/assets/60953006/2feb4941-46af-4bd9-9001-a39a2d66bfc1" height="400" controls></video>
+  
+</p>
 
 <p align="center">
-  <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/9e07f8bf-f922-41a2-bc1b-0d2018bdf595" height="400" />
- <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/e5144cf3-660f-4c27-85b1-bd6c6ec1006f" height="400" />
-  <video src="https://github.com/Bucanero06/DensityPy/assets/60953006/2feb4941-46af-4bd9-9001-a39a2d66bfc1" height="400" controls></video>
-  
+ <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/69fee775-9d5f-4ead-a0fc-25bd6dcc4b16" height="200" />
+  <p align="center">caption: *Dipole and reconstructed Dipole from Atomic Charges, left and right figures respectively.*
+    
+</p>
+
+<p align="center">
+  <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/9e07f8bf-f922-41a2-bc1b-0d2018bdf595" height="200" />
+ <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/e5144cf3-660f-4c27-85b1-bd6c6ec1006f" height="200" />
 </p>
 
 
