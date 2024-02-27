@@ -8,13 +8,9 @@ def read_csv(file_name, fields):
     with open(file_name, 'r') as csv_file:
         csv_reader = csv.DictReader(csv_file)
         for row in csv_reader:
-            print(row)
-            exit()
             data = tuple(row[field] for field in fields)
             data_points.append(data)
 
-    print(data_points)
-    exit()
     return data_points
 
 
@@ -43,7 +39,7 @@ def write_vtk(data_points, fields, output_file):
 
 
 if __name__ == "__main__":
-    csv_file = "/home/ruben/PycharmProjects/DensityPy/Studies/cluttertest/sim/ChargeDensity/ChDenSimPP-4000.0/ChDen1.4014.csv"
+    csv_file = "/home/ruben/PycharmProjects/DensityPy/Studies/ExampleStudy/cm_plot_sim/ChargeDensity/ChDenSimPP-200/ChDen0.0000.csv"
     vtk_file = "output.vtk"
 
     # Define default fields
