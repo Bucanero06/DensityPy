@@ -298,17 +298,21 @@ dephasing & relaxation factors can be changed to account for the environment and
 After finishing, the pipeline can be visualized (although changing) through interactive and png plots like: 
 #TODO ADD PLOTS --placeholder->
 
-[Screencast from 12-20-2023 05:09:56 PM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/a1f04802-067d-4d8b-a596-5b06ed591aee)
-
-![Screenshot from 2023-12-20 17-16-45](https://github.com/Bucanero06/DensityPy/assets/60953006/69fee775-9d5f-4ead-a0fc-25bd6dcc4b16)
-
-*caption: Dipole and reconstructed Dipole from Atomic Charges, left and right figures respectively.*
+<p align="center">
+  <video src="https://github.com/Bucanero06/DensityPy/assets/60953006/a1f04802-067d-4d8b-a596-5b06ed591aee" height="400" controls></video>
+   <video src="https://github.com/Bucanero06/DensityPy/assets/60953006/2feb4941-46af-4bd9-9001-a39a2d66bfc1" height="400" controls></video>
+  
+</p>
 
 <p align="center">
-  <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/9e07f8bf-f922-41a2-bc1b-0d2018bdf595" height="400" />
- <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/e5144cf3-660f-4c27-85b1-bd6c6ec1006f" height="400" />
-  <video src="https://github.com/Bucanero06/DensityPy/assets/60953006/2feb4941-46af-4bd9-9001-a39a2d66bfc1" height="400" controls></video>
-  
+ <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/69fee775-9d5f-4ead-a0fc-25bd6dcc4b16" height="200" />
+  <p align="center">caption: *Dipole and reconstructed Dipole from Atomic Charges, left and right figures respectively.*
+    
+</p>
+
+<p align="center">
+  <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/9e07f8bf-f922-41a2-bc1b-0d2018bdf595" height="200" />
+ <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/e5144cf3-660f-4c27-85b1-bd6c6ec1006f" height="200" />
 </p>
 
 
