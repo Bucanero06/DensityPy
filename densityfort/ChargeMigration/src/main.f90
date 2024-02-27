@@ -110,6 +110,7 @@ program ChargeMigration
             n_times, t_min, t_max, Ext_field_file, Verbous, Weight_File, read_precomputed_weights_flag, &
             save_charge_migration_flag, ivorb, counted_number_of_orbitals, dephasing_factor, relaxation_factor, bath_temperature)
 
+
     call system("mkdir -p " // trim(output_directory))
     call system("mkdir -p " // output_directory // "/Dipole")
     call system("mkdir -p " // output_directory // "/AtomicCharge")
@@ -136,7 +137,7 @@ program ChargeMigration
     write(*, *) "fortran dt=", dt
 
     call omp_set_num_threads(30) ! fixme do not hard code, use number of passed or allowed threads
-!    call omp_set_nested(.true.)
+    !    call omp_set_nested(.true.)
 
     !$OMP PARALLEL DO PRIVATE(strn, i)
     do i = 1, N_Simulations
@@ -209,8 +210,12 @@ program ChargeMigration
 
     write(*, *) "Starting Sim Loop"
     Sim_loop : do iSim = 1, N_Simulations
-        ! Lets keep a percentage write of the simulation only 2 digits after the decimal point
-        write(*, '(A, F0.2, A, I0, A)') "Simulation progress: ", 100.d0 * iSim / (N_Simulations)
+
+        if(save_charge_migration_flag)then
+            !..Makes new directory inside of ChargeDensity directory for each simulation
+            call system("mkdir -p " // output_directory // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)))
+        endif
+
         if(save_charge_migration_flag)then
             write(*, *) "Computing Charge Migration for simulation ", iSim, trim(Simulation_tagv(iSim))
         end if
@@ -243,10 +248,9 @@ program ChargeMigration
 
             !$> this needs to be be moved outside of this module or loop since is costly and can be computed when needed
             if(save_charge_migration_flag)then
+                ! TODO This data needs to be compressed and saved in a more efficient way
                 call TabulateChargeDensity(OrbitalDensity, OrbTab, ChDen)
                 write(istrn, "(f12.4)")t
-                !..Makes new directory inside of ChargeDensity directory for each simulation
-                call system("mkdir -p " // output_directory // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)))
                 call Write_Charge_Density(&
                         output_directory // "/ChargeDensity/ChDenSim" // trim(Simulation_tagv(iSim)) &
                                 // "/ChDen" // trim(adjustl(istrn)) // ".csv", &
@@ -267,9 +271,12 @@ program ChargeMigration
         !.. Save Q_Charge
         call Write_Q_Charge(output_directory // "/AtomicCharge/AtomicCharge" // trim(Simulation_tagv(iSim)) // ".csv", &
                 AtomicChargeEvolution, n_times, t_min, dt, nAtoms, atom_names)
+
+        ! Lets keep a percentage write of the simulation only 2 digits after the decimal point
+        write(*, '(A, F0.2, A, I0, A)') "Simulation progress: ", 100.d0 * iSim / (N_Simulations)
     end do Sim_loop
     !
-    call Write_Summary(output_directory // "/Simulation_Summary", nPts, nAtoms,  Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
+    call Write_Summary(output_directory // "/Simulation_Summary", nPts, nAtoms, Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
     stop
 
 
