@@ -11,7 +11,7 @@ from densitypy.molcas.molcasscripts import create_help_input_file, copy_and_prep
     make_grid_coordinates, add_grid_it_to_manual_input_file, call_open_molcas, parse_project_grid_file, \
     load_project_rasscf_h5_file, write_grid_density_file
 from densitypy.molcas.selectionofactivespace import deprecated_SelectionOfActiveSpace, SelectionOfActiveSpace
-from densitypy.post_processing.plotting_module import plot_dipole_correlation_maps, plot_cm_correlation_maps
+from densitypy.post_processing.plotting_module import plot_cm_correlation_maps_with_time
 from densitypy.project_utils.configuration_parser import parse_configuration_file
 from densitypy.project_utils.file_directory_ops import change_directory_manager, make_directory, copy_to, \
     file_lenth, find
@@ -29,7 +29,8 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
                   weights_file=None, givenfieldfile=None,
                   make_fortran=False, make_fortran_config=None,
                   plot=True,  # todo usage to be changed, here for testing
-                  tidy_up_experiment_dir=False, compress_study_directory=False
+                  tidy_up_experiment_dir=False, compress_study_directory=False,
+                  clean_experiment_prior_to_start=False
                   ):
     """
     Entry Way to DensityPy. This function facilitates computational chemistry simulations with OpenMolcas and the ASTRA-ChargeMigration Fortran code.
@@ -181,8 +182,13 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
         ft_width_step = charge_migration_ft_settings['ftwidthstep']
         Volume = step_size * step_size * step_size
 
-        time_delay_range = generate_time_delays(number_of_pp, time_delay_start, 0.0, time_delay_stop,
-                                                time_Delay_weight_factor)
+        passed_in_time_delays = probe_settings['timedelays']
+        print(f'{passed_in_time_delays = }')
+        if not passed_in_time_delays:
+            time_delay_range = generate_time_delays(number_of_pp, time_delay_start, 0.0, time_delay_stop,
+                                                    time_Delay_weight_factor)
+        else:
+            time_delay_range = passed_in_time_delays
 
         # Useful Flags for e.g. debugging
         if justh5:
@@ -259,8 +265,13 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
             if "RASSCF" in keywords_needed_found:
                 load_project_rasscf_h5_file(project_name, molcas_output_directory, molcas_output_directory)
 
-        # >ChargeMigration TODO(Subject to Change based on C_i reconstruction implementation)
+        if clean_experiment_prior_to_start and (
+                run_charge_migration or run_charge_migration_ft or run_spectrum_reconstruction):
+            system(f"rm -r {experiment_directory}")
+
+            # >ChargeMigration TODO(Subject to Change based on C_i reconstruction implementation)
         if run_charge_migration:
+
             if not path.exists(molcas_output_directory):
                 logger.error(f"Could not find {molcas_output_directory}")
                 exit()
@@ -311,6 +322,10 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
                                                       number_of_tau_omegas, min_tau_omega, max_tau_omega, debug_mode)
 
         if plot:
+            # Todo
+            raise NotImplemented("Plot functions are working, however no logic"
+                                 " regarding which to call and when has been written, thus restricted its usage"
+                                 "in this module for the time being")
             # Becke Weights
             # plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path, weights_file)
 
@@ -323,8 +338,8 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
             #                     plot_all=False)
             # plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delay_range, min_time, max_time,
             #                            xyz_geometry_path, plot_all=False)
-            # # difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delay_range,
-            # #                                                     min_time, max_time, xyz_geometry_path)
+            # difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delay_range,
+            #                                                     min_time, max_time, xyz_geometry_path)
             #
             # # Lets plot the Dipolar Reponse vs Time (t) in the Frequency Domain (w)
             # plot_ft_all_dipoles_v_time(study_directory, experiment_directory, dephasing_factor, relaxation_factor,
@@ -342,7 +357,8 @@ def run_densitypy(study_directory, json_config_path, molcas_input,
 
             # Correlation Plots
             # plot_dipole_correlation_maps(study_directory, experiment_directory)
-            plot_cm_correlation_maps(study_directory, experiment_directory)
+            # fixme hardcoded
+            # plot_cm_correlation_maps_with_time(study_directory, experiment_directory, 'ChDenSimPP150')
 
     if compress_study_directory:
         # Compress the study directory
@@ -377,7 +393,9 @@ if __name__ == "__main__":
         field_file_help=False, molcas_input_help=False,
         gridit=True, write_charge_migration=None, debug_mode=False,
         justh5=False, justgetdipoles=False, justgetdensity=False, weights_file=None, givenfieldfile=None,
-        tidy_up_experiment_dir=False, compress_study_directory=False,
+        tidy_up_experiment_dir=False,
+        clean_experiment_prior_to_start=False,
+        compress_study_directory=False,
         make_fortran=False, make_fortran_config=make_fortran_config
     )
 
@@ -396,6 +414,7 @@ if __name__ == "__main__":
 #   -Code Review for Lindblad Equation and Becke Weights
 #   -modularize the fortran codebase for Lindblad Equation and Becke Weights
 #   -Instead of using the second pulse as timedelay we should use the last pulse since that would be the probe
+#       currently as it stands the python and fortran codebases will specifically only work with Pump Probe.
 #   -update for C_i optimization and reconstruction
 #   -add parameter search for multiple runs with different settings optimizing use of resources, time, and visualization
 #   -Plot per polarization images too for a better breakdown of the data
