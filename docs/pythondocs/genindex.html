@@ -61,6 +61,7 @@
 <li class="toctree-l1"><a class="reference internal" href="post_processing.chden_plotting_needs_work_to_update.plotdensity.html">post_processing.chden_plotting_needs_work_to_update.plotdensity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="post_processing.chden_plotting_needs_work_to_update.plottingscripts.html">post_processing.chden_plotting_needs_work_to_update.plottingscripts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="post_processing.chden_plotting_needs_work_to_update.rpoints2vtk.html">post_processing.chden_plotting_needs_work_to_update.rpoints2vtk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="post_processing.compressed_charge_density_2_pvd_of_vts.html">post_processing.compressed_charge_density_2_pvd_of_vts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="post_processing.plotting_module.html">post_processing.plotting_module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="project_utils.command_execution.html">project_utils.command_execution</a></li>
 <li class="toctree-l1"><a class="reference internal" href="project_utils.configuration_parser.html">project_utils.configuration_parser</a></li>
@@ -173,6 +174,10 @@
 </li>
       <li><a href="molcas.DipolesLogParser.html#molcas.DipolesLogParser.Component">Component (class in molcas.DipolesLogParser)</a>
 </li>
+      <li><a href="post_processing.compressed_charge_density_2_pvd_of_vts.html#post_processing.compressed_charge_density_2_pvd_of_vts.convert_all_csvgz_to_vtk">convert_all_csvgz_to_vtk() (in module post_processing.compressed_charge_density_2_pvd_of_vts)</a>
+</li>
+      <li><a href="post_processing.compressed_charge_density_2_pvd_of_vts.html#post_processing.compressed_charge_density_2_pvd_of_vts.convert_density_csv_to_vtk">convert_density_csv_to_vtk() (in module post_processing.compressed_charge_density_2_pvd_of_vts)</a>
+</li>
       <li><a href="molcas.molcasscripts.html#molcas.molcasscripts.copy_and_prepare_molcas_input_file_for_run">copy_and_prepare_molcas_input_file_for_run() (in module molcas.molcasscripts)</a>
 </li>
       <li><a href="project_utils.file_directory_ops.html#project_utils.file_directory_ops.copy_to">copy_to() (in module project_utils.file_directory_ops)</a>
@@ -273,13 +278,20 @@
         <li><a href="post_processing.chden_plotting_needs_work_to_update.plottingscripts.html#module-post_processing.chden_plotting_needs_work_to_update.plottingscripts">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     post_processing.chden_plotting_needs_work_to_update.rpoints2vtk
 
       <ul>
         <li><a href="post_processing.chden_plotting_needs_work_to_update.rpoints2vtk.html#module-post_processing.chden_plotting_needs_work_to_update.rpoints2vtk">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    post_processing.compressed_charge_density_2_pvd_of_vts
+
+      <ul>
+        <li><a href="post_processing.compressed_charge_density_2_pvd_of_vts.html#module-post_processing.compressed_charge_density_2_pvd_of_vts">module</a>
 </li>
       </ul></li>
       <li>
@@ -371,6 +383,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="project_utils.data_processing_utils.html#project_utils.data_processing_utils.extract_datasets_from_h5_to_csv">extract_datasets_from_h5_to_csv() (in module project_utils.data_processing_utils)</a>
+</li>
+      <li><a href="post_processing.compressed_charge_density_2_pvd_of_vts.html#post_processing.compressed_charge_density_2_pvd_of_vts.extract_simulation_time_from_filename">extract_simulation_time_from_filename() (in module post_processing.compressed_charge_density_2_pvd_of_vts)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -498,6 +512,8 @@
 </li>
         <li><a href="post_processing.chden_plotting_needs_work_to_update.rpoints2vtk.html#module-post_processing.chden_plotting_needs_work_to_update.rpoints2vtk">post_processing.chden_plotting_needs_work_to_update.rpoints2vtk</a>
 </li>
+        <li><a href="post_processing.compressed_charge_density_2_pvd_of_vts.html#module-post_processing.compressed_charge_density_2_pvd_of_vts">post_processing.compressed_charge_density_2_pvd_of_vts</a>
+</li>
         <li><a href="post_processing.plotting_module.html#module-post_processing.plotting_module">post_processing.plotting_module</a>
 </li>
         <li><a href="project_utils.command_execution.html#module-project_utils.command_execution">project_utils.command_execution</a>
@@ -553,18 +569,16 @@
 </li>
       <li><a href="post_processing.plotting_module.html#post_processing.plotting_module.plot_2d_spectrum_peak_analysis">plot_2d_spectrum_peak_analysis() (in module post_processing.plotting_module)</a>
 </li>
-      <li><a href="post_processing.plotting_module.html#post_processing.plotting_module.plot_3d_charge_density">plot_3d_charge_density() (in module post_processing.plotting_module)</a>
-</li>
       <li><a href="post_processing.plotting_module.html#post_processing.plotting_module.plot_atomic_dipoles_v_time">plot_atomic_dipoles_v_time() (in module post_processing.plotting_module)</a>
 </li>
       <li><a href="post_processing.plotting_module.html#post_processing.plotting_module.plot_becke_weights">plot_becke_weights() (in module post_processing.plotting_module)</a>
 </li>
       <li><a href="post_processing.plotting_module.html#post_processing.plotting_module.plot_cm_correlation_maps">plot_cm_correlation_maps() (in module post_processing.plotting_module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="post_processing.plotting_module.html#post_processing.plotting_module.plot_cm_correlation_maps_with_time">plot_cm_correlation_maps_with_time() (in module post_processing.plotting_module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="post_processing.plotting_module.html#post_processing.plotting_module.plot_dipole_correlation_maps">plot_dipole_correlation_maps() (in module post_processing.plotting_module)</a>
 </li>
       <li><a href="post_processing.plotting_module.html#post_processing.plotting_module.plot_dipoles_v_time">plot_dipoles_v_time() (in module post_processing.plotting_module)</a>
