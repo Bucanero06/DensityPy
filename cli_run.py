@@ -30,11 +30,14 @@ import click
                                                                     "also removes directory Pulses", default=False)
 @click.option("--compress_study_directory", is_flag=True,
               help="Compress study directory `tar -czvf {study_directory}.tar.gz {study_directory}`", default=False)
+@click.option("--clean_experiment_prior_to_start", is_flag=True, help="Completely clean the experiment "
+                                                                      "directory prior to start", default=False)
 def cli_run(json_config_path, study_directory, molcas_input, run_charge_migration,
             run_charge_migration_ft, run_spectrum_reconstruction, field_file_help, molcas_input_help, scforbs, gridit,
             autocas,
             write_charge_migration, debug_mode, justh5, justgetdipoles, justgetdensity, weights_file, givenfieldfile,
-            make, make_directory, make_flags, plot, tidy_up_experiment_dir, compress_study_directory):
+            make, make_directory, make_flags, plot, tidy_up_experiment_dir, compress_study_directory,
+            clean_experiment_prior_to_start):
     """
     This CLI is engineered to facilitate computational chemistry simulations with OpenMolcas and the ASTRA-ChargeMigration Fortran code.
 
@@ -74,7 +77,8 @@ def cli_run(json_config_path, study_directory, molcas_input, run_charge_migratio
         make_fortran=make,
         make_fortran_config=dict(directory=make_directory, make_flags=make_flags),
         tidy_up_experiment_dir=tidy_up_experiment_dir,
-        compress_study_directory=compress_study_directory
+        compress_study_directory=compress_study_directory,
+        clean_experiment_prior_to_start=clean_experiment_prior_to_start
     )
 
 
