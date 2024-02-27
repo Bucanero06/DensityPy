@@ -44,9 +44,9 @@ contains
             strn(i:i) = ch2
         enddo
     end subroutine replace_char
-    subroutine Write_Summary(FileName, nPts, nAtoms,  Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
+    subroutine Write_Summary(FileName, nPts, nAtoms, Computed_volume, n_times, t_min, t_max, atom_names, Radius_BS, number_of_orbitals, OrbTab)
         integer, intent(in) :: nPts, nAtoms, n_times, number_of_orbitals
-        real(kind(1d0)), intent(in) ::  Computed_volume, t_min, t_max, Radius_BS(:), OrbTab(:, :)
+        real(kind(1d0)), intent(in) :: Computed_volume, t_min, t_max, Radius_BS(:), OrbTab(:, :)
         character(len = 16), intent(in) :: atom_names(:)
         character(len = *), intent(in) :: FileName
         real(kind(1d0)) :: self_overlap, other_overlap
@@ -844,7 +844,38 @@ contains
             write(uid, "(',', E24.14E3)") ChDen(iPts) * Weightv(iPts, nAtoms)
         enddo
         close(uid)
+
+        call GZIPCompressFile(FileName)
+
     end subroutine Write_Charge_Density
+
+    subroutine GZIPCompressFile(FileName)
+        use iso_fortran_env, only : error_unit
+        use ModuleErrorHandling
+
+        implicit none
+
+        character(len = *), intent(in) :: FileName
+        character(len = :), allocatable :: CompressedFileName
+        integer :: iostat
+        character(len = 1000) :: iomsg
+
+        ! GZIP Compression
+        CompressedFileName = FileName // ".gz"
+        call execute_command_line("gzip -c " // FileName // " > " // CompressedFileName, wait = .true., exitstat = iostat, cmdmsg = iomsg)
+        if (iostat /= 0) then
+            call errormessage(trim(iomsg))
+            stop
+        endif
+
+        ! Delete the original file if compression is successful
+        call execute_command_line("rm " // FileName, wait = .true., exitstat = iostat, cmdmsg = iomsg)
+        if (iostat /= 0) then
+            call errormessage(trim(iomsg))
+            stop
+        endif
+    end subroutine GZIPCompressFile
+
 
     !> Write Weights Subroutine
     subroutine Write_Weights(FileName, WEIGHTV, gridv, nAtoms, nPts, atom_names)
