@@ -1,7 +1,13 @@
+import os
 import os.path
+from multiprocessing import Pool
 
+import imageio
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
+import seaborn as sns
 from matplotlib import colors
 from scipy.ndimage import gaussian_filter
 
@@ -419,7 +425,6 @@ def plot_atomic_dipoles_v_time(study_directory, experiment_directory, time_delay
 def difference_between_dipole_and_atomic_charges_v_time(study_directory, experiment_directory, time_delays, min_time,
                                                         max_time,
                                                         xyz_geometry_path):
-    raise NotImplementedError
     import pandas as pd
 
     # Load the datasets
@@ -1289,7 +1294,7 @@ def plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path,
     # "x","y","z","Atom_O_ChargeDensity","Atom_N_ChargeDensity","Atom_C_ChargeDensity","Atom_C_ChargeDensity",
     # "Atom_C_ChargeDensity","Atom_H_ChargeDensity","Atom_H_ChargeDensity","Atom_H_ChargeDensity",
     # "Atom_H_ChargeDensity","Atom_H_ChargeDensity","Atom_H_ChargeDensity","Atom_H_ChargeDensity"
-    if weights_file == None:
+    if weights_file is None:
         # Use the expected default from the ChargeMigration/Becke code
         weights_file = f'{study_directory}/{experiment_directory}/Weights_File_{experiment_directory}.csv'
 
@@ -1344,43 +1349,6 @@ def plot_becke_weights(study_directory, experiment_directory, xyz_geometry_path,
 
     fig.update_layout(title='3D Scatter Plot for Atom_H_ChargeDensity.4')
     fig.show()
-    exit()
-
-    # Given the content of the file, let's create a DataFrame manually and plot it
-
-    import plotly.graph_objects as go
-
-    R_el_bc = pd.read_csv(f'{study_directory}/{experiment_directory}/R_el_bc.csv')
-    # Create the figure
-    fig = go.Figure()
-
-    # Add a trace for each unique atom type
-    for atom_name in R_el_bc['Atom_Name'].unique():
-        atom_data = R_el_bc[R_el_bc['Atom_Name'] == atom_name]
-        fig.add_trace(
-            go.Scatter3d(
-                x=atom_data['X_Position'],
-                y=atom_data['Y_Position'],
-                z=atom_data['Z_Position'],
-                mode='markers',
-                marker=dict(size=5, opacity=0.8),
-                name=atom_name,
-            )
-        )
-
-    # Update the layout
-    fig.update_layout(
-        title='3D Scatter Plot of Atoms',
-        scene=dict(
-            xaxis_title='X Position',
-            yaxis_title='Y Position',
-            zaxis_title='Z Position'
-        ),
-        margin=dict(l=0, r=0, b=0, t=0)
-    )
-
-    # Display the plot
-    fig.show()
 
 
 '''Correlation Graphs'''
@@ -1405,8 +1373,8 @@ def plot_dipole_correlation_maps(study_directory, experiment_directory):
     plt.figure(figsize=(12, 12))
     atomic_ft_all_real = atomic_ft_all[[col for col in atomic_ft_all.columns if '_Re' in col]]
 
-    sns.heatmap(atomic_ft_all_real.corr(), annot=True, cmap='viridis', vmin=-1, vmax=1, center=0,  square=True,
-                linewidths=.5, cbar_kws={"shrink": .5},  )
+    sns.heatmap(atomic_ft_all_real.corr(), annot=True, cmap='viridis', vmin=-1, vmax=1, center=0, square=True,
+                linewidths=.5, cbar_kws={"shrink": .5}, )
     plt.title('Atomic Charge FT ALL Correlation Matrix')
     plt.tight_layout()
     plt.savefig(f'{study_directory}/{experiment_directory}/AtomicChargeFT_ALL_CorrelationMatrix_Real.png')
@@ -1481,8 +1449,8 @@ def plot_dipole_correlation_maps(study_directory, experiment_directory):
     plt.savefig(f'{study_directory}/{experiment_directory}/2DDipoleCorrelationMatrix.png')
 
 
-
 def plot_cm_correlation_maps(study_directory, experiment_directory):
+    """This function is still in development and is not yet complete. It should be used as a reference for future work."""
     import seaborn as sns
     import matplotlib.pyplot as plt
 
@@ -1498,7 +1466,7 @@ def plot_cm_correlation_maps(study_directory, experiment_directory):
                 # cmap='coolwarm',
                 # cmap='twilight_shifted',
                 cmap='vlag',
-                 vmin=-1, vmax=1, center=0, square=True,
+                vmin=-1, vmax=1, center=0, square=True,
                 linewidths=.5, cbar_kws={"shrink": .5},
                 )
     plt.title('Charge Density Correlation Matrix')
@@ -1512,3 +1480,54 @@ def plot_cm_correlation_maps(study_directory, experiment_directory):
 
     # sns.jointplot(data=plot_atomic_cm)
     # plt.savefig(f'{study_directory}/{experiment_directory}/ChargeDensity_JointPlot.png')
+
+
+def generate_heatmap(csv_file_name: str, data_directory_path: str):
+    atomic_cm = pd.read_csv(os.path.join(data_directory_path, csv_file_name))
+    plt.figure(figsize=(12, 12))
+    plot_atomic_cm = atomic_cm.drop(columns=['x', 'y', 'z'])
+    sns.heatmap(plot_atomic_cm.corr(), annot=True, cmap='vlag', vmin=-1, vmax=1, center=0, square=True,
+                linewidths=.5, cbar_kws={"shrink": .5})
+    plt.title(f'Charge Density Correlation Matrix ({csv_file_name})')
+    plt.tight_layout()
+
+    # Save the heatmap
+    heatmap_path = os.path.join(data_directory_path,
+                                f'heatmap_{csv_file_name}'.replace('.gz', '').replace('.csv', '.png'))
+    print(f'Saving heatmap to {heatmap_path}')
+    plt.savefig(heatmap_path)
+    plt.close()
+    return heatmap_path
+
+
+def plot_cm_correlation_maps_with_time(study_directory, experiment_directory, cm_pp_dir_name):
+    charge_migration_experiment_directory = f'{study_directory}/{experiment_directory}'
+    # Directory containing the CSV files
+    data_directory = f'{charge_migration_experiment_directory}/ChargeDensity/{cm_pp_dir_name}'
+
+    # List of CSV files sorted by time
+    csv_files = sorted(os.listdir(data_directory), key=lambda x: float(x.split('.')[0].split('ChDen')[-1]))
+    csv_files = [file for file in csv_files if file.endswith('.csv.gz')]
+
+    assert len(csv_files) > 0, f'No CSV.GZ files found in {data_directory}'
+
+    # Use multiprocessing to generate heatmaps in parallel
+    with Pool(processes=32) as pool:
+        heatmap_paths = pool.starmap(generate_heatmap, [(csv_file, data_directory) for csv_file in csv_files])
+
+    print('Heatmaps generated!')
+    print(f'{heatmap_paths = }')
+    # Create a GIF from the heatmaps
+    with imageio.get_writer(f'{charge_migration_experiment_directory}/{cm_pp_dir_name}_correlation_heatmaps.gif',
+                            mode='I', duration=0.5) as writer:
+        print('Creating GIF...')
+        for heatmap_path in heatmap_paths:
+            image = imageio.imread(heatmap_path)
+            writer.append_data(image)
+            # Remove the heatmap image to save space
+            os.remove(heatmap_path)
+
+    print(
+        f'GIF created! Location: {charge_migration_experiment_directory}/ChargeDensity/{cm_pp_dir_name}_correlation_heatmaps.gif')
+
+
