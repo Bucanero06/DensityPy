@@ -1,14 +1,21 @@
 # DensityPy
 
+<p align="center">
+  <img src="https://github.com/Bucanero06/Bucanero06/assets/60953006/e9e8a290-9e74-4d45-96ae-4114e423f637" height="135" />
+ <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/190c733a-d935-44e8-9e9e-280d8010714b" height="135" />
+   <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/f17e8400-2a8a-4aef-a9c6-93ea2326cf07" height="135" />
+    <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/2189b3e4-e971-498c-94ba-be8a78cf387c" height="135" />
+</p>
+
 
 Click CLI found in [`cli_run.py`](cli_run.py) and function [`run_densitypy`](densitypy%2Fmain.py) are the entry Way to 
 DensityPy. This cli/function facilitates computational chemistry simulations with OpenMolcas and the 
 ASTRA-ChargeMigration Fortran code; simulating the charge migration of a molecule from MCSCF calculations and generating plots from the observables of pump-probe experiments.
 
-<p align="center">
-  <img src="https://github.com/Bucanero06/Bucanero06/assets/60953006/e9e8a290-9e74-4d45-96ae-4114e423f637" height="248" />
- <img src="https://github.com/Bucanero06/DensityPy/assets/60953006/190c733a-d935-44e8-9e9e-280d8010714b" height="248" />
-</p>
+
+[Screencast from 02-27-2024 02:38:14 AM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/2205545f-2770-469a-9293-63e37f952ac9)
+
+
 
 Functionality and Scope:
 * [Molcas Integration](densitypy%2Fmolcas%2Fmolcasscripts.py): Incorporates Molcas for quantum chemical calculations, essential for accurate modeling of electronic structures.
