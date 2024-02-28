@@ -1,0 +1,11 @@
+post_processing.compressed_charge_density_2_pvd_of_vts
+================================================================
+
+.. automodule:: post_processing.compressed_charge_density_2_pvd_of_vts
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. inheritance-diagram:: post_processing.compressed_charge_density_2_pvd_of_vts
+    :parts: 1
+
