@@ -54,7 +54,9 @@ python cli_v1.py ~/DensityPy/Studies/ExampleStudy/ configuration_help.json \
   --run_charge_migration --run_charge_migration_ft --run_spectrum_reconstruction --plot
 ```
 
-## Quick Start
+## Quick Start 
+*NOTE: does not include all functionality*
+
 You are welcome to deviate from this quick start guide, but this may be a great place to start prior to diving into the
 codebase. Note that DensityPy leverages OpenMolcas (and soon ASTRA) for quantum chemical calculations, essential for 
 accurate modeling of electronic structures, 
