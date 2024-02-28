@@ -2,6 +2,7 @@ import os
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+import click
 import pandas as pd
 import pyvista as pv
 
@@ -98,10 +99,28 @@ def convert_all_csvgz_to_vtk(csv_directory, vtk_directory, x_header, y_header, z
         pvd_file.write('</VTKFile>\n')
 
 
+@click.command()
+@click.option('--csv_directory', required=True, help='The directory containing the CSV.GZ files.')
+@click.option('--vtk_directory', required=True, help='The directory where the VTK files will be saved.')
+@click.option('--x_header', default='x', help='The header name for the x-coordinate in the CSV files.')
+@click.option('--y_header', default='y', help='The header name for the y-coordinate in the CSV files.')
+@click.option('--z_header', default='z', help='The header name for the z-coordinate in the CSV files.')
+@click.option('--density_header', default='ChargeDensity',
+              help='The header name for the density data in the CSV files.')
+@click.option('--max_workers', default=4, help='The maximum number of threads to use for parallel conversion.')
+def main(csv_directory, vtk_directory, x_header, y_header, z_header, density_header, max_workers):
+    convert_all_csvgz_to_vtk(csv_directory, vtk_directory, x_header, y_header, z_header, density_header, max_workers)
+
+
 if __name__ == '__main__':
+    """
+    Example Use Case
+    
     BASE_PATH = "/home/ruben/PycharmProjects/DensityPy/Studies/ExampleStudy/cm_plot_sim/ChargeDensity"
     csv_directory = f'{BASE_PATH}/ChDenSimPP150'
     vtk_directory = f'{BASE_PATH}/VTK'
     convert_all_csvgz_to_vtk(csv_directory, vtk_directory,
                              x_header='x', y_header='y', z_header='z', density_header='ChargeDensity',
                              max_workers=30)
+    """
+    main()
