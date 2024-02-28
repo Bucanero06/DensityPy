@@ -1,0 +1,20 @@
+&GATEWAY 
+ Title = NMA //  _name_of_project_ 
+ coord = NMA.xyz //  _geometry_file_ 
+ basis = 6-31+g_st__st_.1.molcas //  _name_of_basis_ 
+ group = c1 //this prevents use of symmetry
+&SEWARD
+&SCF
+&RASSCF
+ Ras1   = 0 //  _number_of_RAS1_orbitals_
+ Ras2   = 4 //  _number_of_RAS2_orbitals_
+ RAS3   = 0 //  _number_of_RAS3_orbitals_
+ Inactive = 17 //  _number_of_Inactive_orbitals_
+ nactel   = 6 0 0 //# of active electrons, allowed holes, allowed excitations.  _total_ _RAS1_ _RAS3_ 
+ TDM       //writes DM and TDM to RASSCF.h5
+ CIRoot
+ 4 4 1 //e.g. 10 10 1 will do a state average calculation of the ground state and the lower 4 excited states.  _highest_root_needed_ _dimention_of_CI_matrix_ _weight_
+&RASSI
+Nr of JobIph
+ 1 ALL     //e.g. # of job files, # of states in that file ==>> 1 10 or 1 ALL 
+MEES //writes one-electron properties
