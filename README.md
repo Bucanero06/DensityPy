@@ -16,7 +16,6 @@ ASTRA-ChargeMigration Fortran code; simulating the charge migration of a molecul
 [Screencast from 02-27-2024 02:38:14 AM.webm](https://github.com/Bucanero06/DensityPy/assets/60953006/2205545f-2770-469a-9293-63e37f952ac9)
 
 
-
 Functionality and Scope:
 * [Molcas Integration](densitypy%2Fmolcas%2Fmolcasscripts.py): Incorporates Molcas for quantum chemical calculations, essential for accurate modeling of electronic structures.
 * [Charge Migration Analysis](densitypy%2Fcharge_migration%2Fchargemigratonscripts.py): Simulates the charge migration of a system with time under the influence of an external electric field and its environment.
