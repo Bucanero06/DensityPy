@@ -1,35 +1,510 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>DensityPy Documentation</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f4f4f4;
-      padding: 50px;
-    }
-    a {
-      display: inline-block;
-      margin: 20px;
-      padding: 10px 20px;
-      background-color: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-    a:hover {
-      background-color: #0056b3;
-    }
-    h1 {
-      color: #333;
-    }
-  </style>
+    <title>DensityPy Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 50px;
+        }
+
+        a {
+            display: inline-block;
+            margin: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        a:hover {
+            background-color: #0056b3;
+        }
+
+        h1 {
+            color: #333;
+        }
+    </style>
 </head>
 <body>
-  <h1>Welcome to DensityPy's Documentation</h1>
-  <p>Select the documentation you wish to view:</p>
-  <a href="pythondocs/index.html">Python Docs</a>
-  <a href="fortrandocs/index.html">Fortran Docs</a>
+<div>
+    <h1>Welcome to DensityPy's Documentation</h1>
+    <p>Select the documentation you wish to view:</p>
+    <a href="pythondocs/index.html">Python Docs</a>
+    <a href="fortrandocs/index.html">Fortran Docs</a>
+    <iframe src="temp_densitypy.pdf" width="100%" height="1000"></iframe>
+
+</div>
+
+<!--&lt;!&ndash;the readme&ndash;&gt;-->
+<!--<div>-->
+<!--    <h1 class="code-line" data-line-start=0 data-line-end=1><a id="DensityPy_0"></a>DensityPy</h1>-->
+<!--    <p class="has-line-data" data-line-start="2" data-line-end="8">&lt;p align=“center”&gt;<br>-->
+<!--        &lt;img src=&quot;<a-->
+<!--                href="https://github.com/Bucanero06/Bucanero06/assets/60953006/e9e8a290-9e74-4d45-96ae-4114e423f637">https://github.com/Bucanero06/Bucanero06/assets/60953006/e9e8a290-9e74-4d45-96ae-4114e423f637</a>&quot;-->
+<!--        height=“135” /&gt;<br>-->
+<!--        &lt;img src=&quot;<a-->
+<!--                href="https://github.com/Bucanero06/DensityPy/assets/60953006/190c733a-d935-44e8-9e9e-280d8010714b">https://github.com/Bucanero06/DensityPy/assets/60953006/190c733a-d935-44e8-9e9e-280d8010714b</a>&quot;-->
+<!--        height=“135” /&gt;<br>-->
+<!--        &lt;img src=&quot;<a-->
+<!--                href="https://github.com/Bucanero06/DensityPy/assets/60953006/f17e8400-2a8a-4aef-a9c6-93ea2326cf07">https://github.com/Bucanero06/DensityPy/assets/60953006/f17e8400-2a8a-4aef-a9c6-93ea2326cf07</a>&quot;-->
+<!--        height=“135” /&gt;<br>-->
+<!--        &lt;img src=&quot;<a-->
+<!--                href="https://github.com/Bucanero06/DensityPy/assets/60953006/2189b3e4-e971-498c-94ba-be8a78cf387c">https://github.com/Bucanero06/DensityPy/assets/60953006/2189b3e4-e971-498c-94ba-be8a78cf387c</a>&quot;-->
+<!--        height=“135” /&gt;<br>-->
+<!--        &lt;/p&gt;</p>-->
+<!--    <p class="has-line-data" data-line-start="10" data-line-end="13">Click CLI found in <a href="cli_run.py"><code>cli_run.py</code></a>-->
+<!--        and function <a href="densitypy%2Fmain.py"><code>run_densitypy</code></a> are the entry Way to<br>-->
+<!--        DensityPy. This cli/function facilitates computational chemistry simulations with OpenMolcas and the<br>-->
+<!--        ASTRA-ChargeMigration Fortran code; simulating the charge migration of a molecule from MCSCF calculations and-->
+<!--        generating plots from the observables of pump-probe experiments.</p>-->
+<!--    <p class="has-line-data" data-line-start="15" data-line-end="16"><a-->
+<!--            href="https://github.com/Bucanero06/DensityPy/assets/60953006/2205545f-2770-469a-9293-63e37f952ac9">Screencast-->
+<!--        from 02-27-2024 02:38:14 AM.webm</a></p>-->
+<!--    <p class="has-line-data" data-line-start="18" data-line-end="19">Functionality and Scope:</p>-->
+<!--    <ul>-->
+<!--        <li class="has-line-data" data-line-start="19" data-line-end="20"><a-->
+<!--                href="densitypy%2Fmolcas%2Fmolcasscripts.py">Molcas Integration</a>: Incorporates Molcas for quantum-->
+<!--            chemical calculations, essential for accurate modeling of electronic structures.-->
+<!--        </li>-->
+<!--        <li class="has-line-data" data-line-start="20" data-line-end="21"><a-->
+<!--                href="densitypy%2Fcharge_migration%2Fchargemigratonscripts.py">Charge Migration Analysis</a>: Simulates-->
+<!--            the charge migration of a system with time under the influence of an external electric field and its-->
+<!--            environment.-->
+<!--        </li>-->
+<!--        <li class="has-line-data" data-line-start="21" data-line-end="22"><a-->
+<!--                href="densitypy%2Fpost_processing%2Fplotting_module.py">Data Visualization and Analysis</a>: Provides-->
+<!--            tools for generating plots and graphs, crucial for interpreting complex simulation data.-->
+<!--        </li>-->
+<!--        <li class="has-line-data" data-line-start="22" data-line-end="23"><a-->
+<!--                href="densitypy%2Fproject_utils%2Fconfiguration_parser.py">Configurable Workflow</a>: Leverages a <a-->
+<!--                href="densitypy%2FDefault_Settings%2Fdefault_config.py">JSON-based configuration</a> system, allowing-->
+<!--            for flexible and detailed setup of simulation parameters.-->
+<!--        </li>-->
+<!--        <li class="has-line-data" data-line-start="23" data-line-end="24"><a href="densitypy%2Fproject_utils">Environment-->
+<!--            Management</a>: Implements efficient directory and environment management, crucial for handling extensive-->
+<!--            simulations.-->
+<!--        </li>-->
+<!--        <li class="has-line-data" data-line-start="24" data-line-end="25"><a-->
+<!--                href="densitypy%2Fproject_utils%2Flogger.py">Logging</a> and <a-->
+<!--                href="densitypy%2Fproject_utils%2Ffortran_compilation_handler.py">Debugging</a>: Includes comprehensive-->
+<!--            logging for monitoring simulation progress and facilitating debugging.-->
+<!--        </li>-->
+<!--        <li class="has-line-data" data-line-start="25" data-line-end="26"><a-->
+<!--                href="densitypy%2Fproject_utils%2Ffortran_compilation_handler.py">Fortran Compatibility</a>: Uses-->
+<!--            Fortran for <a href="densityfort">performance-critical components</a> of the simulations, often parallelized-->
+<!--            for optimal performance.-->
+<!--        </li>-->
+<!--        <li class="has-line-data" data-line-start="26" data-line-end="28"><a href="Documentation">AutoDocumentation</a>:-->
+<!--            Using both <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> and <a-->
+<!--                    href="forddocs.readthedocs.io/en/latest/">FORD</a>, allowing for easy navigation and understanding-->
+<!--            of the codebase.-->
+<!--        </li>-->
+<!--    </ul>-->
+<!--    <p class="has-line-data" data-line-start="28" data-line-end="29"><em>all the processes above have plenty of room for-->
+<!--        improvement</em></p>-->
+<!--    <p class="has-line-data" data-line-start="30" data-line-end="31">Usage:</p>-->
+<!--    <pre><code class="has-line-data" data-line-start="32" data-line-end="48" class="language-python">run_densitypy(json_config_path=<span-->
+<!--            class="hljs-string">"xy_polarized_config.json"</span>,-->
+<!--              study_directory=<span class="hljs-string">"Studies/ExampleStudy"</span>,-->
+<!--              molcas_input=<span class="hljs-keyword">False</span>,  <span class="hljs-comment"># 'molcas_input_help.input', # False just means not running molcas</span>-->
+<!--              run_charge_migration=<span class="hljs-keyword">True</span>,-->
+<!--              run_charge_migration_ft=<span class="hljs-keyword">True</span>,-->
+<!--              run_spectrum_reconstruction=<span class="hljs-keyword">True</span>,-->
+<!--              plot=<span class="hljs-keyword">True</span>,-->
+<!--              <span class="hljs-comment">#</span>-->
+<!--              field_file_help=<span class="hljs-keyword">False</span>, molcas_input_help=<span class="hljs-keyword">False</span>,-->
+<!--              lus=<span class="hljs-keyword">False</span>, gridit=<span class="hljs-keyword">True</span>, write_charge_migration=<span-->
+<!--                class="hljs-keyword">None</span>, debug_mode=<span class="hljs-keyword">False</span>,-->
+<!--              justh5=<span class="hljs-keyword">False</span>, justgetdipoles=<span class="hljs-keyword">False</span>, justgetdensity=<span-->
+<!--                class="hljs-keyword">False</span>, weights_file=<span-->
+<!--                class="hljs-keyword">None</span>, givenfieldfile=<span class="hljs-keyword">None</span>,-->
+<!--              tidy_up_experiment_dir=<span class="hljs-keyword">False</span>, compress_study_directory=<span-->
+<!--                class="hljs-keyword">False</span>-->
+<!--              make_fortran=<span class="hljs-keyword">False</span>, make_fortran_config={<span class="hljs-string">'directory'</span>: <span-->
+<!--                class="hljs-string">'~/DensityPy/densityfort'</span>,-->
+<!--                                                       <span class="hljs-string">'make_flags'</span>: <span-->
+<!--                class="hljs-string">'all DEB_FLAG=d'</span>}-->
+<!--              )-->
+<!--</code></pre>-->
+<!--    <p class="has-line-data" data-line-start="48" data-line-end="49">or</p>-->
+<!--    <pre><code class="has-line-data" data-line-start="50" data-line-end="54" class="language-bash">python cli_v1.py ~/DensityPy/Studies/ExampleStudy/ configuration_help.json \-->
+<!--  &#45;&#45;make &#45;&#45;make_directory=densityfort &#45;&#45;make_flags=<span class="hljs-string">'all'</span> \-->
+<!--  &#45;&#45;run_charge_migration &#45;&#45;run_charge_migration_ft &#45;&#45;run_spectrum_reconstruction &#45;&#45;plot-->
+<!--</code></pre>-->
+<!--    <h2 class="code-line" data-line-start=55 data-line-end=56><a id="Quick_Start_55"></a>Quick Start</h2>-->
+<!--    <p class="has-line-data" data-line-start="56" data-line-end="57"><em>NOTE: does not include all functionality</em>-->
+<!--    </p>-->
+<!--    <p class="has-line-data" data-line-start="58" data-line-end="63">You are welcome to deviate from this quick start-->
+<!--        guide, but this may be a great place to start prior to diving into the<br>-->
+<!--        codebase. Note that DensityPy leverages OpenMolcas (and soon ASTRA) for quantum chemical calculations, essential-->
+<!--        for<br>-->
+<!--        accurate modeling of electronic structures,<br>-->
+<!--        please <a href="https://molcas.gitlab.io/OpenMolcas/sphinx/installation.guide/ig.html">install</a> and make sure-->
+<!--        h5 and<br>-->
+<!--        GridIt(<em>deprecated</em>) configurations are enabled.</p>-->
+<!--    <h3 class="code-line" data-line-start=64 data-line-end=65><a id="The_Command_Line_Options_are_64"></a>The Command-->
+<!--        Line Options are:</h3>-->
+<!--    <pre><code class="has-line-data" data-line-start="66" data-line-end="90">Options:-->
+<!--  &#45;&#45;molcas_input TEXT            Path to the Molcas input file, this enables molcas execution-->
+<!--  &#45;&#45;run_charge_migration         Enable charge migration-->
+<!--  &#45;&#45;run_charge_migration_ft      Enable charge migration FT-->
+<!--  &#45;&#45;run_spectrum_reconstruction  Enable spectrum reconstruction-->
+<!--  &#45;&#45;field_file_help              Enable field file help-->
+<!--  &#45;&#45;molcas_input_help            Enable Molcas input help-->
+<!--  &#45;&#45;scforbs                      Run SCF Orbital Calculations and plot-->
+<!--  &#45;&#45;gridit                       Enable grid flag-->
+<!--  &#45;&#45;write_charge_migration       Write charge migration-->
+<!--  &#45;&#45;debug_mode                   Enable debug mode-->
+<!--  &#45;&#45;justh5                       Enable just h5-->
+<!--  &#45;&#45;justgetdipoles               Enable just get dipoles-->
+<!--  &#45;&#45;justgetdensity               Enable just get density-->
+<!--  &#45;&#45;weights_file TEXT            Path to the weights file-->
+<!--  &#45;&#45;givenfieldfile TEXT          Path to the given field file-->
+<!--  &#45;&#45;make                         Enable Fortran compilation-->
+<!--  &#45;&#45;make_directory TEXT          Path to the Fortran compilation directory-->
+<!--  &#45;&#45;make_flags TEXT              Path to the Fortran compilation make flags-->
+<!--  &#45;&#45;plot                         Enable plotting-->
+<!--  &#45;&#45;tidy_up_experiment_dir       Removes Pulses dir and eletes  PP/FTPP files in AtomicCharge &amp; Dipole-->
+<!--  &#45;&#45;compress_study_directory     Compress study directory `tar -czvf {study_directory}.tar.gz {study_directory}`-->
+<!--  &#45;&#45;help                         Show this message and exit.-->
+<!--</code></pre>-->
+<!--    <h3 class="code-line" data-line-start=91 data-line-end=92><a id="Configuring_the_Study_Directory_91"></a>Configuring-->
+<!--        the Study Directory</h3>-->
+<!--    <p class="has-line-data" data-line-start="92" data-line-end="95"><img-->
+<!--            src="https://github.com/Bucanero06/DensityPy/assets/60953006/9e90fce9-b7d0-40f5-b09c-63f088a1cce0"-->
+<!--            alt="Screenshot from 2023-12-17 20-41-16"><br>-->
+<!--        We can begin from a single <code>.xyz</code> file, which contains the molecular geometry of the system of<br>-->
+<!--        interest. Let our model system be n-methylacetamide (NMA), which has the following geometry:</p>-->
+<!--    <pre><code class="has-line-data" data-line-start="97" data-line-end="112">12-->
+<!--NMA-->
+<!--O          0.0000000000          1.2300000000          0.0000000000-->
+<!--N          1.1304300000         -0.7915360000          0.0000000000-->
+<!--C          0.0000000000          0.0000000000          0.0000000000-->
+<!--C          2.4748470000         -0.2483560000          0.0000000000-->
+<!--C         -1.2771790000         -0.7674070000          0.0000000000-->
+<!--H          1.0948330000         -1.8109140000          0.0000000000-->
+<!--H          3.1899510000         -1.0709890000          0.0000000000-->
+<!--H         -2.1320400000         -0.0751540000          0.0000000000-->
+<!--H         -1.2748780000         -1.4665740000         -0.8492120000-->
+<!--H         -1.2748810000         -1.4665680000          0.8492160000-->
+<!--H          2.5809700000          0.4362910000         -0.8414850000-->
+<!--H          2.5809800000          0.4362670000          0.8415030000-->
+<!--</code></pre>-->
+<!--    <p class="has-line-data" data-line-start="113" data-line-end="114">From here, either bring your own or create a-->
+<!--        configuration file with the following command:</p>-->
+<!--    <pre><code class="has-line-data" data-line-start="115" data-line-end="124" class="language-bash">python cli_run.py \-->
+<!--<span class="hljs-comment"># Path to StudyDir - Relative/Absolute Path to Study Directory .</span>-->
+<!--<span class="hljs-comment"># Configuration Name - We can name the configuration file anything we want, </span>-->
+<!--<span class="hljs-comment">#     either it exists or an example will be created by that name.</span>-->
+<!--<span class="hljs-comment"># We can also include other helpful flags (optional) when starting.</span>-->
+<!--python cli_run.py \-->
+<!--    Studies/ExampleStudy/ nma_configuration.json \-->
+<!--    &#45;&#45;molcas_input_<span class="hljs-built_in">help</span> &#45;&#45;field_file_<span class="hljs-built_in">help</span>-->
+<!--</code></pre>-->
+<!--    <p class="has-line-data" data-line-start="124" data-line-end="125"><img-->
+<!--            src="https://github.com/Bucanero06/DensityPy/assets/60953006/639a99f2-e225-4df8-8a1f-56e34044045c"-->
+<!--            alt="Screenshot from 2023-12-17 23-29-44"></p>-->
+<!--    <p class="has-line-data" data-line-start="126" data-line-end="129">We already could run the code, everything has-->
+<!--        been prefilled for you. However,<br>-->
+<!--        if we know nothing about a system’s orbitals we can begin with some chemical intuitions and a SCF calculation-->
+<!--        and<br>-->
+<!--        generate any of the following files in order to visualize the orbitals and select an appropriate active space:-->
+<!--    </p>-->
+<!--    <ul>-->
+<!--        <li class="has-line-data" data-line-start="129" data-line-end="130">HDF5 files, as generated by some-->
+<!--            (Open)Molcas modules like SCF, RASSCF or RASSI, if compiled with HDF5 support.-->
+<!--        </li>-->
+<!--        <li class="has-line-data" data-line-start="130" data-line-end="131">Molden files.</li>-->
+<!--        <li class="has-line-data" data-line-start="131" data-line-end="132">Luscus files, generated by the GRID_IT-->
+<!--            module.-->
+<!--        </li>-->
+<!--        <li class="has-line-data" data-line-start="132" data-line-end="133">Grid files (ASCII), generated by the GRID_IT-->
+<!--            module.-->
+<!--        </li>-->
+<!--        <li class="has-line-data" data-line-start="133" data-line-end="135">Cube files (formatted).</li>-->
+<!--    </ul>-->
+<!--    <p class="has-line-data" data-line-start="135" data-line-end="136">To quickly do this, we can run the-->
+<!--        <code>scforbs</code> command, or for a more automated approach use <a href=""><code>autocas</code></a>(expensive):-->
+<!--    </p>-->
+<!--    <pre><code class="has-line-data" data-line-start="137" data-line-end="140" class="language-bash">python cli_run.py Studies/ExampleStudy/ nma_configuration.json &#45;&#45;scforbs-->
+<!--  <span class="hljs-comment"># &#45;&#45;autocas &#45;&#45;&gt; automates active-orbital-space selection step in multi-configurational calculations </span>-->
+<!--</code></pre>-->
+<!--    <p class="has-line-data" data-line-start="140" data-line-end="142">This will, among others, generate a h5 containing-->
+<!--        information about each orbital which will then be loaded and<br>-->
+<!--        visualized.</p>-->
+<!--    <p class="has-line-data" data-line-start="143" data-line-end="144"><a-->
+<!--            href="https://github.com/Bucanero06/DensityPy/assets/60953006/fdc60b98-4231-49ee-9d94-5747cb7f711b">Screencast-->
+<!--        from 12-17-2023 11:47:17 PM.webm</a></p>-->
+<!--    <p class="has-line-data" data-line-start="145" data-line-end="146"><img-->
+<!--            src="https://github.com/Bucanero06/DensityPy/assets/60953006/0e2a9550-5d0b-44ed-8d5b-ed29bb68deed"-->
+<!--            alt="Screenshot from 2023-12-17 23-41-13"></p>-->
+<!--    <p class="has-line-data" data-line-start="147" data-line-end="158">We can then select the orbitals we want to-->
+<!--        include in our initial active space. For this<br>-->
+<!--        example, to compute the ground and excited states of molecules such as formamide and NMA, let’s perform a<br>-->
+<!--        <code>RAS-SCF</code> calculation using a <code>6-31G$^{**}</code> basis. This basis choice is effective for-->
+<!--        organic compounds as it<br>-->
+<!--        includes polarization functions on all atoms and adds diffuse functions on heavy atoms. In our calculations,<br>-->
+<!--        we’ll focus on critical orbitals, including the highest occupied orbitals, which are typically lone pairs on<br>-->
+<!--        oxygen, and the highest π orbitals. Our active space will also encompass several important unoccupied-->
+<!--        Rydberg<br>-->
+<!--        and valence orbitals. Although this selection can lead to large and computationally challenging active-->
+<!--        spaces,<br>-->
+<!--        a more focused approach considering only valence orbitals can simplify the problem. We’ll include key unoccupied<br>-->
+<!--        orbitals, like the σ* and π* orbitals, in our active space. This strategy not only makes the calculations-->
+<!--        more<br>-->
+<!--        manageable but also allows for the inclusion of additional relevant occupied orbitals, such as another lone pair<br>-->
+<!--        on oxygen, thus providing a comprehensive yet efficient and targeted computational run.</p>-->
+<!--    <pre><code class="has-line-data" data-line-start="160" data-line-end="163" class="language-bash">python cli_run.py Studies/ExampleStudy/ nma_configuration.json-->
+<!--    &#45;&#45;molcas_input Studies/ExampleStudy/molcas_input_help.input &#45;&#45;gridit-->
+<!--</code></pre>-->
+<!--    <p class="has-line-data" data-line-start="164" data-line-end="166">The above command adds the gridcoordinates to the-->
+<!--        provided file, runs OpenMolcas, and finally extracts the nessesary<br>-->
+<!--        content from the logs and h5 files, preparing them for the charge migration modules.</p>-->
+<!--    <p class="has-line-data" data-line-start="167" data-line-end="169">Until this point, we have been relying on the-->
+<!--        default configuration file, which is a JSON file that contains the<br>-->
+<!--        parameters for controlling simulations, including molcas. You could have ran the entire pipeline as followed:-->
+<!--    </p>-->
+<!--    <pre><code class="has-line-data" data-line-start="171" data-line-end="175" class="language-bash">python cli_run.py Studies/ExampleStudy/ nma_configuration.json-->
+<!--    &#45;&#45;molcas_input Studies/ExampleStudy/molcas_input_help.input &#45;&#45;gridit-->
+<!--    &#45;&#45;run_charge_migration &#45;&#45;run_charge_migration_ft &#45;&#45;run_spectrum_reconstruction &#45;&#45;plot-->
+<!--</code></pre>-->
+<!--    <p class="has-line-data" data-line-start="176" data-line-end="179">But this would be inappropriate for any other-->
+<!--        case, as we would want to change the parameters based on the characteristics<br>-->
+<!--        of the states and even conduct multiple geometry optimizations. For reference, this is what the configuration-->
+<!--        file we<br>-->
+<!--        generated looks like:</p>-->
+<!--    <pre><code class="has-line-data" data-line-start="181" data-line-end="257" class="language-json">{-->
+<!--    "<span class="hljs-attribute">Project settings</span>": <span class="hljs-value">{-->
+<!--        "<span class="hljs-attribute">project_name</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-string">"NMA"</span></span>,-->
+<!--        "<span class="hljs-attribute">XYZ Molecule Geometry</span>": <span class="hljs-value"><span class="hljs-string">"NMA.xyz"</span></span>,-->
+<!--        "<span class="hljs-attribute">Number of States</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">4</span></span>,-->
+<!--        "<span class="hljs-attribute">List_of_Active_Orbitals</span>": <span class="hljs-value">[-->
+<!--            <span class="hljs-number">18</span>,-->
+<!--            <span class="hljs-number">19</span>,-->
+<!--            <span class="hljs-number">20</span>,-->
+<!--            <span class="hljs-number">21</span>-->
+<!--        ]</span>,-->
+<!--        "<span class="hljs-attribute">Molcas Output Directory</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-string">"NMA_output"</span></span>,-->
+<!--        "<span class="hljs-attribute">Experiment Directory</span>": <span class="hljs-value"><span class="hljs-string">"example_sim"</span>-->
+<!--    </span>}</span>,-->
+<!--    "<span class="hljs-attribute">GRID settings</span>": <span class="hljs-value">{-->
+<!--        "<span class="hljs-attribute">Number of Points X axis</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">100</span></span>,-->
+<!--        "<span class="hljs-attribute">Number of Points Y axis</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">100</span></span>,-->
+<!--        "<span class="hljs-attribute">Number of Points Z axis</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">100</span></span>,-->
+<!--        "<span class="hljs-attribute">X MIN</span>": <span class="hljs-value">-<span class="hljs-number">6</span></span>,-->
+<!--        "<span class="hljs-attribute">X MAX</span>": <span class="hljs-value"><span class="hljs-number">7</span></span>,-->
+<!--        "<span class="hljs-attribute">Y MIN</span>": <span class="hljs-value">-<span class="hljs-number">5</span></span>,-->
+<!--        "<span class="hljs-attribute">Y MAX</span>": <span class="hljs-value"><span class="hljs-number">6</span></span>,-->
+<!--        "<span class="hljs-attribute">Z MIN</span>": <span class="hljs-value">-<span class="hljs-number">5</span></span>,-->
+<!--        "<span class="hljs-attribute">Z MAX</span>": <span class="hljs-value"><span class="hljs-number">5</span></span>,-->
+<!--        "<span class="hljs-attribute">Step Size</span>": <span class="hljs-value"><span class="hljs-number">0.008</span></span>,-->
+<!--        "<span class="hljs-attribute">Boundary</span>": <span class="hljs-value"><span class="hljs-number">6</span>-->
+<!--    </span>}</span>,-->
+<!--    "<span class="hljs-attribute">Charge Migration settings</span>": <span class="hljs-value">{-->
+<!--        "<span class="hljs-attribute">Field File</span>": <span class="hljs-value"><span class="hljs-string">"field_file"</span></span>,-->
+<!--        "<span class="hljs-attribute">Number of Times</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">9001</span></span>,-->
+<!--        "<span class="hljs-attribute">Min Time</span>": <span class="hljs-value">-<span class="hljs-number">5000</span></span>,-->
+<!--        "<span class="hljs-attribute">Max Time</span>": <span class="hljs-value"><span class="hljs-number">13000</span></span>,-->
+<!--        "<span class="hljs-attribute">Bath Temperature</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">3000</span></span>,-->
+<!--        "<span class="hljs-attribute">Dephasing Factor</span>": <span class="hljs-value"><span class="hljs-number">0.0012</span></span>,-->
+<!--        "<span class="hljs-attribute">Relaxation Factor</span>": <span class="hljs-value"><span class="hljs-number">0.0048</span>-->
+<!--    </span>}</span>,-->
+<!--    "<span class="hljs-attribute">Pump Pulses settings</span>": <span class="hljs-value">{-->
+<!--        "<span class="hljs-attribute">Type of Pulse</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-string">"G"</span></span>,-->
+<!--        "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">0</span></span>,-->
+<!--        "<span class="hljs-attribute">Pump Central Frequency</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">0.41</span></span>,-->
+<!--        "<span class="hljs-attribute">Pump Periods</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,-->
+<!--        "<span class="hljs-attribute">Pump Phase</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">0</span></span>,-->
+<!--        "<span class="hljs-attribute">Pump Intensity</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">0.12</span></span>,-->
+<!--        "<span class="hljs-attribute">Pump Polarization</span>": <span class="hljs-value">[-->
+<!--            <span class="hljs-number">90</span>,-->
+<!--            <span class="hljs-number">90</span>-->
+<!--        ]-->
+<!--    </span>}</span>,-->
+<!--    "<span class="hljs-attribute">Probe Pulses settings</span>": <span class="hljs-value">{-->
+<!--        "<span class="hljs-attribute">Type of Pulse</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-string">"G"</span></span>,-->
+<!--        "<span class="hljs-attribute">Time Delays</span>": <span class="hljs-value">[]</span>,-->
+<!--        "<span class="hljs-attribute">Time Delay Start</span>": <span class="hljs-value">-<span-->
+<!--                    class="hljs-number">200</span></span>,-->
+<!--        "<span class="hljs-attribute">Time Delay Stop</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">800</span></span>,-->
+<!--        "<span class="hljs-attribute">Number Of PP</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">120</span></span>,-->
+<!--        "<span class="hljs-attribute">Time Delay Weight Factor</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">0.5</span></span>,-->
+<!--        "<span class="hljs-attribute">Probe Central Frequency</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">0.073</span></span>,-->
+<!--        "<span class="hljs-attribute">Probe Periods</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,-->
+<!--        "<span class="hljs-attribute">Probe Phase</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">0</span></span>,-->
+<!--        "<span class="hljs-attribute">Probe Intensity</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">0.12</span></span>,-->
+<!--        "<span class="hljs-attribute">Probe Polarization</span>": <span class="hljs-value">[-->
+<!--            <span class="hljs-number">90</span>,-->
+<!--            <span class="hljs-number">90</span>-->
+<!--        ]-->
+<!--    </span>}</span>,-->
+<!--    "<span class="hljs-attribute">Charge Migration FT settings</span>": <span class="hljs-value">{-->
+<!--        "<span class="hljs-attribute">Number of Omegas</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">120</span></span>,-->
+<!--        "<span class="hljs-attribute">Min Omega</span>": <span class="hljs-value"><span class="hljs-number">0.18</span></span>,-->
+<!--        "<span class="hljs-attribute">Max Omega</span>": <span class="hljs-value"><span class="hljs-number">0.68</span></span>,-->
+<!--        "<span class="hljs-attribute">Number of TauOmegas</span>": <span class="hljs-value"><span class="hljs-number">120</span></span>,-->
+<!--        "<span class="hljs-attribute">Min TauOmega</span>": <span class="hljs-value">-<span-->
+<!--                    class="hljs-number">0.25</span></span>,-->
+<!--        "<span class="hljs-attribute">Max TauOmega</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">0.25</span></span>,-->
+<!--        "<span class="hljs-attribute">FT TimeStep</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">5000</span></span>,-->
+<!--        "<span class="hljs-attribute">FT WidthStep</span>": <span class="hljs-value"><span-->
+<!--                    class="hljs-number">350</span>-->
+<!--    </span>}-->
+<!--</span>}-->
+<!--</code></pre>-->
+<!--    <p class="has-line-data" data-line-start="257" data-line-end="262">We started with very conservative parameters to-->
+<!--        quickly iterate over settings and get a feel for the system. For example,<br>-->
+<!--        we can change the number of points and size of the grid, the polarization<br>-->
+<!--        of the pump and probe pulses, the number of states, the number of times, omegas, … as well as other Fourier-->
+<!--        Transform parameters;<br>-->
+<!--        all which should be considered in order to minimize artifacts and maximize the accuracy of the results. More-->
+<!--        importantly,<br>-->
+<!--        dephasing &amp; relaxation factors can be changed to account for the environment and the system’s dynamics.-->
+<!--        #TODO search here</p>-->
+<!--    <pre><code class="has-line-data" data-line-start="264" data-line-end="303" class="language-commandline"> Loading Energies-->
+<!--2023-12-20T03:54:06.993796Z [INFO] Charge_Migration: State Energies-->
+<!--2023-12-20T03:54:06.993840Z [INFO] Charge_Migration: 1  -246.525708599498-->
+<!--2023-12-20T03:54:06.993878Z [INFO] Charge_Migration: 2  -246.344501818203-->
+<!--2023-12-20T03:54:06.993913Z [INFO] Charge_Migration: 3  -246.189490935279-->
+<!--2023-12-20T03:54:06.993947Z [INFO] Charge_Migration: 4  -246.047815060530-->
+<!--2023-12-20T03:54:06.993979Z [INFO] Charge_Migration:-->
+<!--2023-12-20T03:54:06.994015Z [INFO] Charge_Migration: Loading Transition Density Matrix-->
+<!--2023-12-20T03:54:06.994100Z [INFO] Charge_Migration: Number of Active Orbitals: 4-->
+<!--2023-12-20T03:54:06.994459Z [INFO] Charge_Migration: Loading Dipole Matrices for XYZ components-->
+<!--2023-12-20T03:54:06.994520Z [INFO] Charge_Migration:-->
+<!--2023-12-20T03:54:06.994554Z [INFO] Charge_Migration: NMA_output/X_DIPOLE.csv-->
+<!--2023-12-20T03:54:06.994596Z [INFO] Charge_Migration: 0.347947E+00   0.456999E-06   0.992338E+00   0.274939E+00-->
+<!--2023-12-20T03:54:06.994632Z [INFO] Charge_Migration: 0.456999E-06   0.215518E+00   0.113281E-05  -0.165158E-05-->
+<!--2023-12-20T03:54:06.994667Z [INFO] Charge_Migration: 0.992338E+00   0.113281E-05   0.172030E+01   0.273282E+00-->
+<!--2023-12-20T03:54:06.994703Z [INFO] Charge_Migration: 0.274939E+00  -0.165158E-05   0.273282E+00   0.809354E+00-->
+<!--2023-12-20T03:54:06.994757Z [INFO] Charge_Migration:-->
+<!--2023-12-20T03:54:06.994790Z [INFO] Charge_Migration: NMA_output/Y_DIPOLE.csv-->
+<!--2023-12-20T03:54:06.994830Z [INFO] Charge_Migration: -0.111155E+01  -0.668804E-06  -0.921473E+00   0.112078E+01-->
+<!--2023-12-20T03:54:06.994866Z [INFO] Charge_Migration: -0.668804E-06  -0.560969E+00  -0.143667E-05   0.850321E-06-->
+<!--2023-12-20T03:54:06.994899Z [INFO] Charge_Migration: -0.921473E+00  -0.143667E-05  -0.205932E+01   0.188877E+00-->
+<!--2023-12-20T03:54:06.994932Z [INFO] Charge_Migration: 0.112078E+01   0.850321E-06   0.188877E+00  -0.203919E+01-->
+<!--2023-12-20T03:54:06.994981Z [INFO] Charge_Migration:-->
+<!--2023-12-20T03:54:06.995014Z [INFO] Charge_Migration: NMA_output/Z_DIPOLE.csv-->
+<!--2023-12-20T03:54:06.995053Z [INFO] Charge_Migration: 0.585080E-05   0.683533E-01   0.103946E-05   0.630551E-06-->
+<!--2023-12-20T03:54:06.995087Z [INFO] Charge_Migration: 0.683533E-01   0.501887E-05   0.268546E-01  -0.723624E-01-->
+<!--2023-12-20T03:54:06.995121Z [INFO] Charge_Migration: 0.103946E-05   0.268546E-01   0.677975E-05   0.545977E-06-->
+<!--2023-12-20T03:54:06.995156Z [INFO] Charge_Migration: 0.630551E-06  -0.723624E-01   0.545977E-06   0.613159E-05-->
+<!--2023-12-20T03:54:06.995200Z [INFO] Charge_Migration: Loading Geometry-->
+<!--2023-12-20T03:54:06.995274Z [INFO] Charge_Migration: nAtoms          12-->
+<!--2023-12-20T03:54:06.995307Z [INFO] Charge_Migration: Loading Grid-->
+<!--2023-12-20T03:54:34.251353Z [INFO] Charge_Migration: Loading Orbitals-->
+<!--2023-12-20T03:54:46.280446Z [INFO] Charge_Migration: Computing Weights-->
+<!--2023-12-20T03:55:26.524639Z [INFO] Charge_Migration: Writing Weights to File-->
+<!--2023-12-20T03:57:24.469582Z [INFO] Charge_Migration: Computing Barycenters of the Atomic Charges-->
+<!--2023-12-20T03:57:40.215674Z [INFO] Charge_Migration: Computing Becke's Matrix-->
+<!--...-->
+<!--...-->
+<!--</code></pre>-->
+<!--    <p class="has-line-data" data-line-start="304" data-line-end="308">#TODO EXTEND DOCUMENTATION FOR THESE STEPS<br>-->
+<!--        #TODO PARAMSEARCH goes here too<br>-->
+<!--        After finishing, the pipeline can be visualized (although changing) through interactive and png plots like:<br>-->
+<!--        #TODO ADD PLOTS &#45;&#45;placeholder-&gt;</p>-->
+<!--    <p class="has-line-data" data-line-start="309" data-line-end="312">&lt;p align=“center”&gt;<br>-->
+<!--        &lt;video src=&quot;<a-->
+<!--                href="https://github.com/Bucanero06/DensityPy/assets/60953006/a1f04802-067d-4d8b-a596-5b06ed591aee">https://github.com/Bucanero06/DensityPy/assets/60953006/a1f04802-067d-4d8b-a596-5b06ed591aee</a>&quot;-->
+<!--        height=“400” controls&gt;&lt;/video&gt;<br>-->
+<!--        &lt;video src=&quot;<a-->
+<!--                href="https://github.com/Bucanero06/DensityPy/assets/60953006/2feb4941-46af-4bd9-9001-a39a2d66bfc1">https://github.com/Bucanero06/DensityPy/assets/60953006/2feb4941-46af-4bd9-9001-a39a2d66bfc1</a>&quot;-->
+<!--        height=“400” controls&gt;&lt;/video&gt;</p>-->
+<!--    <p class="has-line-data" data-line-start="313" data-line-end="314">&lt;/p&gt;</p>-->
+<!--    <p class="has-line-data" data-line-start="315" data-line-end="318">&lt;p align=“center”&gt;<br>-->
+<!--        &lt;img src=&quot;<a-->
+<!--                href="https://github.com/Bucanero06/DensityPy/assets/60953006/69fee775-9d5f-4ead-a0fc-25bd6dcc4b16">https://github.com/Bucanero06/DensityPy/assets/60953006/69fee775-9d5f-4ead-a0fc-25bd6dcc4b16</a>&quot;-->
+<!--        height=“200” /&gt;<br>-->
+<!--        &lt;p align=“center”&gt;caption: <em>Dipole and reconstructed Dipole from Atomic Charges, left and right figures-->
+<!--            respectively.</em></p>-->
+<!--    <p class="has-line-data" data-line-start="319" data-line-end="320">&lt;/p&gt;</p>-->
+<!--    <p class="has-line-data" data-line-start="321" data-line-end="325">&lt;p align=“center”&gt;<br>-->
+<!--        &lt;img src=&quot;<a-->
+<!--                href="https://github.com/Bucanero06/DensityPy/assets/60953006/9e07f8bf-f922-41a2-bc1b-0d2018bdf595">https://github.com/Bucanero06/DensityPy/assets/60953006/9e07f8bf-f922-41a2-bc1b-0d2018bdf595</a>&quot;-->
+<!--        height=“200” /&gt;<br>-->
+<!--        &lt;img src=&quot;<a-->
+<!--                href="https://github.com/Bucanero06/DensityPy/assets/60953006/e5144cf3-660f-4c27-85b1-bd6c6ec1006f">https://github.com/Bucanero06/DensityPy/assets/60953006/e5144cf3-660f-4c27-85b1-bd6c6ec1006f</a>&quot;-->
+<!--        height=“200” /&gt;<br>-->
+<!--        &lt;/p&gt;</p>-->
+<!--    <p class="has-line-data" data-line-start="328" data-line-end="330"><code>I am currently having difficulties with my-->
+<!--        knight's email</code>, please reach out to me here, <code>Github</code>, otherwise either<br>-->
+<!--        <code>ruben.fernandez.carbon@gmail.com</code> or <code>ruben@carbonyl.org</code> to DM me.</p>-->
+<!--    <p class="has-line-data" data-line-start="331" data-line-end="333">This is a part of a larger codebase, currently-->
+<!--        still undergoing a code review and refactoring along the manuscript and<br>-->
+<!--        thesis writing process. Treat this codebase as a proof of concept, and not as final; there are still bugs and-->
+<!--        discrepancies.</p>-->
+<!--    <p class="has-line-data" data-line-start="334" data-line-end="338">With modifications, the outputs from OpenMolcas,-->
+<!--        PySCF, GAMES, and NWChem have been tested and are<br>-->
+<!--        compatible with the Fortran codebase, documentation as it stands is available<br>-->
+<!--        <a href="https://bucanero06.github.io/DensityPy">here</a> and will be regularly updated as the codebase is-->
+<!--        refactored.<br>-->
+<!--        Right now the python documentation is not showing up as intended on github pages, but it is available locally.-->
+<!--    </p>-->
+<!--    <h2 class="code-line" data-line-start=340 data-line-end=341><a id="Documentation_340"></a>Documentation</h2>-->
+<!--    <p class="has-line-data" data-line-start="341" data-line-end="345">The documentation is currently being updated, but-->
+<!--        you can find the latest version<br>-->
+<!--        <a href="https://bucanero06.github.io/DensityPy">here.</a><br>-->
+<!--        Running the following command will generate the documentation locally using Sphinx and FORD for<br>-->
+<!--        <a href="densitypy%2Fautodocumentation_python.py">python</a> and <a-->
+<!--                href="densitypy%2Fautodocumentation_fortran.py">fortran</a> respectively:</p>-->
+<!--    <pre><code class="has-line-data" data-line-start="347" data-line-end="349" class="language-bash">bash update_documentation.sh-->
+<!--</code></pre>-->
+<!--    <p class="has-line-data" data-line-start="349" data-line-end="350">or if needed</p>-->
+<!--    <pre><code class="has-line-data" data-line-start="351" data-line-end="361">python -m densitypy.autodocumentation_python-->
+<!--        -p DensityPy -a {Author} -s {DENSITYPYROOTDIR} -d {OUTPUTDOCUMENTATIONDIR} -e [EXCLUDEDIRS] -r-->
+
+<!--python -m densitypy.autodocumentation_fortran-->
+<!--        &#45;&#45;project_name &quot;Charge Migration&quot; &#45;&#45;project_description {...}-->
+<!--        &#45;&#45;source_dirs &quot;densityfort/ChargeMigration,densityfort/ChargeMigrationFT,densityfort/SpectrumReconstruction&quot;-->
+<!--        &#45;&#45;documentation_dir &quot;docs/fortrandocs&quot;-->
+<!--        &#45;&#45;graphs True &#45;&#45;remove_old_files-->
+<!--        &#45;&#45;exclude_dirs &quot;densityfort/ChargeMigration/src/future_reconstruction_using_ci_work,densityfort/ChargeMigrationFT/src/future_reconstruction_using_ci_work&quot;-->
+<!--</code></pre>-->
+<!--    <p class="has-line-data" data-line-start="362" data-line-end="366"><img-->
+<!--            src="docs%2Fimages%2FScreenshot%20from%202023-12-19%2022-33-54.png"-->
+<!--            alt="Screenshot from 2023-12-19 22-33-54.png"><br>-->
+<!--        <img src="docs%2Fimages%2FScreenshot%20from%202023-12-19%2022-32-06.png"-->
+<!--             alt="Screenshot from 2023-12-19 22-32-06.png"><br>-->
+<!--        The documentation can be generated from docstrings for both modules and functions, handling markdown as well as-->
+<!--        latex and the generation<br>-->
+<!--        of inheritance diagrams.</p>-->
+<!--    <p class="has-line-data" data-line-start="367" data-line-end="369"><img-->
+<!--            src="docs%2Fimages%2FScreenshot%20from%202023-12-20%2013-15-46.png"-->
+<!--            alt="Screenshot from 2023-12-20 13-15-46.png"><br>-->
+<!--        <img src="..%2F..%2FPictures%2FScreenshots%2FScreenshot%20from%202023-12-20%2013-14-44.png"-->
+<!--             alt="Screenshot from 2023-12-20 13-14-44.png"></p>-->
+<!--    <p class="has-line-data" data-line-start="370" data-line-end="372">Notes:<br>-->
+<!--        The most convenient way to install a patched PySCF together with Block is to use the build script <a-->
+<!--                href="PySCF_Block.sh">PySCF_Block.sh</a></p>-->
+<!--</div>-->
+
 </body>
 </html>
