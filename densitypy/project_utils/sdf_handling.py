@@ -56,8 +56,8 @@ def sdf_to_xyz(sdf_filename, output_folder):
         except Exception as e:
             print(f"Failed to process molecule {idx} due to an error: {e}")
 
-
 def download_sdf_file(molecule_identifier, output_dir) -> DownloadSDFFileOutput:
+
     # Create output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok=True)
